@@ -3,7 +3,6 @@ package net.engawapg.app.camrepo.notelist
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import net.engawapg.app.camrepo.Constants
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
@@ -13,8 +12,6 @@ import org.koin.java.KoinJavaComponent.getKoin
 
 class NoteListViewModel(app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
-
-    val currentNote = MutableLiveData<NoteProperty>()
 
     fun onClickAdd() {
         Log.d(TAG, "add")
@@ -50,7 +47,6 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         val noteModel: NoteModel = noteSession.get()
         noteModel.init(property.fileName, property.title)
         Log.d(TAG, "create NoteModel")
-        currentNote.value = property
     }
 
     companion object {
