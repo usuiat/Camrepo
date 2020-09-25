@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.R
-import net.engawapg.app.camrepo.model.NoteProperty
 import net.engawapg.app.camrepo.note.NoteActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -65,8 +64,7 @@ class NoteListActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: NoteCardViewHolder, position: Int) {
-            val note = viewModel.getItem(position)
-            holder.bind(note)
+            holder.bind(position)
             Log.d(TAG, "onBindViewHolder at $position on $holder")
         }
     }
@@ -74,10 +72,13 @@ class NoteListActivity : AppCompatActivity() {
     class NoteCardViewHolder(v: View, private val viewModel: NoteListViewModel)
         : RecyclerView.ViewHolder(v) {
 
-        fun bind(note: NoteProperty) {
+        fun bind(position: Int) {
+            itemView.title.text = viewModel.getTitle(position)
+            itemView.subTitle.text = viewModel.getSubTitle(position)
+            itemView.date.text = viewModel.getUpdateDate(position)
             itemView.cardView.setOnClickListener {
-                Log.d(TAG, "onClick Card at ${note.title}")
-                viewModel.onClickNoteItem(note)
+                Log.d(TAG, "onClick Card at $position")
+                viewModel.selectNote(position)
                 it.context.startActivity(Intent(it.context, NoteActivity::class.java))
             }
         }

@@ -48,7 +48,7 @@ class NoteListModel(private val app: Application) {
             }
         }
         reader.endObject()
-        return NoteProperty(title, fileName, creationDate, updatedDate)
+        return NoteProperty(title, "", fileName, creationDate, updatedDate)
     }
 
     fun save() {
@@ -73,9 +73,7 @@ class NoteListModel(private val app: Application) {
     }
 
     fun createNewNote(title: String): NoteProperty {
-        val date = Date(System.currentTimeMillis()).time
-        val fileName = date.toString()
-        val note = NoteProperty(title, fileName, date, date)
+        val note = NoteProperty.createNewNote(title)
         list.add(note)
         return note
     }

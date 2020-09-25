@@ -9,6 +9,7 @@ import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.model.NoteProperty
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.getKoin
+import java.text.SimpleDateFormat
 
 class NoteListViewModel(app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
@@ -22,16 +23,24 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         model.save()
     }
 
-    fun getItemCount(): Int {
-        return model.list.size
+    fun getItemCount() = model.list.size
+
+    private fun getItem(index: Int) = model.list[index]
+
+    fun getTitle(index: Int) = getItem(index).title
+
+    fun getSubTitle(index: Int) = getItem(index).subTitle
+
+    fun getUpdateDate(index: Int) :String {
+        val date = getItem(index).updatedDate
+        val df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM,
+                                                      SimpleDateFormat.MEDIUM)
+        return df.format(date)
     }
 
-    fun getItem(index: Int): NoteProperty {
-        return model.list[index]
-    }
-
-    fun onClickNoteItem(property: NoteProperty) {
-        createNoteModel(property)
+    fun selectNote(index: Int) {
+        val note = getItem(index)
+        createNoteModel(note)
     }
 
     fun deleteItemsAt(indexes: List<Int>) {
