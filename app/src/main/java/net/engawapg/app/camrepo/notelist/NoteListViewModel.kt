@@ -66,6 +66,10 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         return selection?.getOrNull(index) ?: false
     }
 
+    fun isSelected(): Boolean {
+        return selection?.contains(true) ?: false
+    }
+
     fun deleteSelectedItems() {
         val indexes = mutableListOf<Int>()
         selection?.forEachIndexed { index, b -> if (b) indexes.add(index) }

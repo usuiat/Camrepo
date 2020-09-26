@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_note_list.*
 import kotlinx.android.synthetic.main.view_note_card.view.*
+import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.note.NoteActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListActivity : AppCompatActivity() {
+class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     private val viewModel: NoteListViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private lateinit var noteCardAdapter: NoteCardAdapter
@@ -79,8 +80,9 @@ class NoteListActivity : AppCompatActivity() {
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
-                viewModel.deleteSelectedItems()
-                actionMode?.finish()
+                if (viewModel.isSelected()) {
+                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+                }
             }
             return true
         }
@@ -94,6 +96,12 @@ class NoteListActivity : AppCompatActivity() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
+    }
+
+    override fun onClickDeleteButton() {
+        Log.d(TAG, "onClickDeleteButton")
+        viewModel.deleteSelectedItems()
+        actionMode?.finish()
     }
 
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
@@ -148,5 +156,6 @@ class NoteListActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "NoteListActivity"
         private const val RequestCode_NoteActivity = 1
+        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
     }
 }
