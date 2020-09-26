@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat
 class NoteListViewModel(app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
 
+    private var selection: MutableList<Boolean>? = null
+
     fun onClickAdd() {
         Log.d(TAG, "add")
         createNoteModel(model.createNewNote("New Note ${model.list.size + 1}"))
@@ -43,8 +45,33 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         createNoteModel(note)
     }
 
-    fun deleteItemsAt(indexes: List<Int>) {
+    fun initSelection() {
+        selection = MutableList(getItemCount()){false}
+    }
+
+    fun clearSelection() {
+        selection = null
+    }
+
+    fun setSelection(index: Int, sel: Boolean) {
+        selection?.let {
+            if (index < it.size) {
+                it[index] = sel
+                Log.d(TAG, "setSelection at $index, $sel")
+            }
+        }
+    }
+
+    fun getSelection(index: Int): Boolean {
+        return selection?.getOrNull(index) ?: false
+    }
+
+    fun deleteSelectedItems() {
+        val indexes = mutableListOf<Int>()
+        selection?.forEachIndexed { index, b -> if (b) indexes.add(index) }
+        Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
+        clearSelection()
     }
 
     private fun createNoteModel(property: NoteProperty) {

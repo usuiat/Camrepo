@@ -3,9 +3,7 @@ package net.engawapg.app.camrepo.notelist
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,15 +15,19 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteListActivity : AppCompatActivity() {
     private val viewModel: NoteListViewModel by viewModel()
+    private var actionMode: ActionMode? = null
+    private lateinit var noteCardAdapter: NoteCardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
+        setSupportActionBar(toolbar)
 
+        noteCardAdapter = NoteCardAdapter(viewModel)
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = NoteCardAdapter(viewModel)
+            adapter = noteCardAdapter
         }
 
         floatingActionButton.setOnClickListener {
@@ -50,8 +52,58 @@ class NoteListActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_note_list, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.edit_list_items -> {
+                actionMode = startActionMode(actionModeCallback)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private val actionModeCallback = object: ActionMode.Callback {
+
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_note_list_action_mode, menu)
+            viewModel.initSelection()
+            noteCardAdapter.setEditMode(true)
+            floatingActionButton.visibility = View.INVISIBLE
+            return true
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.delete_selected_items) {
+                viewModel.deleteSelectedItems()
+                actionMode?.finish()
+            }
+            return true
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            actionMode = null
+            viewModel.clearSelection()
+            noteCardAdapter.setEditMode(false)
+            floatingActionButton.visibility = View.VISIBLE
+            Log.d(TAG, "onDestroyActionMode")
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
+    }
+
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
         : RecyclerView.Adapter<NoteCardViewHolder>() {
+
+        private var editMode = false
+        fun setEditMode(mode: Boolean) {
+            editMode = mode
+            notifyDataSetChanged()
+        }
 
         override fun getItemCount(): Int {
             return viewModel.getItemCount()
@@ -64,7 +116,7 @@ class NoteListActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: NoteCardViewHolder, position: Int) {
-            holder.bind(position)
+            holder.bind(position, editMode)
             Log.d(TAG, "onBindViewHolder at $position on $holder")
         }
     }
@@ -72,14 +124,23 @@ class NoteListActivity : AppCompatActivity() {
     class NoteCardViewHolder(v: View, private val viewModel: NoteListViewModel)
         : RecyclerView.ViewHolder(v) {
 
-        fun bind(position: Int) {
+        fun bind(position: Int, editMode: Boolean) {
             itemView.title.text = viewModel.getTitle(position)
             itemView.subTitle.text = viewModel.getSubTitle(position)
             itemView.date.text = viewModel.getUpdateDate(position)
             itemView.cardView.setOnClickListener {
-                Log.d(TAG, "onClick Card at $position")
-                viewModel.selectNote(position)
-                it.context.startActivity(Intent(it.context, NoteActivity::class.java))
+                if (!editMode) {
+                    Log.d(TAG, "onClick Card at $position")
+                    viewModel.selectNote(position)
+                    it.context.startActivity(Intent(it.context, NoteActivity::class.java))
+                }
+            }
+
+            /* CheckBox for delete operation */
+            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
+            itemView.checkBox.isChecked = viewModel.getSelection(position)
+            itemView.checkBox.setOnClickListener {
+                viewModel.setSelection(position, itemView.checkBox.isChecked)
             }
         }
     }
