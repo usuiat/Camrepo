@@ -23,6 +23,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_list)
         setSupportActionBar(toolbar)
+        supportActionBar?.title = ""
 
         noteCardAdapter = NoteCardAdapter(viewModel)
         recyclerView.apply {

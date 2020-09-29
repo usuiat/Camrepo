@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#14A6D3</color>
-    <color name="colorPrimaryDark">#14A6D3</color>
-    <color name="colorAccent">#39AD37</color>
-    <color name="textColorPrimary">#494D4F</color>
-    <color name="navigationBarColor">#FFFFFF</color>
-    <color name="windowBackground">#FFFFFF</color>
-    <color name="baseColorLight">#E8F3F6</color>
+    <color name="colorPrimary">#F1F6F8</color>
+    <color name="colorPrimaryDark">#F1F6F8</color>
+    <color name="windowBackground">#F1F6F8</color>
+    <color name="colorAccent">#14A6D3</color>
     <color name="contentTextColor">#000000</color>
+    <color name="cardBackground">#FFFFFF</color>
 </resources>
