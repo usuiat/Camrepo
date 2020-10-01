@@ -2,6 +2,7 @@ package net.engawapg.app.camrepo
 
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
+import net.engawapg.app.camrepo.note.NoteViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -23,8 +24,8 @@ val appModule = module {
 //    viewModel { CameraViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get()) }
 //
 //    viewModel { PageManageViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get()) }
-//
-//    viewModel { NoteViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get()) }
+
+    viewModel { NoteViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get(), get()) }
 
     viewModel { NoteListViewModel(androidApplication(), get()) }
 

@@ -141,7 +141,9 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
                 if (!editMode) {
                     Log.d(TAG, "onClick Card at $position")
                     viewModel.selectNote(position)
-                    it.context.startActivity(Intent(it.context, NoteActivity::class.java))
+                    val intent = Intent(it.context, NoteActivity::class.java)
+                    intent.putExtra(NoteActivity.INTENT_KEY_NOTE_INDEX, position)
+                    it.context.startActivity(intent)
                 }
             }
 
