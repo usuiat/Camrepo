@@ -1,13 +1,12 @@
 package net.engawapg.app.camrepo.note
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_note_list.*
-import kotlinx.android.synthetic.main.view_note_card.view.*
+import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -94,21 +93,16 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             notifyDataSetChanged()
         }
 
-        override fun getItemCount() = 1
+        override fun getItemCount() = viewModel.getItemCount()
 
-        override fun getItemViewType(position: Int): Int {
-            return if (position == 0) {
-                VIEW_TYPE_TITLE
-            } else {
-                VIEW_TYPE_PAGE
-            }
-        }
+        override fun getItemViewType(position: Int) = viewModel.getViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-            if (viewType == VIEW_TYPE_TITLE) {
-                return PageCardViewHolder.create(parent, viewModel)
-            } else {
-                return PageCardViewHolder.create(parent, viewModel)
+            return when (viewType) {
+                NoteViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
+                NoteViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
+                NoteViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
+                else -> TitleViewHolder.create(parent, viewModel)
             }
         }
 
@@ -121,28 +115,67 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
-    class PageCardViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+    class TitleViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
 
         companion object {
-            fun create(parent: ViewGroup, viewModel: NoteViewModel): PageCardViewHolder {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel): TitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_note_title, parent, false)
-                return PageCardViewHolder(view, viewModel)
+                return TitleViewHolder(view, viewModel)
             }
         }
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.title.text = viewModel.getNoteTitle()
-//            itemView.subTitle.text = viewModel.getNoteSubtitle()
+            itemView.subtitle.text = viewModel.getNoteSubtitle()
+        }
+    }
+
+    class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+
+        companion object {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel): PageTitleViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_page_title, parent, false)
+                return PageTitleViewHolder(view, viewModel)
+            }
+        }
+
+        override fun bind(position: Int, editMode: Boolean) {
+        }
+    }
+
+    class PhotoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+
+        companion object {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel): PhotoViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_photo, parent, false)
+                return PhotoViewHolder(view, viewModel)
+            }
+        }
+
+        override fun bind(position: Int, editMode: Boolean) {
+        }
+    }
+
+    class MemoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+
+        companion object {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel): MemoViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_memo, parent, false)
+                return MemoViewHolder(view, viewModel)
+            }
+        }
+
+        override fun bind(position: Int, editMode: Boolean) {
         }
     }
 
     companion object {
-        private const val TAG = "NoteActivity"
+//        private const val TAG = "NoteActivity"
 
         const val INTENT_KEY_NOTE_INDEX = "IntentKeyNoteIndex"
-
-        private const val VIEW_TYPE_TITLE = 1
-        private const val VIEW_TYPE_PAGE = 2
     }
 }

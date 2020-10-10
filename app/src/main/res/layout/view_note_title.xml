@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="94dp">
+    android:layout_height="80dp">
 
     <TextView
         android:id="@+id/title"
@@ -25,7 +25,7 @@
     <TextView
         android:id="@+id/subtitle"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="24dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="42dp"
         android:layout_marginEnd="12dp"
@@ -33,7 +33,7 @@
         android:singleLine="true"
         android:text="Sub Title"
         android:textColor="@color/contentTextColor"
-        android:textSize="12sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
