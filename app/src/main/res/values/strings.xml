@@ -5,5 +5,11 @@
     <string name="delete_confirm_message">Delete Items?</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="create_new_note">Create New Note</string>
     <string name="slideshow">Slideshow</string>
+    <string name="title">Title</string>
+    <string name="sub_title">Sub Title</string>
+    <string name="default_note_title">New Note</string>
+    <string name="default_note_sub_title">Sub Title</string>
 </resources>

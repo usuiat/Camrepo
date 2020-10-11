@@ -14,7 +14,9 @@ import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.note.NoteActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
+    ,EditTitleDialog.EventListener {
+
     private val viewModel: NoteListViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private lateinit var noteCardAdapter: NoteCardAdapter
@@ -32,11 +34,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
             adapter = noteCardAdapter
         }
 
-        floatingActionButton.setOnClickListener {
-            viewModel.onClickAdd()
-            startActivityForResult(Intent(this, NoteActivity::class.java),
-                RequestCode_NoteActivity)
-        }
+        floatingActionButton.setOnClickListener { onClickAddButton() }
     }
 
     override fun onPause() {
@@ -105,6 +103,20 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
         actionMode?.finish()
     }
 
+    private fun onClickAddButton() {
+        val dialog = EditTitleDialog()
+        dialog.arguments = Bundle().apply {
+            putInt(EditTitleDialog.KEY_TITLE, R.string.create_new_note)
+        }
+        dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
+    }
+
+    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+        viewModel.onClickAdd()
+        startActivityForResult(Intent(this, NoteActivity::class.java),
+            RequestCode_NoteActivity)
+    }
+
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
         : RecyclerView.Adapter<NoteCardViewHolder>() {
 
@@ -160,5 +172,6 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
         private const val TAG = "NoteListActivity"
         private const val RequestCode_NoteActivity = 1
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
+        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
     }
 }
