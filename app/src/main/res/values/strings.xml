@@ -13,4 +13,6 @@
     <string name="sub_title">Sub Title</string>
     <string name="default_note_title">New Note</string>
     <string name="default_note_sub_title">Sub Title</string>
+    <string name="page_title">Page Title</string>
+    <string name="default_page_title">New Page</string>
 </resources>

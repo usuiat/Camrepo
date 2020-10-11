@@ -10,10 +10,11 @@ import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
+import net.engawapg.app.camrepo.page.PageTitleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
-    EditTitleDialog.EventListener {
+    EditTitleDialog.EventListener, PageTitleDialog.EventListener {
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var pageCardAdapter: PageCardAdapter
@@ -45,7 +46,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         floatingActionButton.setOnClickListener {
-
+            onClickAddButton()
         }
     }
 
@@ -65,6 +66,14 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+
+    }
+
+    private fun onClickAddButton() {
+        PageTitleDialog().show(supportFragmentManager, PAGE_TITLE_DIALOG)
+    }
+
+    override fun onClickOkAtPageTitleDialog(title: String) {
 
     }
 
@@ -201,5 +210,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         const val INTENT_KEY_NOTE_INDEX = "IntentKeyNoteIndex"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
+        private const val PAGE_TITLE_DIALOG = "PageTitleDialog"
     }
 }
