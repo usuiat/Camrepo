@@ -9,9 +9,11 @@ import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
+    EditTitleDialog.EventListener {
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var pageCardAdapter: PageCardAdapter
@@ -34,7 +36,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         /* RecyclerView */
-        pageCardAdapter = PageCardAdapter(viewModel)
+        pageCardAdapter = PageCardAdapter(viewModel) {
+            onItemClick(it)
+        }
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = pageCardAdapter
@@ -47,6 +51,21 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     override fun onPause() {
         super.onPause()
+    }
+
+    private fun onItemClick(position: Int) {
+        if (position == 0) {
+            /* Note Title */
+            val dialog = EditTitleDialog()
+            dialog.arguments = Bundle().apply {
+                putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
+            }
+            dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
+        }
+    }
+
+    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -84,7 +103,8 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         actionMode?.finish()
     }
 
-    class PageCardAdapter(private val viewModel: NoteViewModel)
+    class PageCardAdapter(private val viewModel: NoteViewModel,
+                          private val onItemClick: ((Int)->Unit))
         : RecyclerView.Adapter<BaseViewHolder>() {
 
         private var editMode = false
@@ -108,6 +128,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
             holder.bind(position, editMode)
+            holder.itemView.setOnClickListener {
+                onItemClick(position)
+            }
         }
     }
 
@@ -177,5 +200,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 //        private const val TAG = "NoteActivity"
 
         const val INTENT_KEY_NOTE_INDEX = "IntentKeyNoteIndex"
+        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
     }
 }
