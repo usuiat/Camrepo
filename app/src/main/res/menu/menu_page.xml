@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/slideshow"
+        android:checkable="true"
+        android:enabled="true"
+        android:icon="@drawable/slideshow"
+        android:title="@string/slideshow"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/edit_list_items"
+        android:checkable="true"
+        android:enabled="true"
+        android:icon="@drawable/check_menu"
+        android:title="@string/edit_list_items"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+</menu>
