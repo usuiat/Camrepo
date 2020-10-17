@@ -33,16 +33,44 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         const val VIEW_TYPE_PAGE_TITLE = 2
         const val VIEW_TYPE_PHOTO = 3
         const val VIEW_TYPE_MEMO = 4
+        const val VIEW_TYPE_BLANK = 5
         val list: List<Int> = listOf(
             VIEW_TYPE_TITLE,
 
             VIEW_TYPE_PAGE_TITLE,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_MEMO,
+
+            VIEW_TYPE_PAGE_TITLE,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_MEMO,
+
+            VIEW_TYPE_PAGE_TITLE,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
             VIEW_TYPE_PHOTO,
             VIEW_TYPE_MEMO,
 
             VIEW_TYPE_PAGE_TITLE,
             VIEW_TYPE_PHOTO,
             VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_PHOTO,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_BLANK,
+            VIEW_TYPE_BLANK,
             VIEW_TYPE_MEMO
         )
     }

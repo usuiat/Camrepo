@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
@@ -19,7 +19,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     EditTitleDialog.EventListener, PageTitleDialog.EventListener {
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
-    private  lateinit var pageCardAdapter: PageCardAdapter
+    private  lateinit var noteItemAdapter: NoteItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,12 +39,14 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         /* RecyclerView */
-        pageCardAdapter = PageCardAdapter(viewModel) {
+        noteItemAdapter = NoteItemAdapter(viewModel) {
             onItemClick(it)
         }
         recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = pageCardAdapter
+            layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
+                spanSizeLookup = NoteItemSpanSizeLookup()
+            }
+            adapter = noteItemAdapter
         }
 
         floatingActionButton.setOnClickListener {
@@ -115,7 +117,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         actionMode?.finish()
     }
 
-    class PageCardAdapter(private val viewModel: NoteViewModel,
+    class NoteItemAdapter(private val viewModel: NoteViewModel,
                           private val onItemClick: ((Int)->Unit))
         : RecyclerView.Adapter<BaseViewHolder>() {
 
@@ -134,7 +136,8 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                 NoteViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
-                else -> TitleViewHolder.create(parent, viewModel)
+                NoteViewModel.VIEW_TYPE_TITLE -> TitleViewHolder.create(parent, viewModel)
+                else -> BaseViewHolder.create(parent)
             }
         }
 
@@ -147,6 +150,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     open class BaseViewHolder(v: View): RecyclerView.ViewHolder(v) {
+        companion object {
+            fun create(parent: ViewGroup): BaseViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_blank, parent, false)
+                return BaseViewHolder(view)
+            }
+        }
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
@@ -208,6 +218,17 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
     }
 
+    inner class NoteItemSpanSizeLookup: GridLayoutManager.SpanSizeLookup() {
+        override fun getSpanSize(position: Int): Int {
+            return when (noteItemAdapter.getItemViewType(position)) {
+                NoteViewModel.VIEW_TYPE_TITLE -> IMAGE_SPAN_COUNT
+                NoteViewModel.VIEW_TYPE_PAGE_TITLE -> IMAGE_SPAN_COUNT
+                NoteViewModel.VIEW_TYPE_MEMO -> IMAGE_SPAN_COUNT
+                else -> 1
+            }
+        }
+    }
+
     companion object {
 //        private const val TAG = "NoteActivity"
 
@@ -215,5 +236,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val PAGE_TITLE_DIALOG = "PageTitleDialog"
         private const val REQUEST_CODE_PAGE_ACTIVITY = 1
+        private const val IMAGE_SPAN_COUNT = 4
     }
 }
