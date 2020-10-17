@@ -6,4 +6,5 @@
     <color name="colorAccent">#14A6D3</color>
     <color name="contentTextColor">#000000</color>
     <color name="cardBackground">#FFFFFF</color>
+    <color name="lightIcon">#939393</color>
 </resources>

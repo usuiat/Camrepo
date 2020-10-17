@@ -137,6 +137,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                 NoteViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_TITLE -> TitleViewHolder.create(parent, viewModel)
+                NoteViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent, viewModel)
                 else -> BaseViewHolder.create(parent)
             }
         }
@@ -201,6 +202,17 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
+        }
+    }
+
+    class AddPhotoViewHolder(v: View, private val viewModel: NoteViewModel): BaseViewHolder(v) {
+
+        companion object {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel): AddPhotoViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_add_photo, parent, false)
+                return AddPhotoViewHolder(view, viewModel)
+            }
         }
     }
 
