@@ -1,7 +1,5 @@
 package net.engawapg.app.camrepo.note
 
-import android.content.Intent
-import android.graphics.Camera
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +10,6 @@ import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
-import net.engawapg.app.camrepo.page.PageActivity
-import net.engawapg.app.camrepo.page.PageTitleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
@@ -91,12 +87,12 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun onClickAddButton() {
-        PageTitleDialog().show(supportFragmentManager, PAGE_TITLE_DIALOG)
+        PageTitleDialog() .show(supportFragmentManager, PAGE_TITLE_DIALOG)
     }
 
     override fun onClickOkAtPageTitleDialog(title: String) {
-        startActivityForResult(Intent(this, PageActivity::class.java),
-            REQUEST_CODE_PAGE_ACTIVITY)
+//        startActivityForResult(Intent(this, PageActivity::class.java),
+//            REQUEST_CODE_PAGE_ACTIVITY)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -264,7 +260,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         const val INTENT_KEY_NOTE_INDEX = "IntentKeyNoteIndex"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val PAGE_TITLE_DIALOG = "PageTitleDialog"
-        private const val REQUEST_CODE_PAGE_ACTIVITY = 1
         private const val IMAGE_SPAN_COUNT = 4
     }
 }

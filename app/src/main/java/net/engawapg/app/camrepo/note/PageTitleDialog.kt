@@ -1,4 +1,4 @@
-package net.engawapg.app.camrepo.page
+package net.engawapg.app.camrepo.note
 
 import android.app.AlertDialog
 import android.app.Dialog
