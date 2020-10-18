@@ -112,7 +112,8 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        viewModel.onClickAdd()
+        Log.d(TAG, "Title = ${title}, SubTitle = $subTitle")
+        viewModel.createNewNote(title, subTitle)
         startActivityForResult(Intent(this, NoteActivity::class.java),
             RequestCode_NoteActivity)
     }

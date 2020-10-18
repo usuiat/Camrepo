@@ -5,8 +5,6 @@ import android.util.JsonReader
 import android.util.JsonWriter
 import android.util.Log
 import java.io.*
-import java.lang.Exception
-import java.util.*
 
 class NoteListModel(private val app: Application) {
     val list = mutableListOf<NoteProperty>()
@@ -33,6 +31,7 @@ class NoteListModel(private val app: Application) {
 
     private fun loadNoteProperty(reader: JsonReader) : NoteProperty {
         var title = ""
+        var subTitle = ""
         var creationDate = 0L
         var updatedDate = 0L
         var fileName = ""
@@ -41,6 +40,7 @@ class NoteListModel(private val app: Application) {
         while (reader.hasNext()) {
             when (reader.nextName()) {
                 "title" -> title = reader.nextString()
+                "subTitle" -> subTitle = reader.nextString()
                 "creationDate" -> creationDate = reader.nextLong()
                 "updatedDate" -> updatedDate = reader.nextLong()
                 "fileName" -> fileName = reader.nextString()
@@ -48,7 +48,7 @@ class NoteListModel(private val app: Application) {
             }
         }
         reader.endObject()
-        return NoteProperty(title, "", fileName, creationDate, updatedDate)
+        return NoteProperty(title, subTitle, fileName, creationDate, updatedDate)
     }
 
     fun save() {
@@ -66,14 +66,16 @@ class NoteListModel(private val app: Application) {
     private fun saveNoteProperty(writer: JsonWriter, note: NoteProperty) {
         writer.beginObject()
         writer.name("title").value(note.title)
+        writer.name("subTitle").value(note.subTitle)
         writer.name("creationDate").value(note.creationDate)
         writer.name("updatedDate").value(note.updatedDate)
         writer.name("fileName").value(note.fileName)
         writer.endObject()
     }
 
-    fun createNewNote(title: String): NoteProperty {
+    fun createNewNote(title: String, subTitle: String): NoteProperty {
         val note = NoteProperty.createNewNote(title)
+        note.subTitle = subTitle
         list.add(note)
         return note
     }

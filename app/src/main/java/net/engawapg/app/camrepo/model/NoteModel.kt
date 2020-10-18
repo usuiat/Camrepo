@@ -11,10 +11,12 @@ class NoteModel(private val app: Application) {
 
     private lateinit var fileName: String
     lateinit var title: String
+    lateinit var subTitle: String
     private var pageSerialNumber: Int  = 0
-    fun init(_fileName: String, _title: String) {
+    fun init(_fileName: String, _title: String, _subTitle:String) {
         fileName = _fileName
         title = _title
+        subTitle = _subTitle
         load()
     }
 

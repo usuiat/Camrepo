@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import net.engawapg.app.camrepo.R
 
@@ -21,11 +22,21 @@ class EditTitleDialog: DialogFragment() {
             builder.setView(inflater.inflate(R.layout.dialog_edit_title, null))
                 .setTitle(titleId)
                 .setPositiveButton(R.string.ok) { _, _ ->
-                    listener.onClickOkAtEditTitleDialog("New Note", "Sub Title")
+                    onClickOk()
                 }
                 .setNegativeButton(R.string.cancel) { _, _ -> Unit }
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun onClickOk() {
+        val et = dialog?.findViewById<EditText>(R.id.editTitle)
+        val est = dialog?.findViewById<EditText>(R.id.editSubTitle)
+        var title = et?.text.toString()
+        if (title == "") title = getString(R.string.default_note_title)
+        val subTitle = est?.text.toString() /* subTitleは未入力の場合は空欄にしておく */
+
+        listener.onClickOkAtEditTitleDialog(title, subTitle)
     }
 
     interface EventListener {

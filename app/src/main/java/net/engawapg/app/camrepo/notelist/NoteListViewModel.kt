@@ -16,9 +16,9 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     private var selection: MutableList<Boolean>? = null
 
-    fun onClickAdd() {
-        Log.d(TAG, "add")
-        createNoteModel(model.createNewNote("New Note ${model.list.size + 1}"))
+    fun createNewNote(title: String, subTitle: String) {
+        val note = model.createNewNote(title, subTitle)
+        createNoteModel(note)
     }
 
     fun save() {
@@ -85,7 +85,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         val noteSession = getKoin()
             .getOrCreateScope(Constants.SCOPE_ID_NOTE, named(Constants.SCOPE_NAME_NOTE))
         val noteModel: NoteModel = noteSession.get()
-        noteModel.init(property.fileName, property.title)
+        noteModel.init(property.fileName, property.title, property.subTitle)
         Log.d(TAG, "create NoteModel")
     }
 

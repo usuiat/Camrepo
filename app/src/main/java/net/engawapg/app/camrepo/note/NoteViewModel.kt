@@ -20,7 +20,10 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         noteModel.title = title
     }
 
-    fun getNoteSubtitle() = "Sub Title xyz!!!!"
+    fun getNoteSubtitle() = noteModel.subTitle
+    fun setNoteSubTitle(subTitle: String) {
+        noteModel.subTitle = subTitle
+    }
 
     fun getItemCount() = list.size
 
