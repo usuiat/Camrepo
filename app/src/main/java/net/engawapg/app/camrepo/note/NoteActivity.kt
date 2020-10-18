@@ -76,19 +76,14 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun showCameraFragment() {
-        val trs = supportFragmentManager.beginTransaction()
-
-        cameraFragmentId = if (cameraFragmentId == 0) {
-            val cf = CameraFragment.newInstance()
+        var cf = supportFragmentManager.findFragmentById(cameraFragmentId)
+        if (cf == null) {
+            cf = CameraFragment.newInstance()
+            val trs = supportFragmentManager.beginTransaction()
             trs.add(R.id.cameraFragmentContainer, cf)
-            cf.id
-        } else {
-            val cf = supportFragmentManager.findFragmentById(cameraFragmentId)
-            cf?.let { trs.remove(it) }
-            0
+            trs.commit()
+            cameraFragmentId = cf.id
         }
-
-        trs.commit()
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {

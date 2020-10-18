@@ -7,4 +7,5 @@
     <color name="contentTextColor">#000000</color>
     <color name="cardBackground">#FFFFFF</color>
     <color name="lightIcon">#939393</color>
+    <color name="black">#000000</color>
 </resources>

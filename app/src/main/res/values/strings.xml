@@ -16,4 +16,7 @@
     <string name="page_title">Page Title</string>
     <string name="default_page_title">New Page</string>
     <string name="request_camera_permission_message">This app needs permission to access camera and storage to take photos.</string>
+    <string name="desc_shutter">Shutter Button</string>
+    <string name="desc_close_camera">Close Camera</string>
+    <string name="desc_flash_button">Flash Button</string>
 </resources>

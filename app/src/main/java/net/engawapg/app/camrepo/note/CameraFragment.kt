@@ -53,6 +53,10 @@ class CameraFragment : Fragment()  {
             viewModel.onPressShuttter()
             lockFocus()
         }
+        closeCameraButton.setOnClickListener {
+            parentFragmentManager.beginTransaction().remove(this).commit()
+        }
+        flashButton.setOnClickListener {  }
 
         permissionHelper = PermissionHelper(this,
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
