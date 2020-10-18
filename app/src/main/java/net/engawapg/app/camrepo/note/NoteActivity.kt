@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.note
 
 import android.content.Intent
+import android.graphics.Camera
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var noteItemAdapter: NoteItemAdapter
+    private var cameraFragmentId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +69,26 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             }
             dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
         }
+        else if(noteItemAdapter.getItemViewType(position) == NoteViewModel.VIEW_TYPE_ADD_PHOTO) {
+            /* Add Photo */
+            showCameraFragment()
+        }
+    }
+
+    private fun showCameraFragment() {
+        val trs = supportFragmentManager.beginTransaction()
+
+        cameraFragmentId = if (cameraFragmentId == 0) {
+            val cf = CameraFragment.newInstance()
+            trs.add(R.id.cameraFragmentContainer, cf)
+            cf.id
+        } else {
+            val cf = supportFragmentManager.findFragmentById(cameraFragmentId)
+            cf?.let { trs.remove(it) }
+            0
+        }
+
+        trs.commit()
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
