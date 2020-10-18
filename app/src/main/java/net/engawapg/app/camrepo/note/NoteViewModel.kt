@@ -20,7 +20,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         noteModel.title = title
     }
 
-    fun getNoteSubtitle() = noteModel.subTitle
+    fun getNoteSubTitle() = noteModel.subTitle
     fun setNoteSubTitle(subTitle: String) {
         noteModel.subTitle = subTitle
     }

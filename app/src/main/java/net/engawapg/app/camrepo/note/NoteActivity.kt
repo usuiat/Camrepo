@@ -62,6 +62,8 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             val dialog = EditTitleDialog()
             dialog.arguments = Bundle().apply {
                 putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
+                putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
+                putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
             }
             dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
         }
@@ -83,7 +85,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-
+        viewModel.setNoteTitle(title)
+        viewModel.setNoteSubTitle(subTitle)
+        noteItemAdapter.notifyItemChanged(0)
     }
 
     private fun onClickAddButton() {
@@ -186,7 +190,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.title.text = viewModel.getNoteTitle()
-            itemView.subtitle.text = viewModel.getNoteSubtitle()
+            itemView.subtitle.text = viewModel.getNoteSubTitle()
         }
     }
 

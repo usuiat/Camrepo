@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import kotlinx.android.synthetic.main.dialog_edit_title.view.*
 import net.engawapg.app.camrepo.R
 
 class EditTitleDialog: DialogFragment() {
@@ -16,10 +17,17 @@ class EditTitleDialog: DialogFragment() {
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val titleId = arguments?.getInt(KEY_TITLE) ?: 0
+        val noteTitle = arguments?.getString(KEY_NOTE_TITLE) ?: ""
+        val noteSubTitle = arguments?.getString(KEY_NOTE_SUB_TITLE) ?: ""
+
         return activity?.let {
-            val builder = AlertDialog.Builder(it)
             val inflater = requireActivity().layoutInflater
-            builder.setView(inflater.inflate(R.layout.dialog_edit_title, null))
+            val view = inflater.inflate(R.layout.dialog_edit_title, null)
+            view.editTitle.setText(noteTitle)
+            view.editSubTitle.setText(noteSubTitle)
+
+            val builder = AlertDialog.Builder(it)
+            builder.setView(view)
                 .setTitle(titleId)
                 .setPositiveButton(R.string.ok) { _, _ ->
                     onClickOk()
@@ -56,6 +64,8 @@ class EditTitleDialog: DialogFragment() {
 
     companion object {
         const val KEY_TITLE = "KeyTitle"
+        const val KEY_NOTE_TITLE = "KeyNoteTitle"
+        const val KEY_NOTE_SUB_TITLE = "KeyNoteSubTitle"
 //        private const val TAG = "EditTitleDialog"
     }
 }
