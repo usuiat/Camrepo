@@ -14,4 +14,9 @@ class NoteProperty(var title: String,
             return NoteProperty(title, "", date.toString(), date, date)
         }
     }
+
+    fun updateLastModifiedDate() {
+        val date = Date(System.currentTimeMillis()).time
+        updatedDate = date
+    }
 }
