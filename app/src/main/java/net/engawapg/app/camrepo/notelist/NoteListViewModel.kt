@@ -3,12 +3,8 @@ package net.engawapg.app.camrepo.notelist
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import net.engawapg.app.camrepo.Constants
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
-import net.engawapg.app.camrepo.model.NoteProperty
-import org.koin.core.qualifier.named
-import org.koin.java.KoinJavaComponent.getKoin
 import java.text.SimpleDateFormat
 
 class NoteListViewModel(app: Application, private val model: NoteListModel)
@@ -18,7 +14,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     fun createNewNote(title: String, subTitle: String) {
         val note = model.createNewNote(title, subTitle)
-        createNoteModel(note)
+        NoteModel.createModel(note)
     }
 
     fun save() {
@@ -42,7 +38,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     fun selectNote(index: Int) {
         val note = getItem(index)
-        createNoteModel(note)
+        NoteModel.createModel(note)
     }
 
     fun initSelection() {
@@ -76,17 +72,6 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
         clearSelection()
-    }
-
-    private fun createNoteModel(property: NoteProperty) {
-        // Close old session
-        getKoin().getScopeOrNull(Constants.SCOPE_ID_NOTE)?.close()
-        // Create new session
-        val noteSession = getKoin()
-            .getOrCreateScope(Constants.SCOPE_ID_NOTE, named(Constants.SCOPE_NAME_NOTE))
-        val noteModel: NoteModel = noteSession.get()
-        noteModel.init(property.fileName, property.title, property.subTitle)
-        Log.d(TAG, "create NoteModel")
     }
 
     companion object {

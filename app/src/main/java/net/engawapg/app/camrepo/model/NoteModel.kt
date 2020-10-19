@@ -5,11 +5,14 @@ import android.net.Uri
 import android.util.JsonReader
 import android.util.JsonWriter
 import android.util.Log
+import net.engawapg.app.camrepo.Constants
+import org.koin.core.qualifier.named
+import org.koin.java.KoinJavaComponent.getKoin
 import java.io.*
 
 class NoteModel(private val app: Application) {
 
-    private lateinit var fileName: String
+    lateinit var fileName: String
     lateinit var title: String
     lateinit var subTitle: String
     private var pageSerialNumber: Int  = 0
@@ -172,6 +175,17 @@ class NoteModel(private val app: Application) {
     }
 
     companion object {
+        fun createModel(noteProperty: NoteProperty) {
+            // Close old session
+            getKoin().getScopeOrNull(Constants.SCOPE_ID_NOTE)?.close()
+            // Create new session
+            val noteSession = getKoin()
+                .getOrCreateScope(Constants.SCOPE_ID_NOTE, named(Constants.SCOPE_NAME_NOTE))
+            val noteModel: NoteModel = noteSession.get()
+            noteModel.init(noteProperty.fileName, noteProperty.title, noteProperty.subTitle)
+            Log.d(TAG, "create NoteModel")
+        }
+
         private const val TAG = "NoteModel"
     }
 }

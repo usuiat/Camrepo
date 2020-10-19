@@ -80,6 +80,12 @@ class NoteListModel(private val app: Application) {
         return note
     }
 
+    fun updateNoteTitle(fileName: String, title: String, subTitle: String) {
+        val note = list.find { it.fileName == fileName }
+        note?.title = title
+        note?.subTitle = subTitle
+    }
+
     fun deleteNotesAt(indexes: List<Int>) {
         val sorted = indexes.sortedByDescending { it }
         sorted.forEach{ i ->

@@ -16,19 +16,23 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     }
 
     fun getNoteTitle() = noteModel.title
-    fun setNoteTitle(title: String) {
-        noteModel.title = title
-    }
-
     fun getNoteSubTitle() = noteModel.subTitle
-    fun setNoteSubTitle(subTitle: String) {
+
+    fun setNoteTitle(title: String, subTitle: String) {
+        noteModel.title = title
         noteModel.subTitle = subTitle
+        noteListModel.updateNoteTitle(noteModel.fileName, title, subTitle)
     }
 
     fun getItemCount() = list.size
 
     fun getViewType(index: Int): Int {
         return list[index]
+    }
+
+    fun save() {
+        noteModel.save()
+        noteListModel.save()
     }
 
     companion object {

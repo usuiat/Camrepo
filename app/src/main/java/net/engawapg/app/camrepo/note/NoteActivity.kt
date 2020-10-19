@@ -53,6 +53,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     override fun onPause() {
+        viewModel.save()
         super.onPause()
     }
 
@@ -85,8 +86,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        viewModel.setNoteTitle(title)
-        viewModel.setNoteSubTitle(subTitle)
+        viewModel.setNoteTitle(title, subTitle)
         noteItemAdapter.notifyItemChanged(0)
     }
 
