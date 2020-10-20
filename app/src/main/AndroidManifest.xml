@@ -17,9 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".page.PageActivity"
-            android:parentActivityName=".note.NoteActivity"/>
-        <activity
             android:name=".note.NoteActivity"
             android:parentActivityName=".notelist.NoteListActivity" />
         <activity android:name=".notelist.NoteListActivity">
