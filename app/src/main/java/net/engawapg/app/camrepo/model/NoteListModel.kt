@@ -76,7 +76,7 @@ class NoteListModel(private val app: Application) {
     fun createNewNote(title: String, subTitle: String): NoteProperty {
         val note = NoteProperty.createNewNote(title)
         note.subTitle = subTitle
-        list.add(note)
+        list.add(0, note) /* 新規ノートは一番上に追加 */
         return note
     }
 
@@ -84,12 +84,24 @@ class NoteListModel(private val app: Application) {
         val note = list.find { it.fileName == fileName }
         note?.title = title
         note?.subTitle = subTitle
-        note?.updateLastModifiedDate()
+        note?.let {
+            updateLastModifiedDate(it)
+        }
     }
 
     fun updateLastModifiedDate(fileName: String) {
         val note = list.find { it.fileName == fileName }
-        note?.updateLastModifiedDate()
+        note?.let {
+            updateLastModifiedDate(it)
+        }
+    }
+
+    private fun updateLastModifiedDate(note: NoteProperty) {
+        note.updateLastModifiedDate()
+
+        /* 更新したノートを先頭に移動 */
+        list.remove(note)
+        list.add(0, note)
     }
 
     fun deleteNotesAt(indexes: List<Int>) {
