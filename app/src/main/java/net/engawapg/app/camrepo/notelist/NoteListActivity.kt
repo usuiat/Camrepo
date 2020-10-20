@@ -35,6 +35,15 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
         }
 
         floatingActionButton.setOnClickListener { onClickAddButton() }
+        Log.d(TAG, "onCreate")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.isCurrentNoteModified()) {
+            noteCardAdapter.notifyDataSetChanged()
+            recyclerView.scrollToPosition(0)
+        }
     }
 
     override fun onPause() {

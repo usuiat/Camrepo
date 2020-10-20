@@ -5,15 +5,21 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
+import net.engawapg.app.camrepo.model.NoteProperty
 import java.text.SimpleDateFormat
 
 class NoteListViewModel(app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
 
     private var selection: MutableList<Boolean>? = null
+    private var lastModified: Long = 0
+    private var currentNote: NoteProperty? = null
 
     fun createNewNote(title: String, subTitle: String) {
         val note = model.createNewNote(title, subTitle)
+        lastModified = note.updatedDate
+        currentNote = note
+        Log.d(TAG, "updateDate = $lastModified")
         NoteModel.createModel(note)
     }
 
@@ -38,6 +44,9 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     fun selectNote(index: Int) {
         val note = getItem(index)
+        lastModified = note.updatedDate
+        currentNote = note
+        Log.d(TAG, "updateDate = $lastModified")
         NoteModel.createModel(note)
     }
 
@@ -72,6 +81,12 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
         clearSelection()
+    }
+
+    fun isCurrentNoteModified(): Boolean {
+        Log.d(TAG, "updateDate = ${currentNote?.updatedDate}")
+        val date = currentNote?.updatedDate
+        return (date != null) && (date != lastModified)
     }
 
     companion object {

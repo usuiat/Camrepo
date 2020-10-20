@@ -110,6 +110,10 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                 actionMode = startActionMode(actionModeCallback)
                 true
             }
+            android.R.id.home -> {
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
