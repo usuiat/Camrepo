@@ -17,7 +17,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     fun createNewNote(title: String, subTitle: String) {
         val note = model.createNewNote(title, subTitle)
-        lastModified = note.updatedDate
+        lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
         currentNote = note
         Log.d(TAG, "updateDate = $lastModified")
         NoteModel.createModel(note)
