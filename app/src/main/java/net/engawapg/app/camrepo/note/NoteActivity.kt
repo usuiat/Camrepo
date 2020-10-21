@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.android.synthetic.main.view_note_memo.view.*
+import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
@@ -204,6 +206,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
+            itemView.pageTitle.setText(viewModel.getPageTitle(position))
         }
     }
 
@@ -243,6 +246,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
+            itemView.memo.setText(viewModel.getMemo(position))
         }
     }
 
