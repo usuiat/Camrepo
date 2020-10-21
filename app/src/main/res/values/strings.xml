@@ -19,4 +19,6 @@
     <string name="desc_shutter">Shutter Button</string>
     <string name="desc_close_camera">Close Camera</string>
     <string name="desc_flash_button">Flash Button</string>
+    <string name="hint_page_title">Page Title</string>
+    <string name="hint_memo">Memo</string>
 </resources>
