@@ -51,16 +51,6 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
         super.onPause()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            RequestCode_NoteActivity -> {
-                recyclerView.adapter?.notifyDataSetChanged()
-                Log.d(TAG, "Return from NoteActivity")
-            }
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_note_list, menu)
         return true
@@ -123,8 +113,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
         Log.d(TAG, "Title = ${title}, SubTitle = $subTitle")
         viewModel.createNewNote(title, subTitle)
-        startActivityForResult(Intent(this, NoteActivity::class.java),
-            RequestCode_NoteActivity)
+        startActivity(Intent(this, NoteActivity::class.java))
     }
 
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
@@ -164,7 +153,6 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
                     Log.d(TAG, "onClick Card at $position")
                     viewModel.selectNote(position)
                     val intent = Intent(it.context, NoteActivity::class.java)
-                    intent.putExtra(NoteActivity.INTENT_KEY_NOTE_INDEX, position)
                     it.context.startActivity(intent)
                 }
             }
@@ -180,7 +168,6 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
 
     companion object {
         private const val TAG = "NoteListActivity"
-        private const val RequestCode_NoteActivity = 1
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
     }

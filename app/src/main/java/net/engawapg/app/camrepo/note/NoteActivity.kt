@@ -23,11 +23,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
 
-        val noteIndex = intent.getIntExtra(INTENT_KEY_NOTE_INDEX, -1)
-        if (noteIndex >= 0) {
-            viewModel.setNoteIndex(noteIndex)
-        }
-
         /* ToolBar */
         setSupportActionBar(toolbar)
         supportActionBar?.let {
@@ -265,7 +260,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     companion object {
 //        private const val TAG = "NoteActivity"
 
-        const val INTENT_KEY_NOTE_INDEX = "IntentKeyNoteIndex"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val PAGE_TITLE_DIALOG = "PageTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4

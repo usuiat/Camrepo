@@ -9,12 +9,6 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
                     private val noteListModel: NoteListModel)
     : AndroidViewModel(app) {
 
-    private var noteIndex: Int? = null
-
-    fun setNoteIndex(index: Int) {
-        noteIndex = index
-    }
-
     fun getNoteTitle() = noteModel.title
     fun getNoteSubTitle() = noteModel.subTitle
 
