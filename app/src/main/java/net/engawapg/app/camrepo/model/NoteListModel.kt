@@ -84,24 +84,16 @@ class NoteListModel(private val app: Application) {
         val note = list.find { it.fileName == fileName }
         note?.title = title
         note?.subTitle = subTitle
-        note?.let {
-            updateLastModifiedDate(it)
-        }
     }
 
     fun updateLastModifiedDate(fileName: String) {
         val note = list.find { it.fileName == fileName }
         note?.let {
-            updateLastModifiedDate(it)
+            it.updateLastModifiedDate()
+            /* 更新したノートを先頭に移動 */
+            list.remove(it)
+            list.add(0, it)
         }
-    }
-
-    private fun updateLastModifiedDate(note: NoteProperty) {
-        note.updateLastModifiedDate()
-
-        /* 更新したノートを先頭に移動 */
-        list.remove(note)
-        list.add(0, note)
     }
 
     fun deleteNotesAt(indexes: List<Int>) {

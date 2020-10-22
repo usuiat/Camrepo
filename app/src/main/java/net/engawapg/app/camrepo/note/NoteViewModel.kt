@@ -18,6 +18,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     /* RecyclerViewを構成するアイテムのリスト */
     private lateinit var itemList: MutableList<ItemInfo>
     private var columnCount: Int = 4
+    private var modified = false
 
     fun initItemList(columnCount: Int) {
         this.columnCount = columnCount
@@ -55,6 +56,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     fun addPage() {
         noteModel.createNewPage()
         buildItemList()
+        modified = true
     }
 
     fun getNoteTitle() = noteModel.title
@@ -64,6 +66,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         noteModel.title = title
         noteModel.subTitle = subTitle
         noteListModel.updateNoteTitle(noteModel.fileName, title, subTitle)
+        modified = true
     }
 
     fun getItemCount() = itemList.size
@@ -84,7 +87,11 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
 
     fun save() {
         noteModel.save()
-        noteListModel.save()
+        if (modified) {
+            modified = false
+            noteListModel.updateLastModifiedDate(noteModel.fileName)
+            noteListModel.save()
+        }
     }
 
     companion object {
