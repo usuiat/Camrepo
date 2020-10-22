@@ -79,10 +79,20 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getTitle(pageIndex)
     }
+    fun setPageTitle(itemIndex: Int, t: String) {
+        val pageIndex = itemList[itemIndex].pageIndex
+        noteModel.setTitle(pageIndex, t)
+        modified = true
+    }
 
     fun getMemo(itemIndex: Int): String {
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getMemo(pageIndex)
+    }
+    fun setMemo(itemIndex: Int, m:String) {
+        val pageIndex = itemList[itemIndex].pageIndex
+        noteModel.setMemo(pageIndex, m)
+        modified = true
     }
 
     fun save() {

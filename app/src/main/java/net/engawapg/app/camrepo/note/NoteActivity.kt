@@ -1,6 +1,8 @@
 package net.engawapg.app.camrepo.note
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -209,6 +211,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.pageTitle.setText(viewModel.getPageTitle(position))
+            itemView.pageTitle.addTextChangedListener(object: TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    viewModel.setPageTitle(position, s.toString())
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
         }
     }
 
@@ -249,6 +258,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.memo.setText(viewModel.getMemo(position))
+            itemView.memo.addTextChangedListener(object: TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    viewModel.setMemo(position, s.toString())
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
         }
     }
 
