@@ -15,7 +15,7 @@ import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
-    EditTitleDialog.EventListener, PageTitleDialog.EventListener {
+    EditTitleDialog.EventListener {
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var noteItemAdapter: NoteItemAdapter
@@ -24,6 +24,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
+
+        /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
+        viewModel.initItemList(IMAGE_SPAN_COUNT)
 
         /* ToolBar */
         setSupportActionBar(toolbar)
@@ -88,12 +91,11 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun onClickAddButton() {
-        PageTitleDialog() .show(supportFragmentManager, PAGE_TITLE_DIALOG)
-    }
-
-    override fun onClickOkAtPageTitleDialog(title: String) {
-//        startActivityForResult(Intent(this, PageActivity::class.java),
-//            REQUEST_CODE_PAGE_ACTIVITY)
+        viewModel.addPage()
+        /* リストの末尾に追加されるので、表示更新してスクロール */
+        val lastPosition = viewModel.getItemCount() - 1
+        noteItemAdapter.notifyItemInserted(lastPosition)
+        recyclerView.scrollToPosition(lastPosition)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -265,7 +267,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 //        private const val TAG = "NoteActivity"
 
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
-        private const val PAGE_TITLE_DIALOG = "PageTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4
     }
 }

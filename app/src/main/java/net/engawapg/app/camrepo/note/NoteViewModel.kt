@@ -17,8 +17,10 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
 
     /* RecyclerViewを構成するアイテムのリスト */
     private lateinit var itemList: MutableList<ItemInfo>
+    private var columnCount: Int = 4
 
-    init {
+    fun initItemList(columnCount: Int) {
+        this.columnCount = columnCount
         buildItemList()
     }
 
@@ -39,7 +41,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
             list.add(ItemInfo(VIEW_TYPE_ADD_PHOTO, pageIdx, 0)) /* 写真追加ボタン */
 
             /* カードビューをいびつな形にしないための空欄 */
-            val blankCount = 4 - ((photoCount + 1) % 4)
+            val blankCount = columnCount - ((photoCount + 1) % columnCount)
             for (blankIdx in 0 until blankCount) {
                 list.add(ItemInfo(VIEW_TYPE_BLANK, pageIdx, blankIdx))
             }
@@ -48,6 +50,11 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         }
 
         itemList = list
+    }
+
+    fun addPage() {
+        noteModel.createNewPage()
+        buildItemList()
     }
 
     fun getNoteTitle() = noteModel.title
