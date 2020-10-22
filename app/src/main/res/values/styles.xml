@@ -8,6 +8,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:colorEdgeEffect">@color/windowShadow</item>
     </style>
 
 </resources>
