@@ -20,7 +20,10 @@ class NoteModel(private val app: Application) {
         fileName = _fileName
         title = _title
         subTitle = _subTitle
-        load()
+        if(!load()) {
+            /* ファイルが存在しない（新規作成）の場合は空のページを一つ作る */
+            createNewPage()
+        }
     }
 
     private val pages = mutableListOf<PageInfo>()
@@ -74,10 +77,11 @@ class NoteModel(private val app: Application) {
         pages.add(to, page)
     }
 
-    private fun load() {
+    /* ファイルが存在しない場合は false を返す */
+    private fun load(): Boolean {
         val file = File(app.filesDir, fileName)
         if (!file.exists()) {
-            return
+            return false
         }
 
         try {
@@ -95,6 +99,8 @@ class NoteModel(private val app: Application) {
         } catch (e: Exception) {
             Log.e(TAG, e.toString())
         }
+
+        return true
     }
 
     private fun loadPages(reader: JsonReader) {
