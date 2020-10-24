@@ -11,7 +11,6 @@ import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.getViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
@@ -26,7 +25,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         /* Get PageIndex */
         val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
-        viewModel = getViewModel { parametersOf(pageIndex) }
+        viewModel = getViewModel { parametersOf(pageIndex, IMAGE_SPAN_COUNT) }
 
         /* ToolBar */
         setSupportActionBar(toolbar)
@@ -129,7 +128,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                 PageViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
                 PageViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 PageViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent, viewModel)
-                else -> MemoViewHolder.create(parent, viewModel)
+                PageViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
+                else -> BaseViewHolder.create(parent)
             }
         }
 
@@ -142,6 +142,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     }
 
     open class BaseViewHolder(v: View): RecyclerView.ViewHolder(v) {
+        companion object {
+            fun create(parent: ViewGroup): BaseViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val view = layoutInflater.inflate(R.layout.view_note_blank, parent, false)
+                return BaseViewHolder(view)
+            }
+        }
+
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
