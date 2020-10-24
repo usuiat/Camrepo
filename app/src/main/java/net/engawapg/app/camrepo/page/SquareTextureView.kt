@@ -1,4 +1,4 @@
-package net.engawapg.app.camrepo.note
+package net.engawapg.app.camrepo.page
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,8 +1,7 @@
 package net.engawapg.app.camrepo.note
 
+import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,6 +13,7 @@ import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
+import net.engawapg.app.camrepo.page.PageActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
@@ -21,7 +21,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var noteItemAdapter: NoteItemAdapter
-    private var cameraFragmentId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,30 +59,20 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun onItemClick(position: Int) {
-        if (position == 0) {
-            /* Note Title */
-            val dialog = EditTitleDialog()
-            dialog.arguments = Bundle().apply {
-                putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
-                putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
-                putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
+        when (noteItemAdapter.getItemViewType(position)) {
+            NoteViewModel.VIEW_TYPE_TITLE -> {
+                val dialog = EditTitleDialog()
+                dialog.arguments = Bundle().apply {
+                    putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
+                    putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
+                    putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
+                }
+                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
             }
-            dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
-        }
-        else if(noteItemAdapter.getItemViewType(position) == NoteViewModel.VIEW_TYPE_ADD_PHOTO) {
-            /* Add Photo */
-            showCameraFragment()
-        }
-    }
-
-    private fun showCameraFragment() {
-        var cf = supportFragmentManager.findFragmentById(cameraFragmentId)
-        if (cf == null) {
-            cf = CameraFragment.newInstance()
-            val trs = supportFragmentManager.beginTransaction()
-            trs.add(R.id.cameraFragmentContainer, cf)
-            trs.commit()
-            cameraFragmentId = cf.id
+            NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
+            NoteViewModel.VIEW_TYPE_BLANK -> {
+                startActivity(Intent(this, PageActivity::class.java))
+            }
         }
     }
 
@@ -93,11 +82,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun onClickAddButton() {
-        viewModel.addPage()
-        /* リストの末尾に追加されるので、表示更新してスクロール */
-        val lastPosition = viewModel.getItemCount() - 1
-        noteItemAdapter.notifyItemInserted(lastPosition)
-        recyclerView.scrollToPosition(lastPosition)
+        startActivity(Intent(this, PageActivity::class.java))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -159,7 +144,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                 NoteViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_TITLE -> TitleViewHolder.create(parent, viewModel)
-                NoteViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent, viewModel)
                 else -> BaseViewHolder.create(parent)
             }
         }
@@ -210,14 +194,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.pageTitle.setText(viewModel.getPageTitle(position))
-            itemView.pageTitle.addTextChangedListener(object: TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    viewModel.setPageTitle(position, s.toString())
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            itemView.pageTitle.text = viewModel.getPageTitle(position)
         }
     }
 
@@ -235,17 +212,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
     }
 
-    class AddPhotoViewHolder(v: View, private val viewModel: NoteViewModel): BaseViewHolder(v) {
-
-        companion object {
-            fun create(parent: ViewGroup, viewModel: NoteViewModel): AddPhotoViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_add_photo, parent, false)
-                return AddPhotoViewHolder(view, viewModel)
-            }
-        }
-    }
-
     class MemoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
 
         companion object {
@@ -257,14 +223,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.memo.setText(viewModel.getMemo(position))
-            itemView.memo.addTextChangedListener(object: TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    viewModel.setMemo(position, s.toString())
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            itemView.memo.text = viewModel.getMemo(position)
         }
     }
 

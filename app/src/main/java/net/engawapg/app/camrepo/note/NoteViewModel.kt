@@ -39,10 +39,8 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
                 list.add(ItemInfo(VIEW_TYPE_PHOTO, pageIdx, photoIdx))
             }
 
-            list.add(ItemInfo(VIEW_TYPE_ADD_PHOTO, pageIdx, 0)) /* 写真追加ボタン */
-
             /* カードビューをいびつな形にしないための空欄 */
-            val blankCount = columnCount - ((photoCount + 1) % columnCount)
+            val blankCount = columnCount - (photoCount % columnCount)
             for (blankIdx in 0 until blankCount) {
                 list.add(ItemInfo(VIEW_TYPE_BLANK, pageIdx, blankIdx))
             }
@@ -110,6 +108,5 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         const val VIEW_TYPE_PHOTO = 3
         const val VIEW_TYPE_MEMO = 4
         const val VIEW_TYPE_BLANK = 5
-        const val VIEW_TYPE_ADD_PHOTO = 6
     }
 }

@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <EditText
             android:id="@+id/pageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -26,6 +26,9 @@
             android:textSize="22sp"
             android:ems="10"
             android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:hint="@string/hint_page_title"
+            android:autofillHints=""
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

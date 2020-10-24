@@ -1,4 +1,4 @@
-package net.engawapg.app.camrepo.note
+package net.engawapg.app.camrepo.page
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -245,8 +245,8 @@ class CameraFragment : Fragment()  {
 //                    Log.d(TAG, size.toString())
 //                }
                 previewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture::class.java),
-                    rotatedPreviewWidth, rotatedPreviewHeight,
-                    maxPreviewWidth, maxPreviewHeight,
+                        rotatedPreviewWidth, rotatedPreviewHeight,
+                        maxPreviewWidth, maxPreviewHeight,
                     largest)
                 Log.d(TAG, "previewSize = $previewSize")
 

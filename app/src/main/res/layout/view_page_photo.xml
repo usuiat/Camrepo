@@ -4,31 +4,25 @@
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
     app:cardBackgroundColor="@color/cardBackground"
     app:cardCornerRadius="0dp"
     app:cardElevation="3dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp">
 
-        <TextView
-            android:id="@+id/memo"
+        <net.engawapg.app.camrepo.SquareImageView
+            android:id="@+id/imageView0"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="20dp"
-            android:textColor="@color/contentTextColor"
-            android:textSize="18sp"
-            android:ems="10"
-            android:gravity="start|top"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:minLines="3" />
+            app:srcCompat="@color/design_default_color_error" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

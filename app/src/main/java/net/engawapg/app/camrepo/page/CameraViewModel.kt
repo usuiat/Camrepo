@@ -1,4 +1,4 @@
-package net.engawapg.app.camrepo.note
+package net.engawapg.app.camrepo.page
 
 import android.app.Application
 import android.util.Log
