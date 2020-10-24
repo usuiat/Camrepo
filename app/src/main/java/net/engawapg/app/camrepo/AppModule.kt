@@ -20,7 +20,14 @@ val appModule = module {
 
     single { NoteListModel(androidApplication()) }
 
-    viewModel { PageViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get(), get()) }
+    viewModel { (pageIndex: Int) ->
+        PageViewModel(
+            androidApplication(),
+            getScope(Constants.SCOPE_ID_NOTE).get(),
+            get(),
+            pageIndex
+        )
+    }
 
     viewModel {
         CameraViewModel(

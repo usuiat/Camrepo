@@ -10,10 +10,12 @@ import kotlinx.android.synthetic.main.view_page_memo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
-    private val viewModel: PageViewModel by viewModel()
+    private lateinit var viewModel: PageViewModel
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
@@ -21,6 +23,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
+
+        /* Get PageIndex */
+        val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
+        viewModel = getViewModel { parametersOf(pageIndex) }
 
         /* ToolBar */
         setSupportActionBar(toolbar)
@@ -206,5 +212,6 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     companion object {
         private const val IMAGE_SPAN_COUNT = 4
+        const val KEY_PAGE_INDEX = "KeyPageIndex"
     }
 }

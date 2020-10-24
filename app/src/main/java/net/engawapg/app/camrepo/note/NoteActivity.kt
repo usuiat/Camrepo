@@ -71,7 +71,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {
-                startActivity(Intent(this, PageActivity::class.java))
+                startActivity(Intent(this, PageActivity::class.java).apply {
+                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
+                })
             }
         }
     }

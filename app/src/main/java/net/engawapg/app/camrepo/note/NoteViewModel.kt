@@ -73,6 +73,8 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         return itemList[index].viewType
     }
 
+    fun getPageIndex(itemIndex: Int) = itemList[itemIndex].pageIndex
+
     fun getPageTitle(itemIndex: Int): String {
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getTitle(pageIndex)
