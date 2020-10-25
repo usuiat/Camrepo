@@ -46,6 +46,7 @@ class NoteModel(private val app: Application) {
 
     fun addPhotoAt(pageIndex: Int, imageInfo: ImageInfo) {
         getPage(pageIndex)?.addPhoto(imageInfo)
+        Log.d(TAG, "addPhoto page=$pageIndex")
     }
 
     fun deletePhotosAt(pageIndex: Int, indexes: List<Int>) {

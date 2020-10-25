@@ -10,7 +10,7 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
                     private val columnCount: Int)
     : AndroidViewModel(app) {
 
-    private var modified = false
+    var modified = false
 
     fun getItemCount(): Int {
         /* 写真の数に +1(Add_Photoの分) して、列数を求める */

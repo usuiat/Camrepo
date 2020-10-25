@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_page.*
@@ -13,20 +14,23 @@ import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.getViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     private lateinit var viewModel: PageViewModel
+    private val cameraViewModel: CameraViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
+    private var pageIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
 
         /* Get PageIndex */
-        val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
+        pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
         viewModel = getViewModel { parametersOf(pageIndex, IMAGE_SPAN_COUNT) }
 
         /* ToolBar */
@@ -47,6 +51,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             }
             adapter = pageItemAdapter
         }
+
+        /* 写真追加イベントの監視 */
+        cameraViewModel.eventAddImagePageIndex.observe(this, Observer { index ->
+            if (index == pageIndex) {
+                pageItemAdapter.notifyDataSetChanged()
+                viewModel.modified = true
+            }
+        })
     }
 
     override fun onPause() {
@@ -68,6 +80,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             trs.add(R.id.cameraFragmentContainer, cf)
             trs.commit()
             cameraFragmentId = cf.id
+            cameraViewModel.currentPageIndex = pageIndex
         }
     }
 
