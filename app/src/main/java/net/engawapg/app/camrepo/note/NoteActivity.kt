@@ -56,7 +56,11 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.isModified()) {
+        if (viewModel.isPageAdded()) {
+            noteItemAdapter.notifyDataSetChanged()
+            recyclerView.scrollToPosition(noteItemAdapter.itemCount - 1)
+        }
+        if (viewModel.isModifiedAfterLastDisplayedTime()) {
             Log.d(TAG, "Note Updated")
             noteItemAdapter.notifyDataSetChanged()
         }
@@ -93,7 +97,12 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     private fun onClickAddButton() {
-        startActivity(Intent(this, PageActivity::class.java))
+        viewModel.addPage()
+        val newPageIndex = viewModel.getPageIndex(noteItemAdapter.itemCount - 1)
+        Log.d(TAG, "Page added. itemCount = ${noteItemAdapter.itemCount}, pageIndex = $newPageIndex")
+        startActivity(Intent(this, PageActivity::class.java).apply {
+            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

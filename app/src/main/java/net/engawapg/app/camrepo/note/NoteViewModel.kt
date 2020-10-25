@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.note
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
@@ -19,6 +20,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     private lateinit var itemList: MutableList<ItemInfo>
     private var columnCount: Int = 4
     private var modified = false
+    private var pageAdded = false
     private var lastModifiedDate: Long = 0
 
     fun initItemList(columnCount: Int) {
@@ -53,9 +55,18 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     }
 
     fun addPage() {
+        Log.d(TAG, "before createNewPage: itemList.size = ${itemList.size}")
         noteModel.createNewPage()
         buildItemList()
         modified = true
+        pageAdded = true
+        Log.d(TAG, "after  createNewPage: itemList.size = ${itemList.size}")
+    }
+
+    fun isPageAdded(): Boolean {
+        val added = pageAdded
+        pageAdded = false
+        return added
     }
 
     fun getNoteTitle() = noteModel.title
@@ -86,7 +97,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         return noteModel.getMemo(pageIndex)
     }
 
-    fun isModified(): Boolean {
+    fun isModifiedAfterLastDisplayedTime(): Boolean {
         val date = noteListModel.getNote(noteModel.fileName)?.updatedDate ?: 0
         return (date != 0L) && (lastModifiedDate != 0L) && (date != lastModifiedDate)
     }
@@ -107,5 +118,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         const val VIEW_TYPE_PHOTO = 3
         const val VIEW_TYPE_MEMO = 4
         const val VIEW_TYPE_BLANK = 5
+
+        private const val TAG = "NoteViewModel"
     }
 }
