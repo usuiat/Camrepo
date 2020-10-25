@@ -2,6 +2,7 @@ package net.engawapg.app.camrepo.note
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -50,6 +51,14 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         floatingActionButton.setOnClickListener {
             onClickAddButton()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.isModified()) {
+            Log.d(TAG, "Note Updated")
+            noteItemAdapter.notifyDataSetChanged()
         }
     }
 
@@ -241,7 +250,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     companion object {
-//        private const val TAG = "NoteActivity"
+        private const val TAG = "NoteActivity"
 
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4

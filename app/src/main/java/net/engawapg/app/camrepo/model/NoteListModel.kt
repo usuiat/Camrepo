@@ -73,6 +73,8 @@ class NoteListModel(private val app: Application) {
         writer.endObject()
     }
 
+    fun getNote(fileName: String): NoteProperty? = list.find { it.fileName == fileName }
+
     fun createNewNote(title: String, subTitle: String): NoteProperty {
         val note = NoteProperty.createNewNote(title)
         note.subTitle = subTitle

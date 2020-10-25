@@ -19,6 +19,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     private lateinit var itemList: MutableList<ItemInfo>
     private var columnCount: Int = 4
     private var modified = false
+    private var lastModifiedDate: Long = 0
 
     fun initItemList(columnCount: Int) {
         this.columnCount = columnCount
@@ -79,29 +80,25 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getTitle(pageIndex)
     }
-    fun setPageTitle(itemIndex: Int, t: String) {
-        val pageIndex = itemList[itemIndex].pageIndex
-        noteModel.setTitle(pageIndex, t)
-        modified = true
-    }
 
     fun getMemo(itemIndex: Int): String {
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getMemo(pageIndex)
     }
-    fun setMemo(itemIndex: Int, m:String) {
-        val pageIndex = itemList[itemIndex].pageIndex
-        noteModel.setMemo(pageIndex, m)
-        modified = true
+
+    fun isModified(): Boolean {
+        val date = noteListModel.getNote(noteModel.fileName)?.updatedDate ?: 0
+        return (date != 0L) && (lastModifiedDate != 0L) && (date != lastModifiedDate)
     }
 
     fun save() {
-        noteModel.save()
         if (modified) {
+            noteModel.save()
             modified = false
             noteListModel.updateLastModifiedDate(noteModel.fileName)
             noteListModel.save()
         }
+        lastModifiedDate = noteListModel.getNote(noteModel.fileName)?.updatedDate ?: 0
     }
 
     companion object {
