@@ -153,7 +153,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
             holder.bind(position, editMode)
             holder.itemView.setOnClickListener {
-                onItemClick(position)
+                onItemClick(holder.adapterPosition)
             }
         }
     }
