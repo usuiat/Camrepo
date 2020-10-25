@@ -1,8 +1,11 @@
 package net.engawapg.app.camrepo.page
 
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Size
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -10,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.view_page_memo.view.*
+import kotlinx.android.synthetic.main.view_page_photo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
@@ -142,7 +146,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             return when (viewType) {
                 PageViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
                 PageViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
-                PageViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent, viewModel)
+                PageViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent)
                 PageViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
                 else -> BaseViewHolder.create(parent)
             }
@@ -201,16 +205,30 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun bind(position: Int, editMode: Boolean) {
+            val imageInfo = viewModel.getPhotoAt(position - 1) ?: return
+            val resolver = itemView.context.contentResolver
+
+            val bmp = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                val id = imageInfo.uri.lastPathSegment?.toLong() ?: 0
+                MediaStore.Images.Thumbnails.getThumbnail(
+                    resolver, id,
+                    MediaStore.Images.Thumbnails.MINI_KIND, null
+                )
+            } else {
+                resolver?.loadThumbnail(imageInfo.uri, Size(256, 256), null)
+            }
+
+            itemView.imageView.setImageBitmap(bmp)
         }
     }
 
-    class AddPhotoViewHolder(v: View, private val viewModel: PageViewModel): BaseViewHolder(v) {
+    class AddPhotoViewHolder(v: View): BaseViewHolder(v) {
 
         companion object {
-            fun create(parent: ViewGroup, viewModel: PageViewModel): AddPhotoViewHolder {
+            fun create(parent: ViewGroup): AddPhotoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_page_add_photo, parent, false)
-                return AddPhotoViewHolder(view, viewModel)
+                return AddPhotoViewHolder(view)
             }
         }
     }
@@ -250,5 +268,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     companion object {
         private const val IMAGE_SPAN_COUNT = 4
         const val KEY_PAGE_INDEX = "KeyPageIndex"
+
+//        private const val TAG = "PageActivity"
     }
 }

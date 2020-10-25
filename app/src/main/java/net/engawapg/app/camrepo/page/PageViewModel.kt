@@ -2,6 +2,7 @@ package net.engawapg.app.camrepo.page
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 
@@ -47,6 +48,8 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
             modified = true
         }
     }
+
+    fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
 
     fun save(){
         if (modified) {
