@@ -1,6 +1,8 @@
 package net.engawapg.app.camrepo.page
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -165,6 +167,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.pageTitle.setText(viewModel.getPageTitle())
+            itemView.pageTitle.addTextChangedListener(object: TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    viewModel.setPageTitle(s.toString())
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
         }
     }
 
@@ -205,6 +214,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.memo.setText(viewModel.getMemo())
+            itemView.memo.addTextChangedListener(object: TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    viewModel.setMemo(s.toString())
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
         }
     }
 

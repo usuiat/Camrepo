@@ -10,6 +10,8 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
                     private val columnCount: Int)
     : AndroidViewModel(app) {
 
+    private var modified = false
+
     fun getItemCount(): Int {
         /* 写真の数に +1(Add_Photoの分) して、列数を求める */
         val photoRow = ((noteModel.getPhotoCount(pageIndex) + 1) / columnCount) + 1
@@ -29,11 +31,30 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
     }
 
     fun getPageTitle() = noteModel.getTitle(pageIndex)
+    fun setPageTitle(title: String) {
+        val oldTitle = noteModel.getTitle(pageIndex)
+        if (title != oldTitle) {
+            noteModel.setTitle(pageIndex, title)
+            modified = true
+        }
+    }
 
     fun getMemo() = noteModel.getMemo(pageIndex)
+    fun setMemo(memo: String) {
+        val oldMemo = noteModel.getMemo(pageIndex)
+        if (memo != oldMemo) {
+            noteModel.setMemo(pageIndex, memo)
+            modified = true
+        }
+    }
 
     fun save(){
-
+        if (modified) {
+            modified = false
+            noteModel.save()
+            noteListModel.updateLastModifiedDate(noteModel.fileName)
+            noteListModel.save()
+        }
     }
 
     companion object {
