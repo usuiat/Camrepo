@@ -1,8 +1,11 @@
 package net.engawapg.app.camrepo.note
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
+import android.util.Size
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -11,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.view_note_memo.view.*
 import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
+import kotlinx.android.synthetic.main.view_note_photo.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
@@ -230,6 +234,20 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun bind(position: Int, editMode: Boolean) {
+            val imageInfo = viewModel.getPhoto(position) ?: return
+            val resolver = itemView.context.contentResolver
+
+            val bmp = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                val id = imageInfo.uri.lastPathSegment?.toLong() ?: 0
+                MediaStore.Images.Thumbnails.getThumbnail(
+                    resolver, id,
+                    MediaStore.Images.Thumbnails.MINI_KIND, null
+                )
+            } else {
+                resolver?.loadThumbnail(imageInfo.uri, Size(256, 256), null)
+            }
+
+            itemView.imageView.setImageBitmap(bmp)
         }
     }
 

@@ -3,6 +3,7 @@ package net.engawapg.app.camrepo.note
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 
@@ -95,6 +96,12 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     fun getMemo(itemIndex: Int): String {
         val pageIndex = itemList[itemIndex].pageIndex
         return noteModel.getMemo(pageIndex)
+    }
+
+    fun getPhoto(itemIndex: Int): ImageInfo? {
+        val pageIndex = itemList[itemIndex].pageIndex
+        val photoIndex = itemList[itemIndex].subIndex
+        return noteModel.getPhotoAt(pageIndex, photoIndex)
     }
 
     fun isModifiedAfterLastDisplayedTime(): Boolean {
