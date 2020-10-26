@@ -15,7 +15,7 @@ class CameraViewModel(app:Application, private val noteModel: NoteModel): Androi
     var currentPageIndex: Int = 0       // 表示中のページインデックス
     private var pageIndexToAddImage: Int = 0    // シャッター押された時点でのページインデックス
 
-    fun onPressShuttter() {
+    fun onPressShutter() {
         pageIndexToAddImage = currentPageIndex
         Log.d(TAG, "Page index to add image is $pageIndexToAddImage")
     }

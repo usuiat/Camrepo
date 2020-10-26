@@ -50,7 +50,7 @@ class CameraFragment : Fragment()  {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         shutterButton.setOnClickListener {
-            viewModel.onPressShuttter()
+            viewModel.onPressShutter()
             lockFocus()
         }
         closeCameraButton.setOnClickListener {
