@@ -62,6 +62,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
         if (viewModel.isModifiedAfterLastDisplayedTime()) {
             Log.d(TAG, "Note Updated")
+            viewModel.buildItemList()
             noteItemAdapter.notifyDataSetChanged()
         }
     }

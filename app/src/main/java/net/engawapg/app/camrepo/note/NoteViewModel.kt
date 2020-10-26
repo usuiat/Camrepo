@@ -28,7 +28,7 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         buildItemList()
     }
 
-    private fun buildItemList() {
+    fun buildItemList() {
         val list = mutableListOf<ItemInfo>()
         list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0)) /* 先頭はタイトル */
 

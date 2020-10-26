@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.page
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
@@ -53,6 +54,7 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
 
     fun save(){
         if (modified) {
+            Log.d(TAG, "Note modified")
             modified = false
             noteModel.save()
             noteListModel.updateLastModifiedDate(noteModel.fileName)
@@ -61,7 +63,7 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
     }
 
     companion object {
-//        private const val TAG = "PageViewModel"
+        private const val TAG = "PageViewModel"
 
         const val VIEW_TYPE_PAGE_TITLE = 1
         const val VIEW_TYPE_PHOTO = 2
