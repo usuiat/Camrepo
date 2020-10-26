@@ -10,6 +10,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_page.*
 import kotlinx.android.synthetic.main.view_page_memo.view.*
@@ -55,6 +56,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             }
             adapter = pageItemAdapter
         }
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         /* 写真追加イベントの監視 */
         cameraViewModel.eventAddImagePageIndex.observe(this, Observer { index ->
@@ -264,6 +266,42 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             }
         }
     }
+
+    private val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(
+        0, 0
+    ) {
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return if (viewHolder is PhotoViewHolder) ItemTouchHelper.Callback.makeMovementFlags(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                        or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0
+            ) else 0
+        }
+
+        override fun canDropOver(
+            recyclerView: RecyclerView,
+            current: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return (target is PhotoViewHolder)
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val from = viewHolder.adapterPosition
+            val to = target.adapterPosition
+            viewModel.movePhoto(from - 1, to - 1)   /* from/toからPage Title分を除外 */
+            pageItemAdapter.notifyItemMoved(from, to)
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+    })
 
     companion object {
         private const val IMAGE_SPAN_COUNT = 4

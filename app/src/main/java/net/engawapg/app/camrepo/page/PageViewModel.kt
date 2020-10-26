@@ -52,6 +52,11 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
 
     fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
 
+    fun movePhoto(from: Int, to: Int) {
+        noteModel.movePhoto(pageIndex, from, to)
+        modified = true
+    }
+
     fun save(){
         if (modified) {
             Log.d(TAG, "Note modified")
