@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.note.NoteActivity
+import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
@@ -60,6 +61,10 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
         return when(item.itemId) {
             R.id.edit_list_items -> {
                 actionMode = startActionMode(actionModeCallback)
+                true
+            }
+            R.id.settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
