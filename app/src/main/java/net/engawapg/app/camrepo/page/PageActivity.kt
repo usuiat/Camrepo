@@ -111,6 +111,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            pageItemAdapter.editMode = true
+            itemTouchHelper.attachToRecyclerView(null)
             return true
         }
 
@@ -119,7 +121,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-
+            pageItemAdapter.editMode = false
+            itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
@@ -134,11 +137,11 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                           private val onItemClick: ((Int)->Unit)):
         RecyclerView.Adapter<BaseViewHolder>() {
 
-        private var editMode = false
-        fun setEditMode(mode: Boolean) {
-            editMode = mode
-            notifyDataSetChanged()
-        }
+        var editMode = false
+            set(value) {
+                field = value
+                notifyDataSetChanged()
+            }
 
         override fun getItemCount() = viewModel.getItemCount()
 
@@ -274,10 +277,12 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ): Int {
-            return if (viewHolder is PhotoViewHolder) ItemTouchHelper.Callback.makeMovementFlags(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                        or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0
-            ) else 0
+            if (viewHolder is PhotoViewHolder) {
+                val drag = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
+                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+                return ItemTouchHelper.Callback.makeMovementFlags(drag, 0)
+            }
+            return 0
         }
 
         override fun canDropOver(
