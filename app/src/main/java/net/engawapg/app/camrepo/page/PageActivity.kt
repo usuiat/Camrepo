@@ -1,12 +1,15 @@
 package net.engawapg.app.camrepo.page
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.util.Size
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,6 +32,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
     private var pageIndex = 0
+    private lateinit var inputMethodManager: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +69,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                 viewModel.modified = true
             }
         })
+
+        /* 写真操作時にキーボードを閉じるためのやつ */
+        inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     override fun onPause() {
@@ -111,8 +118,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            pageItemAdapter.editMode = true
+            pageItemAdapter.setEditMode(true)
             itemTouchHelper.attachToRecyclerView(null)
+            /* キーボード消す */
+            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             return true
         }
 
@@ -121,8 +130,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            pageItemAdapter.editMode = false
+            pageItemAdapter.setEditMode(false)
             itemTouchHelper.attachToRecyclerView(recyclerView)
+            /* PageTitleにフォーカスが当たってしまうのを防ぐ */
+            rootLayout.requestFocus()
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
@@ -137,11 +148,11 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                           private val onItemClick: ((Int)->Unit)):
         RecyclerView.Adapter<BaseViewHolder>() {
 
-        var editMode = false
-            set(value) {
-                field = value
-                notifyDataSetChanged()
-            }
+        private var editMode = false
+        fun setEditMode(mode: Boolean) {
+            editMode = mode
+            notifyDataSetChanged()
+        }
 
         override fun getItemCount() = viewModel.getItemCount()
 
@@ -188,14 +199,17 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.pageTitle.setText(viewModel.getPageTitle())
-            itemView.pageTitle.addTextChangedListener(object: TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    viewModel.setPageTitle(s.toString())
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            itemView.pageTitle.apply {
+                setText(viewModel.getPageTitle())
+                isEnabled = !editMode
+                addTextChangedListener(object: TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        viewModel.setPageTitle(s.toString())
+                    }
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                })
+            }
         }
     }
 
@@ -249,14 +263,17 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.memo.setText(viewModel.getMemo())
-            itemView.memo.addTextChangedListener(object: TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    viewModel.setMemo(s.toString())
-                }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            })
+            itemView.memo.apply {
+                setText(viewModel.getMemo())
+                isEnabled = !editMode
+                addTextChangedListener(object: TextWatcher {
+                    override fun afterTextChanged(s: Editable?) {
+                        viewModel.setMemo(s.toString())
+                    }
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                })
+            }
         }
     }
 
@@ -293,6 +310,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             return (target is PhotoViewHolder)
         }
 
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            Log.d(TAG, "ItemTouchHelper onSelectedChanged")
+            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            rootLayout.requestFocus()
+        }
+
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
@@ -312,6 +336,6 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         private const val IMAGE_SPAN_COUNT = 4
         const val KEY_PAGE_INDEX = "KeyPageIndex"
 
-//        private const val TAG = "PageActivity"
+        private const val TAG = "PageActivity"
     }
 }
