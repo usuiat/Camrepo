@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".notelist.NoteListActivity"/>
+        <activity
             android:name=".page.PageActivity"
             android:parentActivityName=".note.NoteActivity" />
         <activity
