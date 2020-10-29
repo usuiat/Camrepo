@@ -16,8 +16,8 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
 
     fun getItemCount(): Int {
         /* 写真の数に +1(Add_Photoの分) して、列数を求める */
-        val photoRow = ((noteModel.getPhotoCount(pageIndex) + 1) / columnCount) + 1
-        return photoRow * columnCount * columnCount + 2 /* Title, Memo */
+        val photoRow = (noteModel.getPhotoCount(pageIndex) / columnCount) + 1
+        return photoRow * columnCount + 2 /* Title, Memo */
     }
 
     fun getViewType(position: Int) :Int {
