@@ -18,7 +18,7 @@
         android:layout_marginBottom="2dp">
 
         <net.engawapg.app.camrepo.SquareImageView
-            android:id="@+id/imageView0"
+            android:id="@+id/cameraIcon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"

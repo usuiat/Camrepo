@@ -154,9 +154,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             notifyDataSetChanged()
         }
 
-        override fun getItemCount() = viewModel.getItemCount()
+        override fun getItemCount() = viewModel.getItemCount(editMode)
 
-        override fun getItemViewType(position: Int) = viewModel.getViewType(position)
+        override fun getItemViewType(position: Int) = viewModel.getViewType(position, editMode)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
             return when (viewType) {
@@ -224,7 +224,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            val imageInfo = viewModel.getPhotoAt(position - 1) ?: return
+            val photoIndex = position - if (editMode) 0 else 1
+            val imageInfo = viewModel.getPhotoAt(photoIndex) ?: return
             val resolver = itemView.context.contentResolver
 
             val bmp = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
