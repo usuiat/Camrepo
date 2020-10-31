@@ -239,6 +239,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             }
 
             itemView.imageView.setImageBitmap(bmp)
+
+            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
         }
     }
 
