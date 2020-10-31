@@ -13,6 +13,7 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
     : AndroidViewModel(app) {
 
     var modified = false
+    private var photoSelection: MutableList<Boolean>? = null
 
     fun getItemCount(photoSelectMode: Boolean): Int {
         var n = noteModel.getPhotoCount(pageIndex)
@@ -60,10 +61,38 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
         }
     }
 
+    fun getPhotoIndexOfItemIndex(itemIndex: Int, editMode: Boolean): Int {
+        return if (editMode) itemIndex else itemIndex - 1
+    }
+
     fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
 
     fun movePhoto(from: Int, to: Int) {
         noteModel.movePhoto(pageIndex, from, to)
+        modified = true
+    }
+
+    fun initPhotoSelection() {
+        photoSelection  = MutableList(noteModel.getPhotoCount(pageIndex)){false}
+    }
+
+    fun setPhotoSelection(index: Int, sel: Boolean) {
+        photoSelection?.let {
+            if (index < it.size) {
+                it[index] = sel
+            }
+        }
+    }
+
+    fun getPhotoSelection(index: Int) = photoSelection?.getOrNull(index) ?: false
+
+    fun isPhotoSelected() = photoSelection?.contains(true) ?: false
+
+    fun deleteSelectedPhotos() {
+        val indexes = mutableListOf<Int>()
+        photoSelection?.forEachIndexed{ index, b -> if (b) indexes.add(index) }
+        Log.d(TAG, "Delete at $indexes")
+        noteModel.deletePhotosAt(pageIndex, indexes)
         modified = true
     }
 

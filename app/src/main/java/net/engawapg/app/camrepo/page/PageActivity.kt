@@ -118,6 +118,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_page_action_mode, menu)
+            viewModel.initPhotoSelection()
             pageItemAdapter.setEditMode(true)
             itemTouchHelper.attachToRecyclerView(null)
             /* キーボード消す */
@@ -126,6 +128,11 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.delete_selected_items) {
+                if (viewModel.isPhotoSelected()) {
+                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+                }
+            }
             return true
         }
 
@@ -140,6 +147,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     }
 
     override fun onClickDeleteButton() {
+        viewModel.deleteSelectedPhotos()
         actionMode?.finish()
     }
 
@@ -224,7 +232,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            val photoIndex = position - if (editMode) 0 else 1
+            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, editMode)
             val imageInfo = viewModel.getPhotoAt(photoIndex) ?: return
             val resolver = itemView.context.contentResolver
 
@@ -240,7 +248,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
             itemView.imageView.setImageBitmap(bmp)
 
-            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
+            itemView.checkBox.apply {
+                visibility = if (editMode) View.VISIBLE else View.INVISIBLE
+                isChecked = viewModel.getPhotoSelection(position)
+                setOnClickListener {
+                    viewModel.setPhotoSelection(adapterPosition, isChecked)
+                }
+            }
         }
     }
 
@@ -338,6 +352,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     companion object {
         private const val IMAGE_SPAN_COUNT = 4
         const val KEY_PAGE_INDEX = "KeyPageIndex"
+        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
 
         private const val TAG = "PageActivity"
     }

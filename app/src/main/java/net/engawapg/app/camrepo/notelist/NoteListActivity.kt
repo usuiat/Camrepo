@@ -166,7 +166,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
             itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
             itemView.checkBox.isChecked = viewModel.getSelection(position)
             itemView.checkBox.setOnClickListener {
-                viewModel.setSelection(position, itemView.checkBox.isChecked)
+                viewModel.setSelection(adapterPosition, itemView.checkBox.isChecked)
             }
         }
     }
