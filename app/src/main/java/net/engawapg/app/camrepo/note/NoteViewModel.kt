@@ -23,19 +23,31 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     private var modified = false
     private var pageAdded = false
     private var lastModifiedDate: Long = 0
+    private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
 
     fun initItemList(columnCount: Int) {
         this.columnCount = columnCount
         buildItemList()
     }
 
+    fun setPageTitleListMode(mode: Boolean) {
+        pageTitleListMode = mode
+        buildItemList()
+    }
+
     fun buildItemList() {
         val list = mutableListOf<ItemInfo>()
-        list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0)) /* 先頭はタイトル */
+        if (!pageTitleListMode) {
+            list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0)) /* 先頭はタイトル */
+        }
 
         val n = noteModel.getPageNum()
         for (pageIdx in 0 until n) {
             list.add(ItemInfo(VIEW_TYPE_PAGE_TITLE, pageIdx, 0)) /* ページの先頭はページタイトル */
+
+            if (pageTitleListMode) {
+                continue
+            }
 
             /* 写真 */
             val photoCount = noteModel.getPhotoCount(pageIdx)

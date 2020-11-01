@@ -132,6 +132,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.menu_note_action_mode, menu)
+            viewModel.setPageTitleListMode(true)
             noteItemAdapter.setEditMode(true)
             return true
         }
@@ -144,6 +145,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
+            viewModel.setPageTitleListMode(false)
             noteItemAdapter.setEditMode(false)
         }
 
