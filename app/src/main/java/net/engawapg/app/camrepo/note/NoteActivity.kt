@@ -183,7 +183,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
             holder.bind(position, editMode)
             holder.itemView.setOnClickListener {
-                onItemClick(holder.adapterPosition)
+                if (!editMode) {
+                    onItemClick(holder.adapterPosition)
+                }
             }
         }
     }
@@ -227,6 +229,8 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.pageTitle.text = viewModel.getPageTitle(position)
+            itemView.pageCheckBox.visibility = if (editMode) View.VISIBLE else View.GONE
+            itemView.dragHandle.visibility = if (editMode) View.VISIBLE else View.GONE
         }
     }
 

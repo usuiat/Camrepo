@@ -27,8 +27,30 @@
             android:ems="10"
             android:gravity="start|top"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/pageCheckBox"
+            app:layout_constraintStart_toEndOf="@+id/dragHandle"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/pageCheckBox"
+            android:layout_width="32dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toEndOf="@+id/pageTitle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/dragHandle"
+            android:layout_width="32dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/drag_handle"
+            android:scaleType="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/pageTitle"
+            app:srcCompat="@drawable/draghandle" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
