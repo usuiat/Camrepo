@@ -131,15 +131,20 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_note_action_mode, menu)
+            noteItemAdapter.setEditMode(true)
             return true
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.delete_selected_items) {
+
+            }
             return true
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-
+            noteItemAdapter.setEditMode(false)
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
