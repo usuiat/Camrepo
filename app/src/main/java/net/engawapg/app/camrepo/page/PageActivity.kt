@@ -51,11 +51,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         /* RecyclerView */
-        pageItemAdapter = PageItemAdapter(
-            viewModel,
-            {position -> onItemClick( position ) },
-            onFocusChangeListenerForRecyclerView
-        )
+        pageItemAdapter = PageItemAdapter(viewModel, onFocusChangeListenerForRecyclerView) { position ->
+            onItemClick( position )
+        }
 
         recyclerView.apply {
             layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
@@ -179,8 +177,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
 
     class PageItemAdapter(private val viewModel: PageViewModel,
-                          private val onItemClick: ((Int)->Unit),
-                          private val onFocusChangeListener: View.OnFocusChangeListener)
+                          private val onFocusChangeListener: View.OnFocusChangeListener,
+                          private val onItemClick: ((Int)->Unit))
         : RecyclerView.Adapter<BaseViewHolder>() {
 
         private var editMode = false
