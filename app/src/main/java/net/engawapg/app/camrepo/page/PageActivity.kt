@@ -51,9 +51,12 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
 
         /* RecyclerView */
-        pageItemAdapter = PageItemAdapter(viewModel) { position ->
-            onItemClick( position )
-        }
+        pageItemAdapter = PageItemAdapter(
+            viewModel,
+            {position -> onItemClick( position ) },
+            onFocusChangeListenerForRecyclerView
+        )
+
         recyclerView.apply {
             layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
                 spanSizeLookup = PageItemSpanSizeLookup()
@@ -85,15 +88,37 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
     }
 
+    private val onFocusChangeListenerForRecyclerView = View.OnFocusChangeListener { v, hasFocus ->
+        if (hasFocus &&
+            ((v.tag == PageTitleViewHolder.TAG_PATE_TITLE) || (v.tag == MemoViewHolder.TAG_MEMO))) {
+            hideCameraFragment()
+        }
+    }
+
     private fun showCameraFragment() {
         var cf = supportFragmentManager.findFragmentById(cameraFragmentId)
         if (cf == null) {
+            /* キーボード消す */
+            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            /* EditTextからフォーカスを外す */
+            rootLayout.requestFocus()
+
             cf = CameraFragment.newInstance()
             val trs = supportFragmentManager.beginTransaction()
             trs.add(R.id.cameraFragmentContainer, cf)
             trs.commit()
             cameraFragmentId = cf.id
             cameraViewModel.currentPageIndex = pageIndex
+        }
+    }
+
+    private fun hideCameraFragment() {
+        val cf = supportFragmentManager.findFragmentById(cameraFragmentId)
+        if (cf != null) {
+            supportFragmentManager.beginTransaction()
+                .remove(cf)
+                .commit()
+            cameraFragmentId = 0
         }
     }
 
@@ -105,6 +130,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.edit_list_items -> {
+                hideCameraFragment()
                 actionMode = startActionMode(actionModeCallback)
                 true
             }
@@ -153,8 +179,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
 
     class PageItemAdapter(private val viewModel: PageViewModel,
-                          private val onItemClick: ((Int)->Unit)):
-        RecyclerView.Adapter<BaseViewHolder>() {
+                          private val onItemClick: ((Int)->Unit),
+                          private val onFocusChangeListener: View.OnFocusChangeListener)
+        : RecyclerView.Adapter<BaseViewHolder>() {
 
         private var editMode = false
         fun setEditMode(mode: Boolean) {
@@ -168,10 +195,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
             return when (viewType) {
-                PageViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
+                PageViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel, onFocusChangeListener)
                 PageViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 PageViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent)
-                PageViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
+                PageViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel, onFocusChangeListener)
                 else -> BaseViewHolder.create(parent)
             }
         }
@@ -196,14 +223,20 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
-    class PageTitleViewHolder(v: View, private val viewModel: PageViewModel): BaseViewHolder(v) {
+    class PageTitleViewHolder(v: View,
+                              private val viewModel: PageViewModel,
+                              private val onFocusChangeListener: View.OnFocusChangeListener)
+        : BaseViewHolder(v) {
 
         companion object {
-            fun create(parent: ViewGroup, viewModel: PageViewModel): PageTitleViewHolder {
+            fun create(parent: ViewGroup,
+                       viewModel: PageViewModel,
+                       onFocusChangeListener: View.OnFocusChangeListener): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_page_title, parent, false)
-                return PageTitleViewHolder(view, viewModel)
+                return PageTitleViewHolder(view, viewModel, onFocusChangeListener)
             }
+            const val TAG_PATE_TITLE = "TagPageTitle"
         }
 
         override fun bind(position: Int, editMode: Boolean) {
@@ -217,6 +250,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 })
+                onFocusChangeListener = this@PageTitleViewHolder.onFocusChangeListener
+                tag = TAG_PATE_TITLE
             }
         }
     }
@@ -269,14 +304,18 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
     }
 
-    class MemoViewHolder(v: View, private val viewModel: PageViewModel): BaseViewHolder(v) {
+    class MemoViewHolder(v: View, private val viewModel: PageViewModel,
+                         private val onFocusChangeListener: View.OnFocusChangeListener)
+        : BaseViewHolder(v) {
 
         companion object {
-            fun create(parent: ViewGroup, viewModel: PageViewModel): MemoViewHolder {
+            fun create(parent: ViewGroup, viewModel: PageViewModel,
+                       onFocusChangeListener: View.OnFocusChangeListener): MemoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_page_memo, parent, false)
-                return MemoViewHolder(view, viewModel)
+                return MemoViewHolder(view, viewModel, onFocusChangeListener)
             }
+            const val TAG_MEMO = "TagMemo"
         }
 
         override fun bind(position: Int, editMode: Boolean) {
@@ -290,6 +329,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 })
+                onFocusChangeListener = this@MemoViewHolder.onFocusChangeListener
+                tag = TAG_MEMO
             }
         }
     }
