@@ -139,7 +139,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
-
+                if (viewModel.isPageSelected()) {
+                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+                }
             }
             return true
         }
@@ -153,6 +155,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     override fun onClickDeleteButton() {
+        viewModel.deleteSelectedPages()
         actionMode?.finish()
     }
 
@@ -229,7 +232,15 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.pageTitle.text = viewModel.getPageTitle(position)
-            itemView.pageCheckBox.visibility = if (editMode) View.VISIBLE else View.GONE
+            itemView.pageCheckBox.apply {
+                visibility = if (editMode) View.VISIBLE else View.GONE
+                if (editMode) {
+                    isChecked = viewModel.getPageSelection(position)
+                    setOnClickListener {
+                        viewModel.setPageSelection(adapterPosition, isChecked)
+                    }
+                }
+            }
             itemView.dragHandle.visibility = if (editMode) View.VISIBLE else View.GONE
         }
     }
@@ -293,5 +304,6 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4
+        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
     }
 }

@@ -14,7 +14,8 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     data class ItemInfo(
         val viewType: Int,  /* RecyclerViewのViewType */
         val pageIndex: Int, /* ページ番号 */
-        val subIndex: Int   /* ページ内の要素（写真）の番号 */
+        val subIndex: Int,   /* ページ内の要素（写真）の番号 */
+        var selected: Boolean
     )
 
     /* RecyclerViewを構成するアイテムのリスト */
@@ -38,12 +39,12 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
     fun buildItemList() {
         val list = mutableListOf<ItemInfo>()
         if (!pageTitleListMode) {
-            list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0)) /* 先頭はタイトル */
+            list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0, false)) /* 先頭はタイトル */
         }
 
         val n = noteModel.getPageNum()
         for (pageIdx in 0 until n) {
-            list.add(ItemInfo(VIEW_TYPE_PAGE_TITLE, pageIdx, 0)) /* ページの先頭はページタイトル */
+            list.add(ItemInfo(VIEW_TYPE_PAGE_TITLE, pageIdx, 0, false)) /* ページの先頭はページタイトル */
 
             if (pageTitleListMode) {
                 continue
@@ -52,16 +53,16 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
             /* 写真 */
             val photoCount = noteModel.getPhotoCount(pageIdx)
             for (photoIdx in 0 until photoCount) {
-                list.add(ItemInfo(VIEW_TYPE_PHOTO, pageIdx, photoIdx))
+                list.add(ItemInfo(VIEW_TYPE_PHOTO, pageIdx, photoIdx, false))
             }
 
             /* カードビューをいびつな形にしないための空欄 */
             val blankCount = columnCount - (photoCount % columnCount)
             for (blankIdx in 0 until blankCount) {
-                list.add(ItemInfo(VIEW_TYPE_BLANK, pageIdx, blankIdx))
+                list.add(ItemInfo(VIEW_TYPE_BLANK, pageIdx, blankIdx, false))
             }
 
-            list.add(ItemInfo(VIEW_TYPE_MEMO, pageIdx, 0)) /* メモ欄 */
+            list.add(ItemInfo(VIEW_TYPE_MEMO, pageIdx, 0, false)) /* メモ欄 */
         }
 
         itemList = list
@@ -80,6 +81,26 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         val added = pageAdded
         pageAdded = false
         return added
+    }
+
+    fun setPageSelection(index: Int, sel: Boolean) {
+        if (index < itemList.size) {
+            itemList[index].selected = sel
+        }
+    }
+
+    fun getPageSelection(index: Int) = itemList.getOrNull(index)?.selected ?: false
+
+    fun isPageSelected(): Boolean {
+        return itemList.find { item -> item.selected } != null
+    }
+
+    fun deleteSelectedPages() {
+        val indexes = mutableListOf<Int>()
+        itemList.forEachIndexed { index, item -> if (item.selected) indexes.add(index) }
+        Log.d(TAG, "Delete at $indexes")
+        noteModel.deletePagesAt(indexes)
+        modified = true
     }
 
     fun getNoteTitle() = noteModel.title
