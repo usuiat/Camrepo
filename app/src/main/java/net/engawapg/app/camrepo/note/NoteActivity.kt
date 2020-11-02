@@ -137,6 +137,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             mode?.menuInflater?.inflate(R.menu.menu_note_action_mode, menu)
             viewModel.setPageTitleListMode(true)
             noteItemAdapter.setEditMode(true)
+            floatingActionButton.visibility = View.INVISIBLE
             return true
         }
 
@@ -152,6 +153,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onDestroyActionMode(mode: ActionMode?) {
             viewModel.setPageTitleListMode(false)
             noteItemAdapter.setEditMode(false)
+            floatingActionButton.visibility = View.VISIBLE
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
