@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_logo" />
+        app:logo="@drawable/ic_logo" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -29,7 +29,8 @@
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/new_note" />
+        app:srcCompat="@drawable/new_note"
+        android:contentDescription="@string/create_new_note" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
