@@ -9,6 +9,7 @@ import android.util.Size
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_note.*
 import kotlinx.android.synthetic.main.view_note_memo.view.*
@@ -43,7 +44,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
 
         /* RecyclerView */
-        noteItemAdapter = NoteItemAdapter(viewModel) {
+        noteItemAdapter = NoteItemAdapter(viewModel, itemTouchHelper) {
             onItemClick(it)
         }
         recyclerView.apply {
@@ -52,6 +53,8 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             }
             adapter = noteItemAdapter
         }
+
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         floatingActionButton.setOnClickListener {
             onClickAddButton()
@@ -160,6 +163,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
+                          private val itemTouchHelper: ItemTouchHelper,
                           private val onItemClick: ((Int)->Unit))
         : RecyclerView.Adapter<BaseViewHolder>() {
 
@@ -175,7 +179,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
             return when (viewType) {
-                NoteViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel)
+                NoteViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel, itemTouchHelper)
                 NoteViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel)
                 NoteViewModel.VIEW_TYPE_TITLE -> TitleViewHolder.create(parent, viewModel)
@@ -220,13 +224,15 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
     }
 
-    class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+    class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel,
+                              private val itemTouchHelper: ItemTouchHelper) :BaseViewHolder(v) {
 
         companion object {
-            fun create(parent: ViewGroup, viewModel: NoteViewModel): PageTitleViewHolder {
+            fun create(parent: ViewGroup, viewModel: NoteViewModel,
+                       itemTouchHelper: ItemTouchHelper): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_note_page_title, parent, false)
-                return PageTitleViewHolder(view, viewModel)
+                return PageTitleViewHolder(view, viewModel, itemTouchHelper)
             }
         }
 
@@ -241,7 +247,17 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                     }
                 }
             }
-            itemView.dragHandle.visibility = if (editMode) View.VISIBLE else View.GONE
+            itemView.dragHandle.apply {
+                visibility = if (editMode) View.VISIBLE else View.GONE
+                setOnTouchListener { v, event ->
+                    if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                        itemTouchHelper.startDrag(this@PageTitleViewHolder)
+                    } else {
+                        v.performClick()
+                    }
+                    return@setOnTouchListener true
+                }
+            }
         }
     }
 
@@ -298,6 +314,25 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             }
         }
     }
+
+    private val itemTouchHelper = ItemTouchHelper(object: ItemTouchHelper.SimpleCallback(
+        (ItemTouchHelper.UP or ItemTouchHelper.DOWN), 0) {
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.adapterPosition
+            val toPosition = target.adapterPosition
+            viewModel.movePage(fromPosition, toPosition)
+            noteItemAdapter.notifyItemMoved(fromPosition, toPosition)
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
+        override fun isLongPressDragEnabled() = false
+    })
 
     companion object {
         private const val TAG = "NoteActivity"

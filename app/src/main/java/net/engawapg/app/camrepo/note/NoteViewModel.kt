@@ -83,6 +83,11 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         return added
     }
 
+    fun movePage(from:Int, to:Int) {
+        noteModel.movePage(from, to)
+        modified = true
+    }
+
     fun setPageSelection(index: Int, sel: Boolean) {
         if (index < itemList.size) {
             itemList[index].selected = sel
