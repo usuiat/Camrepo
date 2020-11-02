@@ -56,7 +56,9 @@ class CameraFragment : Fragment()  {
         closeCameraButton.setOnClickListener {
             parentFragmentManager.beginTransaction().remove(this).commit()
         }
-        flashButton.setOnClickListener {  }
+        flashButton.setOnClickListener {
+            toggleFlashMode()
+        }
 
         permissionHelper = PermissionHelper(this,
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -102,6 +104,7 @@ class CameraFragment : Fragment()  {
     private var swappedDimensions: Boolean = false
     private lateinit var previewSize: Size
     private var flashSupported = false
+    private var flashMode = FLASH_MODE_AUTO
     private val cameraOpenCloseLock = Semaphore(1)
     private var cameraDevice: CameraDevice? = null
     private lateinit var previewRequestBuilder: CaptureRequest.Builder
@@ -438,10 +441,46 @@ class CameraFragment : Fragment()  {
 
     }
 
+    private fun toggleFlashMode() {
+        when (flashMode) {
+            FLASH_MODE_OFF -> setFlashMode(FLASH_MODE_ON)
+            FLASH_MODE_ON -> setFlashMode(FLASH_MODE_AUTO)
+            FLASH_MODE_AUTO -> setFlashMode(FLASH_MODE_OFF)
+        }
+    }
+
+    private fun setFlashMode(mode: Int) {
+        flashMode = mode
+        val imageRes = when (flashMode) {
+            FLASH_MODE_OFF -> R.drawable.flash_off
+            FLASH_MODE_ON -> R.drawable.flash_on
+            else -> R.drawable.flash_auto
+        }
+        flashButton.setImageResource(imageRes)
+        setAutoFlash(previewRequestBuilder)
+    }
+
     private fun setAutoFlash(requestBuilder: CaptureRequest.Builder) {
         if (flashSupported) {
-            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+            when (flashMode) {
+                FLASH_MODE_AUTO -> {
+                    Log.d(TAG, " setAutoFlash FLASH_REQUEST_AUTO")
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+                }
+                FLASH_MODE_ON -> {
+                    Log.d(TAG, " setAutoFlash FLASH_REQUEST_ON")
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON)
+                    requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH)
+                }
+                FLASH_MODE_OFF -> {
+                    Log.d(TAG, " setAutoFlash FLASH_REQUEST_OFF")
+                    requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON)
+                    requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
+                }
+            }
         }
     }
 
@@ -631,6 +670,11 @@ class CameraFragment : Fragment()  {
         const val TAG = "CameraFragment"
         const val MAX_PREVIEW_WIDTH = 1920
         const val MAX_PREVIEW_HEIGHT = 1080
+
+        /* Flash mode */
+        private const val FLASH_MODE_OFF = 0
+        private const val FLASH_MODE_AUTO = 1
+        private const val FLASH_MODE_ON = 2
 
         /* Camera state */
         private const val STATE_PREVIEW = 0                 /* Showing camera preview. */

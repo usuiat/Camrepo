@@ -49,7 +49,7 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/desc_flash_button"
         android:scaleType="center"
-        android:src="@drawable/flash"
+        android:src="@drawable/flash_auto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
