@@ -64,6 +64,14 @@ class CameraFragment : Fragment()  {
             arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
             getString(R.string.request_camera_permission_message)
         )
+
+        /* Flash Modeの設定を復元 */
+        activity?.getSharedPreferences(
+            getString(R.string.preference_file), Context.MODE_PRIVATE
+        )?.apply {
+            val mode = getInt(getString(R.string.preference_key_flash_mode), FLASH_MODE_AUTO)
+            setFlashMode(mode)
+        }
     }
 
     override fun onResume() {
@@ -442,10 +450,20 @@ class CameraFragment : Fragment()  {
     }
 
     private fun toggleFlashMode() {
-        when (flashMode) {
-            FLASH_MODE_OFF -> setFlashMode(FLASH_MODE_ON)
-            FLASH_MODE_ON -> setFlashMode(FLASH_MODE_AUTO)
-            FLASH_MODE_AUTO -> setFlashMode(FLASH_MODE_OFF)
+        val mode = when (flashMode) {
+            FLASH_MODE_OFF -> FLASH_MODE_ON
+            FLASH_MODE_ON -> FLASH_MODE_AUTO
+            else -> FLASH_MODE_OFF
+        }
+        setFlashMode(mode)
+        setAutoFlash(previewRequestBuilder)
+
+        /* 設定値を保存 */
+        activity?.getSharedPreferences(
+            getString(R.string.preference_file), Context.MODE_PRIVATE
+        )?.edit()?.apply {
+            putInt(getString(R.string.preference_key_flash_mode), mode)
+            apply()
         }
     }
 
@@ -457,7 +475,6 @@ class CameraFragment : Fragment()  {
             else -> R.drawable.flash_auto
         }
         flashButton.setImageResource(imageRes)
-        setAutoFlash(previewRequestBuilder)
     }
 
     private fun setAutoFlash(requestBuilder: CaptureRequest.Builder) {
