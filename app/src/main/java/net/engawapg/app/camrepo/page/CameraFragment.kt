@@ -9,6 +9,7 @@ import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
+import android.media.MediaActionSound
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -119,6 +120,7 @@ class CameraFragment : Fragment()  {
     private lateinit var previewRequest: CaptureRequest
     private var captureSession: CameraCaptureSession? = null
     private var state = STATE_PREVIEW
+    private var mediaActionSound: MediaActionSound? = null
 
     @SuppressLint("MissingPermission")
     private fun openCamera(width: Int, height: Int) {
@@ -142,6 +144,8 @@ class CameraFragment : Fragment()  {
         } catch (e: InterruptedException) {
             throw RuntimeException("Interrupted while trying to lock camera opening.", e)
         }
+
+        mediaActionSound = MediaActionSound().apply { load(MediaActionSound.SHUTTER_CLICK) }
     }
 
     /**
@@ -161,6 +165,7 @@ class CameraFragment : Fragment()  {
         } finally {
             cameraOpenCloseLock.release()
         }
+        mediaActionSound?.release()
     }
 
     /**
@@ -646,6 +651,8 @@ class CameraFragment : Fragment()  {
                     unlockFocus()
                 }
             }
+
+            mediaActionSound?.play(MediaActionSound.SHUTTER_CLICK)
 
             captureSession?.apply {
                 stopRepeating()
