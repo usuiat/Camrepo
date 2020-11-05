@@ -1,6 +1,8 @@
 package net.engawapg.app.camrepo.page
 
 import android.Manifest
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.ImageFormat
@@ -102,6 +104,20 @@ class CameraFragment : Fragment()  {
         closeCamera()
         stopBackgroundThread()
         super.onPause()
+    }
+
+    private fun doShutterEffect() {
+        val color1 = resources.getColor(R.color.black, requireActivity().theme)
+        val color2 = resources.getColor(android.R.color.transparent, requireActivity().theme)
+        ValueAnimator.ofObject(ArgbEvaluator(), color1, color2).apply {
+            duration = 100
+            addUpdateListener {
+                maskView.setBackgroundColor(it.animatedValue as Int)
+            }
+            start()
+        }
+
+        mediaActionSound?.play(MediaActionSound.SHUTTER_CLICK)
     }
 
     //------------------- Camera Preparation --------------------//
@@ -582,7 +598,6 @@ class CameraFragment : Fragment()  {
         } catch (e: CameraAccessException) {
             Log.e(TAG, e.toString())
         }
-
     }
 
     /**
@@ -652,7 +667,7 @@ class CameraFragment : Fragment()  {
                 }
             }
 
-            mediaActionSound?.play(MediaActionSound.SHUTTER_CLICK)
+            activity?.runOnUiThread { doShutterEffect() }
 
             captureSession?.apply {
                 stopRepeating()
