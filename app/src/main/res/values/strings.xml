@@ -43,4 +43,10 @@
     <!-- Shared Preference -->
     <string name="preference_file">net.engawapg.app.Camrepo.PREFERENCE_FILE</string>
     <string name="preference_key_flash_mode">PREFERENCE_KEY_FLASH_MODE</string>
+
+    <!-- About App Preferences -->
+    <string name="about_app_header">About App</string>
+    <string name="pref_key_version">PrefKeyVersion</string>
+    <string name="pref_title_version">Version</string>
+
 </resources>
