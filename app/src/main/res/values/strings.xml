@@ -20,6 +20,7 @@
     <string name="hint_page_title">Page Title</string>
     <string name="hint_memo">Memo</string>
     <string name="settings">Settings</string>
+    <string name="photoView">Photo View</string>
     <string name="drag_handle" translatable="false">Drag Handle</string>
 
     <!-- Shared Preference -->

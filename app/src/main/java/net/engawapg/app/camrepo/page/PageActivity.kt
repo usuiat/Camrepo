@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.page
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.view_page_photo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.photo.PhotoActivity
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -83,6 +85,8 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     private fun onItemClick(position: Int) {
         if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
             showCameraFragment()
+        } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
+            startActivity(Intent(this, PhotoActivity::class.java))
         }
     }
 
