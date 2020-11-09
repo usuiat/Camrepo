@@ -1,17 +1,14 @@
 package net.engawapg.app.camrepo.photo
 
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_photo.*
+import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -46,24 +43,11 @@ class PhotoFragment : Fragment() {
         Log.d(TAG, "viewModel = $viewModel")
         Log.d(TAG, "pageIndex = ${viewModel.pageIndex}, photoIndex = $photoIndex")
 
-        viewModel.getPhotoAt(photoIndex)?.let {
-            setImageWithUri(it.uri)
-        }
-    }
-
-    private fun setImageWithUri(uri: Uri) {
-        val resolver = context?.contentResolver ?: return
-        Handler().post {
-            val bmp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                MediaStore.Images.Media.getBitmap(resolver, uri)
-            } else {
-                val decoder = ImageDecoder.createSource(resolver, uri)
-                ImageDecoder.decodeBitmap(decoder)
-            }
-            activity?.runOnUiThread {
-                photoView.setImageBitmap(bmp)
-                Log.d(TAG, "setImage $photoIndex, ${uri.toString()}")
-            }
+        val imageInfo = viewModel.getPhotoAt(photoIndex)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val resolver = context?.contentResolver
+            val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it) }
+            photoView.setImageBitmap(bmp)
         }
     }
 

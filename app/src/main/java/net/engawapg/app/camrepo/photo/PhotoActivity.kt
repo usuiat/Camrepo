@@ -35,6 +35,7 @@ class PhotoActivity : AppCompatActivity() {
             title = ""
         }
 
+        photoPager.offscreenPageLimit = 1
         photoPager.adapter = PhotoAdapter(this, viewModel)
         photoPager.setCurrentItem(photoIndex, false)
     }
