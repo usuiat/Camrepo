@@ -6,6 +6,7 @@ import net.engawapg.app.camrepo.page.CameraViewModel
 import net.engawapg.app.camrepo.note.NoteViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import net.engawapg.app.camrepo.page.PageViewModel
+import net.engawapg.app.camrepo.photo.PhotoViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -34,6 +35,14 @@ val appModule = module {
         CameraViewModel(
             androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
+        )
+    }
+
+    viewModel { (pageIndex: Int) ->
+        PhotoViewModel(
+            androidApplication(),
+            getScope(Constants.SCOPE_ID_NOTE).get(),
+            pageIndex
         )
     }
 //

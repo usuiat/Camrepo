@@ -86,7 +86,11 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
             showCameraFragment()
         } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
-            startActivity(Intent(this, PhotoActivity::class.java))
+            val intent = Intent(this, PhotoActivity::class.java)
+            intent.putExtra(PhotoActivity.KEY_PAGE_INDEX, pageIndex)
+            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
+            intent.putExtra(PhotoActivity.KEY_PHOTO_INDEX, photoIndex)
+            startActivity(intent)
         }
     }
 
