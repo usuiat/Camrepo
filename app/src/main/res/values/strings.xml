@@ -1,52 +1,35 @@
 <resources>
-    <string name="app_name">Camrepo</string>
-    <string name="edit_list_items">Edit List Items</string>
-    <string name="delete_selected_items">Delete Selected Items</string>
+    <string name="app_name" translatable="false">Camrepo</string>
+    <string name="edit_list_items">Edit</string>
+    <string name="delete_selected_items">Delete</string>
     <string name="delete_confirm_message">Delete Items?</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="create_new_note">Create New Note</string>
-    <string name="edit_note_title">Edit Note Title</string>
+    <string name="edit_note_title" translatable="false">Edit Note Title</string>
     <string name="slideshow">Slideshow</string>
     <string name="title">Title</string>
     <string name="sub_title">Sub Title</string>
     <string name="default_note_title">New Note</string>
     <string name="default_note_sub_title">Sub Title</string>
-    <string name="page_title">Page Title</string>
-    <string name="default_page_title">New Page</string>
     <string name="request_camera_permission_message">This app needs permission to access camera and storage to take photos.</string>
-    <string name="desc_shutter">Shutter Button</string>
-    <string name="desc_close_camera">Close Camera</string>
-    <string name="desc_flash_button">Flash Button</string>
+    <string name="desc_shutter" translatable="false">Shutter Button</string>
+    <string name="desc_close_camera" translatable="false">Close Camera</string>
+    <string name="desc_flash_button" translatable="false">Flash Button</string>
     <string name="hint_page_title">Page Title</string>
     <string name="hint_memo">Memo</string>
     <string name="settings">Settings</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="drag_handle">Drag Handle</string>
+    <string name="drag_handle" translatable="false">Drag Handle</string>
 
     <!-- Shared Preference -->
-    <string name="preference_file">net.engawapg.app.Camrepo.PREFERENCE_FILE</string>
-    <string name="preference_key_flash_mode">PREFERENCE_KEY_FLASH_MODE</string>
+    <string name="preference_file" translatable="false">net.engawapg.app.Camrepo.PREFERENCE_FILE</string>
+    <string name="preference_key_flash_mode" translatable="false">PREFERENCE_KEY_FLASH_MODE</string>
 
     <!-- About App Preferences -->
     <string name="about_app_header">About App</string>
-    <string name="pref_key_version">PrefKeyVersion</string>
+    <string name="pref_key_version" translatable="false">PrefKeyVersion</string>
     <string name="pref_title_version">Version</string>
+    <string name="default_page_title">New Page</string>
 
 </resources>

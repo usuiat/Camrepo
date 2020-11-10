@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">設定</string>
+    <string name="about_app_header">アプリについて</string>
+    <string name="pref_title_version">バージョン</string>
+    <string name="hint_memo">メモ</string>
+    <string name="hint_page_title">ページタイトル</string>
+    <string name="edit_list_items">編集</string>
+    <string name="delete_selected_items">削除</string>
+    <string name="delete_confirm_message">アイテムを削除しますか？</string>
+    <string name="delete">削除</string>
+    <string name="cancel">キャンセル</string>
+    <string name="ok">OK</string>
+    <string name="create_new_note">新しいノートを作成</string>
+    <string name="slideshow">スライドショー</string>
+    <string name="title">タイトル</string>
+    <string name="sub_title">サブタイトル</string>
+    <string name="default_note_title">新しいノート</string>
+    <string name="default_note_sub_title">サブタイトル</string>
+    <string name="request_camera_permission_message">このアプリは写真撮影のためにカメラとストレージのアクセス許可が必要です。</string>
+    <string name="default_page_title">新しいページ</string>
+</resources>

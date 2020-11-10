@@ -6,6 +6,7 @@ import android.util.JsonReader
 import android.util.JsonWriter
 import android.util.Log
 import net.engawapg.app.camrepo.Constants
+import net.engawapg.app.camrepo.R
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.getKoin
 import java.io.*
@@ -61,7 +62,7 @@ class NoteModel(private val app: Application) {
     fun createNewPage(): Int {
         val page = PageInfo()
         pageSerialNumber++
-        page.title = "New Page $pageSerialNumber"
+        page.title = app.getString(R.string.default_page_title) + " $pageSerialNumber"
         pages.add(page)
         return pages.size - 1
     }
