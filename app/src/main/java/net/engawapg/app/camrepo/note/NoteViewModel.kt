@@ -136,6 +136,8 @@ class NoteViewModel(app: Application, private val noteModel: NoteModel,
         return noteModel.getMemo(pageIndex)
     }
 
+    fun getPhotoIndex(itemIndex: Int) = itemList[itemIndex].subIndex
+
     fun getPhoto(itemIndex: Int): ImageInfo? {
         val pageIndex = itemList[itemIndex].pageIndex
         val photoIndex = itemList[itemIndex].subIndex

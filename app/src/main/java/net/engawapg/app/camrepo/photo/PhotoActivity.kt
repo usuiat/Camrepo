@@ -9,23 +9,28 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.android.synthetic.main.activity_photo.*
 import net.engawapg.app.camrepo.R
-import org.koin.android.viewmodel.ext.android.getViewModel
-import org.koin.core.parameter.parametersOf
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class PhotoActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: PhotoViewModel
-    private var pageIndex = 0
+    private val viewModel: PhotoViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo)
 
-        pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
+        val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
         val photoIndex = intent.getIntExtra(KEY_PHOTO_INDEX, 0)
-        viewModel = getViewModel { parametersOf(pageIndex) }
+        val wholeOfNote = intent.getBooleanExtra(KEY_WHOLE_OF_NOTE, false)
         Log.d(TAG, "pageIndex = $pageIndex")
         Log.d(TAG, "viewModel = $viewModel")
+
+        /* ViewModel初期化 */
+        if (wholeOfNote) {
+            viewModel.initModel(-1) /* ノート全体 */
+        } else {
+            viewModel.initModel(pageIndex)
+        }
 
         /* ToolBar */
         setSupportActionBar(toolbar)
@@ -37,7 +42,8 @@ class PhotoActivity : AppCompatActivity() {
 
         photoPager.offscreenPageLimit = 1
         photoPager.adapter = PhotoAdapter(this, viewModel)
-        photoPager.setCurrentItem(photoIndex, false)
+        val position = viewModel.getPosition(pageIndex, photoIndex)
+        photoPager.setCurrentItem(position, false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -62,6 +68,7 @@ class PhotoActivity : AppCompatActivity() {
     companion object {
         const val KEY_PAGE_INDEX = "KeyPageIndex"
         const val KEY_PHOTO_INDEX = "KeyPhotoIndex"
+        const val KEY_WHOLE_OF_NOTE = "KeyWholeOfNote"
         private const val TAG = "PhotoActivity"
     }
 }

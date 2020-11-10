@@ -41,7 +41,7 @@ class PhotoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "viewModel = $viewModel")
-        Log.d(TAG, "pageIndex = ${viewModel.pageIndex}, photoIndex = $photoIndex")
+        Log.d(TAG, "photoIndex = $photoIndex")
 
         val imageInfo = viewModel.getPhotoAt(photoIndex)
         viewLifecycleOwner.lifecycleScope.launch {

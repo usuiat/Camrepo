@@ -38,11 +38,10 @@ val appModule = module {
         )
     }
 
-    viewModel { (pageIndex: Int) ->
+    viewModel {
         PhotoViewModel(
             androidApplication(),
-            getScope(Constants.SCOPE_ID_NOTE).get(),
-            pageIndex
+            getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 //

@@ -20,6 +20,7 @@ import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import net.engawapg.app.camrepo.page.PageActivity
+import net.engawapg.app.camrepo.photo.PhotoActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
@@ -94,6 +95,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             NoteViewModel.VIEW_TYPE_BLANK -> {
                 startActivity(Intent(this, PageActivity::class.java).apply {
                     putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
+                })
+            }
+            NoteViewModel.VIEW_TYPE_PHOTO -> {
+                startActivity(Intent(this, PhotoActivity::class.java).apply {
+                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
+                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
+                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
                 })
             }
         }
