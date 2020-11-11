@@ -1,6 +1,8 @@
 package net.engawapg.app.camrepo.page
 
 import android.app.Application
+import android.content.ContentResolver
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
@@ -65,7 +67,12 @@ class PageViewModel(app: Application, private val noteModel: NoteModel,
         return if (editMode) itemIndex else itemIndex - 1
     }
 
-    fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
+    private fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
+
+    fun getPhotoBitmap(index: Int, resolver: ContentResolver): Bitmap? {
+        val imageInfo = getPhotoAt(index)
+        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
+    }
 
     fun movePhoto(from: Int, to: Int) {
         noteModel.movePhoto(pageIndex, from, to)

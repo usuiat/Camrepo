@@ -2,13 +2,10 @@ package net.engawapg.app.camrepo.page
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.Size
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -274,20 +271,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun bind(position: Int, editMode: Boolean) {
             val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, editMode)
-            val imageInfo = viewModel.getPhotoAt(photoIndex) ?: return
             val resolver = itemView.context.contentResolver
+            val bmp = viewModel.getPhotoBitmap(photoIndex, resolver)
 
-            val bmp = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                val id = imageInfo.uri.lastPathSegment?.toLong() ?: 0
-                MediaStore.Images.Thumbnails.getThumbnail(
-                    resolver, id,
-                    MediaStore.Images.Thumbnails.MINI_KIND, null
-                )
+            if (bmp != null) {
+                itemView.imageView.setImageBitmap(bmp)
             } else {
-                resolver?.loadThumbnail(imageInfo.uri, Size(256, 256), null)
+                itemView.imageView.setImageResource(R.drawable.imagenotfound)
             }
-
-            itemView.imageView.setImageBitmap(bmp)
 
             itemView.checkBox.apply {
                 visibility = if (editMode) View.VISIBLE else View.INVISIBLE

@@ -47,7 +47,11 @@ class PhotoFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val resolver = context?.contentResolver
             val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it) }
-            photoView.setImageBitmap(bmp)
+            if (bmp != null) {
+                photoView.setImageBitmap(bmp)
+            } else {
+                photoView.setImageResource(R.drawable.imagenotfound)
+            }
         }
     }
 
