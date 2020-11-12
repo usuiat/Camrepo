@@ -66,6 +66,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         cameraViewModel.eventAddImagePageIndex.observe(this, Observer { index ->
             if (index == pageIndex) {
                 pageItemAdapter.notifyDataSetChanged()
+                recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
                 viewModel.modified = true
             }
         })
@@ -107,9 +108,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             rootLayout.requestFocus()
 
             cf = CameraFragment.newInstance()
-            val trs = supportFragmentManager.beginTransaction()
-            trs.add(R.id.cameraFragmentContainer, cf)
-            trs.commit()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.cameraFragmentContainer, cf)
+                .runOnCommit {
+                    /* カメラアイコンが見えるようにスクロール */
+                    recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
+                }
+                .commit()
             cameraFragmentId = cf.id
             cameraViewModel.currentPageIndex = pageIndex
         }
