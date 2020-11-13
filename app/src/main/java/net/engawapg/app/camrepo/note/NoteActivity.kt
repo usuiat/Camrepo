@@ -245,6 +245,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
 
         override fun bind(position: Int, editMode: Boolean) {
             itemView.pageTitle.text = viewModel.getPageTitle(position)
+            itemView.editButton.apply {
+                visibility = if (editMode) View.GONE else View.VISIBLE
+            }
             itemView.pageCheckBox.apply {
                 visibility = if (editMode) View.VISIBLE else View.GONE
                 if (editMode) {

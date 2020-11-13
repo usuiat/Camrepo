@@ -20,7 +20,7 @@
     <string name="hint_page_title">Page Title</string>
     <string name="hint_memo">Memo</string>
     <string name="settings">Settings</string>
-    <string name="photoView">Photo View</string>
+    <string name="photoView" translatable="false">Photo View</string>
     <string name="drag_handle" translatable="false">Drag Handle</string>
 
     <!-- Shared Preference -->
@@ -32,5 +32,6 @@
     <string name="pref_key_version" translatable="false">PrefKeyVersion</string>
     <string name="pref_title_version">Version</string>
     <string name="default_page_title">New Page</string>
+    <string name="desc_edit_button" translatable="false">Edit Button</string>
 
 </resources>
