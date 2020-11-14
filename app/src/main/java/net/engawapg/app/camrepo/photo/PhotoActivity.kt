@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.activity_photo.*
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -40,6 +41,7 @@ class PhotoActivity : AppCompatActivity() {
             title = ""
         }
 
+        photoPager.registerOnPageChangeCallback(pageChangeCallback)
         photoPager.offscreenPageLimit = 1
         photoPager.adapter = PhotoAdapter(this, viewModel)
         val position = viewModel.getPosition(pageIndex, photoIndex)
@@ -63,6 +65,20 @@ class PhotoActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return PhotoFragment.newInstance(position)
         }
+    }
+
+    private val pageChangeCallback = object: ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            showToolbarTitle(position)
+        }
+    }
+
+    /** Toolbarにタイトルを表示
+     * @param index: 0始まりの写真の番号
+     */
+    private fun showToolbarTitle(index: Int) {
+        supportActionBar?.title = "${index + 1}/${viewModel.getPhotoCount()} (${viewModel.getTitle()})"
     }
 
     companion object {

@@ -57,4 +57,12 @@ class PhotoViewModel(app: Application, private val noteModel: NoteModel)
             noteModel.getPhotoAt(pageIndex, index)
         }
     }
+
+    fun getTitle(): String {
+        return if (wholeOfNote) {
+            noteModel.title
+        } else {
+            noteModel.getTitle(pageIndex)
+        }
+    }
 }
