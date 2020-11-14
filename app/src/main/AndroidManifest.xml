@@ -16,10 +16,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".slideshow.SlideshowActivity" />
         <activity android:name=".photo.PhotoActivity" />
         <activity
             android:name=".settings.SettingsActivity"
-            android:parentActivityName=".notelist.NoteListActivity"/>
+            android:parentActivityName=".notelist.NoteListActivity" />
         <activity
             android:name=".page.PageActivity"
             android:parentActivityName=".note.NoteActivity" />

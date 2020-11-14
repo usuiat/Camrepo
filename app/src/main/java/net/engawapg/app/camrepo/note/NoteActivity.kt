@@ -18,6 +18,7 @@ import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import net.engawapg.app.camrepo.page.PageActivity
 import net.engawapg.app.camrepo.photo.PhotoActivity
+import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
@@ -127,6 +128,12 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         return when(item.itemId) {
             R.id.edit_list_items -> {
                 actionMode = startActionMode(actionModeCallback)
+                true
+            }
+            R.id.slideshow -> {
+                startActivity(Intent(this, SlideshowActivity::class.java).apply {
+                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, 0)
+                })
                 true
             }
             android.R.id.home -> {

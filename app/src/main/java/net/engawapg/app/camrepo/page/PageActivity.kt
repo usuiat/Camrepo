@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.photo.PhotoActivity
+import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -140,6 +141,12 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             R.id.edit_list_items -> {
                 hideCameraFragment()
                 actionMode = startActionMode(actionModeCallback)
+                true
+            }
+            R.id.slideshow -> {
+                startActivity(Intent(this, SlideshowActivity::class.java).apply {
+                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, pageIndex)
+                })
                 true
             }
             android.R.id.home -> {
