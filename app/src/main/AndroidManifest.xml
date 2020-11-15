@@ -16,7 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".slideshow.SlideshowActivity" />
+        <activity
+            android:name=".slideshow.SlideshowActivity"
+            android:screenOrientation="sensor"/>
         <activity android:name=".photo.PhotoActivity" />
         <activity
             android:name=".settings.SettingsActivity"

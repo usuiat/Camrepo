@@ -11,4 +11,8 @@
         <item name="android:colorEdgeEffect">@color/windowShadow</item>
     </style>
 
+    <style name="SlideshowToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
+
 </resources>
