@@ -10,9 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import kotlinx.android.synthetic.main.activity_page.toolbar
 import kotlinx.android.synthetic.main.activity_slideshow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -20,6 +23,7 @@ class SlideshowActivity : AppCompatActivity() {
 
     private val viewModel: SlideshowViewModel by viewModel()
     private var isFullScreen = false
+    private lateinit var hideSystemUiJob: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +44,13 @@ class SlideshowActivity : AppCompatActivity() {
             insets
         }
 
-        isFullScreen = true
-        hideSystemUI()
+        showSystemUI() /* LAYOUT系のフラグを最初に設定しておく必要がある */
+        /* ちょっと待ってから全画面にする */
+        hideSystemUiJob = lifecycleScope.launch {
+            delay(2000)
+            isFullScreen = true
+            hideSystemUI()
+        }
 
         /* Get page index */
         val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
@@ -64,6 +73,7 @@ class SlideshowActivity : AppCompatActivity() {
         /* タップ（だけ）を検出し、StatusBarなどの表示・非表示を切り替える */
         rootLayout.setSingleTapListener(object: TouchDetectLayout.SingleTapListener {
             override fun onSingleTap() {
+                hideSystemUiJob.cancel() /* 最初の自動全画面化処理のキャンセル */
                 toggleSystemUI()
             }
         })
@@ -98,6 +108,7 @@ class SlideshowActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_FULLSCREEN
                 )
+        toolbar.visibility = View.INVISIBLE
     }
 
     private fun showSystemUI() {
@@ -107,6 +118,7 @@ class SlideshowActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+        toolbar.visibility = View.VISIBLE
     }
 
 
