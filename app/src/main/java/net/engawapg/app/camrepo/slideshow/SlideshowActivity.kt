@@ -1,8 +1,13 @@
 package net.engawapg.app.camrepo.slideshow
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
-import android.view.MenuItem
+import android.util.AttributeSet
+import android.util.Log
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -14,10 +19,29 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class SlideshowActivity : AppCompatActivity() {
 
     private val viewModel: SlideshowViewModel by viewModel()
+    private var isFullScreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_slideshow)
+
+        /* 画面の切り欠きがあるエリアにはレイアウトしない */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+        }
+
+        /* ウィンドウ領域の変更を検知し、StatusBarの下端にToolBarの上端を合わせる。*/
+        fullScreenContent.setOnApplyWindowInsetsListener { _, insets ->
+            Log.d(TAG, "System Inset Top ${insets.systemWindowInsetTop}")
+            val mlp = toolbar.layoutParams as ViewGroup.MarginLayoutParams
+            mlp.setMargins(0, insets.systemWindowInsetTop, 0, 0)
+            toolbar.layoutParams = mlp
+            insets
+        }
+
+        isFullScreen = true
+        hideSystemUI()
 
         /* Get page index */
         val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
@@ -36,6 +60,13 @@ class SlideshowActivity : AppCompatActivity() {
             adapter = SlideAdapter(this@SlideshowActivity, viewModel)
             setCurrentItem(pageIndex, false)
         }
+
+        /* タップ（だけ）を検出し、StatusBarなどの表示・非表示を切り替える */
+        rootLayout.setSingleTapListener(object: TouchDetectLayout.SingleTapListener {
+            override fun onSingleTap() {
+                toggleSystemUI()
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -48,6 +79,37 @@ class SlideshowActivity : AppCompatActivity() {
         }
     }
 
+    private fun toggleSystemUI() {
+        isFullScreen = !isFullScreen
+        if (isFullScreen) {
+            hideSystemUI()
+        } else {
+            showSystemUI()
+        }
+    }
+
+    private fun hideSystemUI() {
+        Log.d(TAG, "Hide System UI")
+        fullScreenContent.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+                )
+    }
+
+    private fun showSystemUI() {
+        Log.d(TAG, "Show System UI")
+        fullScreenContent.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                )
+    }
+
+
     class SlideAdapter(fa: FragmentActivity, private val viewModel: SlideshowViewModel)
         : FragmentStateAdapter(fa) {
         override fun getItemCount() = viewModel.getSlideCount()
@@ -58,5 +120,44 @@ class SlideshowActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_PAGE_INDEX = "KeyPageIndex"
+        private const val TAG = "SlideshowActivity"
+    }
+}
+
+/**
+ * タップを検出するためのLayout。
+ * 子View（ここではPager）でスクロールされた場合は何もせず、シングルタップだけを検出する。
+ */
+class TouchDetectLayout(context: Context, attrs: AttributeSet): ConstraintLayout(context, attrs) {
+
+    interface SingleTapListener {
+        fun onSingleTap()
+    }
+
+    private var singleTapListener: SingleTapListener? = null
+
+    fun setSingleTapListener(listener: SingleTapListener) {
+        singleTapListener = listener
+    }
+
+    /*
+     * onInterceptTouchEventではfalseを返し、通常通り子Viewによってタッチイベントが処理されるようにする。
+     * 子ViewがOnClickを処理した場合はACTION_UPが来るので、シングルタップだと判定できる。
+     * ドラッグした場合はOnClickが発動しないので、ACTION_UPが来ない。
+     * 全面でタップを検出するため、このレイアウトのすぐ上にダミーのclickableなViewをかぶせる。
+     */
+    override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
+        event?.let {
+            val action = event.actionMasked
+            Log.d(TAG, "onInterceptTouchEvent ${MotionEvent.actionToString(action)}")
+            if (action == MotionEvent.ACTION_UP) {
+                singleTapListener?.onSingleTap()
+            }
+        }
+        return false
+    }
+
+    companion object {
+        private const val TAG = "TouchDetectLayout"
     }
 }
