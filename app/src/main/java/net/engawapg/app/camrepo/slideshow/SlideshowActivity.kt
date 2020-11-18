@@ -44,6 +44,16 @@ class SlideshowActivity : AppCompatActivity() {
             insets
         }
 
+        /* ToolBarはSystemUIの表示状態に合わせる */
+        /* タップ検出リスナーで処理してしまうと、タップ以外でSystemUI状態が変わった場合を見逃してしまう */
+        fullScreenContent.setOnSystemUiVisibilityChangeListener { visibility ->
+            if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
+                toolbar.visibility = View.VISIBLE
+            } else {
+                toolbar.visibility = View.INVISIBLE
+            }
+        }
+
         showSystemUI() /* LAYOUT系のフラグを最初に設定しておく必要がある */
         /* ちょっと待ってから全画面にする */
         hideSystemUiJob = lifecycleScope.launch {
@@ -108,7 +118,6 @@ class SlideshowActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_FULLSCREEN
                 )
-        toolbar.visibility = View.INVISIBLE
     }
 
     private fun showSystemUI() {
@@ -118,7 +127,6 @@ class SlideshowActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
-        toolbar.visibility = View.VISIBLE
     }
 
 
