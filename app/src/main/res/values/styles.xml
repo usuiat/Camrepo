@@ -15,4 +15,7 @@
         <item name="colorControlNormal">@android:color/white</item>
     </style>
 
+    <style name="Theme.AppTheme.TranslucentStatusBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/halfTransparentBar</item>
+    </style>
 </resources>

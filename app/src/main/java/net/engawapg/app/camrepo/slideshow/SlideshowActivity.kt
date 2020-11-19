@@ -49,8 +49,10 @@ class SlideshowActivity : AppCompatActivity() {
         fullScreenContent.setOnSystemUiVisibilityChangeListener { visibility ->
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
                 toolbar.visibility = View.VISIBLE
+                uiBackGround.visibility = View.VISIBLE
             } else {
                 toolbar.visibility = View.INVISIBLE
+                uiBackGround.visibility = View.INVISIBLE
             }
         }
 

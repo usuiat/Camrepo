@@ -9,4 +9,6 @@
     <color name="lightIcon">#939393</color>
     <color name="black">#000000</color>
     <color name="windowShadow">#A9ACAD</color>
+    <color name="halfTransparentBar">#20000000</color>
+    <color name="uiOverlayBackground">#A0000000</color>
 </resources>

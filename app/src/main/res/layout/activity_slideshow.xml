@@ -39,12 +39,23 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <View
+        android:id="@+id/uiBackGround"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/background_ui_overlay"
+        android:focusable="false"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:alpha="0.7"
-        android:background="@color/black"
+        android:background="@android:color/transparent"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/SlideshowToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
