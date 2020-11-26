@@ -61,6 +61,12 @@ class SlideshowFragment : Fragment() {
         if (photoCount == 0) {
             photoGrid.visibility = View.GONE
         } else {
+            if ((photoCount == 1) and isMemoEmpty) {
+                /* 写真が1枚だけの時は両側にスペースを配置して中央寄せにする */
+                group_space_photo.visibility = View.VISIBLE
+            } else {
+                group_space_photo.visibility = View.GONE
+            }
             photoGrid.visibility = View.VISIBLE
             val span = getPhotoGridSpan(isMemoEmpty)
             photoGrid.layoutManager = GridLayoutManager(context, span)

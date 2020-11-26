@@ -98,10 +98,27 @@
             app:layout_constraintDimensionRatio="2">
 
             <androidx.constraintlayout.widget.Group
+                android:id="@+id/group_space_photo"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="space_right_photo,space_left_photo" />
+
+            <androidx.constraintlayout.widget.Group
                 android:id="@+id/group_memo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:constraint_referenced_ids="space_right_memo,textView_memo,space_left_memo" />
+
+            <Space
+                android:id="@+id/space_left_photo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/photoGrid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/photoGrid"
@@ -109,12 +126,22 @@
                 android:layout_height="0dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/space_left_memo"
+                app:layout_constraintStart_toEndOf="@+id/space_left_photo"
+                app:layout_constraintEnd_toStartOf="@id/space_right_photo"
                 app:layout_constraintHorizontal_weight="0.5"
                 android:background="@android:color/darker_gray">
 
             </androidx.recyclerview.widget.RecyclerView>
+
+            <Space
+                android:id="@+id/space_right_photo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHorizontal_weight="0.25"
+                app:layout_constraintStart_toEndOf="@+id/photoGrid"
+                app:layout_constraintEnd_toStartOf="@id/space_left_memo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Space
                 android:id="@+id/space_left_memo"
@@ -123,7 +150,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/textView_memo"
                 app:layout_constraintHorizontal_weight="0.02"
-                app:layout_constraintStart_toEndOf="@id/photoGrid"
+                app:layout_constraintStart_toEndOf="@id/space_right_photo"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
