@@ -1,18 +1,18 @@
 package net.engawapg.app.camrepo.slideshow
 
-import android.graphics.ImageDecoder
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_slideshow.*
 import kotlinx.android.synthetic.main.view_slide_photo_grid.view.*
+import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.viewModel
 import kotlin.math.ceil
@@ -33,7 +33,7 @@ class SlideshowFragment : Fragment() {
         arguments?.let {
             viewModel.pageIndex = it.getInt(ARG_PAGE_INDEX, 0)
         }
-        Log.d(TAG, "pageIndex = ${viewModel.pageIndex}")
+        Log.d(TAG, "Slide page = ${viewModel.pageIndex}, title = ${viewModel.getPageTitle()}")
     }
 
     override fun onCreateView(
@@ -70,7 +70,7 @@ class SlideshowFragment : Fragment() {
             photoGrid.visibility = View.VISIBLE
             val span = getPhotoGridSpan(isMemoEmpty)
             photoGrid.layoutManager = GridLayoutManager(context, span)
-            photoGrid.adapter = PhotoGridAdapter(viewModel)
+            photoGrid.adapter = PhotoGridAdapter(viewModel, viewLifecycleOwner, span)
         }
     }
 
@@ -118,7 +118,8 @@ class SlideshowFragment : Fragment() {
         private const val TAG = "SlideshowFragment"
     }
 
-    class PhotoGridAdapter(private val viewModel: SlideViewModel)
+    class PhotoGridAdapter(private val viewModel: SlideViewModel,
+                           private val lifecycleOwner: LifecycleOwner, private val span: Int)
         : RecyclerView.Adapter<PhotoGridViewHolder>() {
 
         override fun getItemCount() = viewModel.getPhotoCount()
@@ -126,31 +127,25 @@ class SlideshowFragment : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGridViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val view = layoutInflater.inflate(R.layout.view_slide_photo_grid, parent, false)
-            return PhotoGridViewHolder(view)
+            val width = parent.width / span
+            Log.d(TAG, "PhotoGrid width = $width")
+            return PhotoGridViewHolder(view, width)
         }
 
         override fun onBindViewHolder(holder: PhotoGridViewHolder, position: Int) {
             val imageInfo = viewModel.getPhoto(position)
-            val resolver = holder.itemView.context.contentResolver
-            val bmp = try {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                    MediaStore.Images.Media.getBitmap(resolver, imageInfo?.uri)
+            lifecycleOwner.lifecycleScope.launch {
+                val resolver = holder.itemView.context.contentResolver
+                val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it, holder.size) }
+                if (bmp != null) {
+                    holder.itemView.imageView.setImageBitmap(bmp)
                 } else {
-                    val decoder = ImageDecoder.createSource(resolver!!, imageInfo!!.uri)
-                    ImageDecoder.decodeBitmap(decoder)
+                    holder.itemView.imageView.setImageResource(R.drawable.imagenotfound)
                 }
-            } catch (e: Exception) {
-                null
-            }
-            if (bmp != null) {
-                holder.itemView.imageView.setImageBitmap(bmp)
-            } else {
-                holder.itemView.imageView.setImageResource(R.drawable.imagenotfound)
             }
         }
     }
 
-    class PhotoGridViewHolder(v: View): RecyclerView.ViewHolder(v) {
+    class PhotoGridViewHolder(v: View, val size: Int): RecyclerView.ViewHolder(v)
 
-    }
 }
