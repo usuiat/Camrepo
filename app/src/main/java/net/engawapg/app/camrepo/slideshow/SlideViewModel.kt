@@ -12,7 +12,12 @@ class SlideViewModel(app: Application, private val noteModel: NoteModel): Androi
 
     fun getPageMemo() = noteModel.getMemo(pageIndex)
 
-    fun getPhotoCount() = noteModel.getPhotoCount(pageIndex)
+    fun getPhotoCount(): Int {
+        val memo = getPageMemo()
+        val maxCount = if (memo.isEmpty()) 50 else 25
+        val count = noteModel.getPhotoCount(pageIndex)
+        return if (count < maxCount) count else maxCount
+    }
 
     fun getPhoto(photoIndex: Int) = noteModel.getPhotoAt(pageIndex, photoIndex)
 }

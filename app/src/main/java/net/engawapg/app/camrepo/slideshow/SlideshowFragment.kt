@@ -76,13 +76,7 @@ class SlideshowFragment : Fragment() {
 
     private fun getPhotoGridSpan(isFullScreen: Boolean): Int {
         /* 写真数を取得 */
-        val photoCount = viewModel.getPhotoCount()
-        /* 写真の最大数を制限 */
-        val count = if (isFullScreen) {
-            if (photoCount < 50) photoCount else 50
-        } else {
-            if (photoCount < 25) photoCount else 25
-        }
+        val count = viewModel.getPhotoCount()
 
         /* 列数を決定 */
         val span = if (isFullScreen) {
@@ -101,7 +95,7 @@ class SlideshowFragment : Fragment() {
             /* 縦横比 1:1 */
             ceil(sqrt(count.toFloat())).toInt()
         }
-        Log.d(TAG, "Photo count = $photoCount, Span = $span")
+        Log.d(TAG, "Photo count = $count, Span = $span")
 
         return span
     }
