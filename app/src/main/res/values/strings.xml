@@ -33,5 +33,6 @@
     <string name="pref_title_version">Version</string>
     <string name="default_page_title">New Page</string>
     <string name="desc_edit_button" translatable="false">Edit Button</string>
+    <string name="request_camera_permission_message_sdk29">This app needs permission to access camera to take photos.</string>
 
 </resources>

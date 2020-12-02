@@ -12,6 +12,7 @@ import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
 import android.media.MediaActionSound
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -63,10 +64,16 @@ class CameraFragment : Fragment()  {
             toggleFlashMode()
         }
 
-        permissionHelper = PermissionHelper(this,
-            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            getString(R.string.request_camera_permission_message)
-        )
+        val perms: Array<String>
+        val message: String
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            message = getString(R.string.request_camera_permission_message)
+        } else {
+            perms = arrayOf(Manifest.permission.CAMERA)
+            message = getString(R.string.request_camera_permission_message_sdk29)
+        }
+        permissionHelper = PermissionHelper(this, perms, message)
 
         /* Flash Modeの設定を復元 */
         activity?.getSharedPreferences(

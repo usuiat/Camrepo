@@ -19,4 +19,5 @@
     <string name="default_note_sub_title">サブタイトル</string>
     <string name="request_camera_permission_message">このアプリは写真撮影のためにカメラとストレージのアクセス許可が必要です。</string>
     <string name="default_page_title">新しいページ</string>
+    <string name="request_camera_permission_message_sdk29">このアプリは写真撮影のためにカメラのアクセス許可が必要です。</string>
 </resources>
