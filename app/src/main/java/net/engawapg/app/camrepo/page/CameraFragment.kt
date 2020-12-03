@@ -630,6 +630,7 @@ class CameraFragment : Fragment()  {
      * Capture a still picture. This method should be called when we get a response in
      * [.captureCallback] from both [.lockFocus].
      */
+    @SuppressLint("ObsoleteSdkInt")
     private fun captureStillPicture() {
         try {
             if (activity == null || cameraDevice == null) return
@@ -677,8 +678,10 @@ class CameraFragment : Fragment()  {
             activity?.runOnUiThread { doShutterEffect() }
 
             captureSession?.apply {
-                stopRepeating()
-                abortCaptures()
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                    stopRepeating()
+                    abortCaptures()
+                }
                 captureBuilder?.build()?.let {
                     capture(it, captureCallback, null)
                 }
