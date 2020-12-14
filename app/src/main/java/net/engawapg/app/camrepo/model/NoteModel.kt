@@ -183,7 +183,7 @@ class NoteModel(private val app: Application) {
     }
 
     companion object {
-        fun createModel(noteProperty: NoteProperty) {
+        fun createModel(noteProperty: NoteProperty): NoteModel {
             // Close old session
             getKoin().getScopeOrNull(Constants.SCOPE_ID_NOTE)?.close()
             // Create new session
@@ -192,6 +192,7 @@ class NoteModel(private val app: Application) {
             val noteModel: NoteModel = noteSession.get()
             noteModel.init(noteProperty.fileName, noteProperty.title, noteProperty.subTitle)
             Log.d(TAG, "create NoteModel")
+            return noteModel
         }
 
         private const val TAG = "NoteModel"

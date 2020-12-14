@@ -34,5 +34,7 @@
     <string name="default_page_title">New Page</string>
     <string name="desc_edit_button" translatable="false">Edit Button</string>
     <string name="request_camera_permission_message_sdk29">This app needs permission to access camera to take photos.</string>
+    <string name="desc_app_icon" translatable="false">App Icon</string>
+    <string name="desc_add_new_page" translatable="false">Add new page</string>
 
 </resources>

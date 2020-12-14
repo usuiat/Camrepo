@@ -11,6 +11,7 @@ class NoteListModel(private val app: Application) {
 
     init {
         load()
+        Log.d(TAG, "Load Note List")
     }
 
     private fun load() {

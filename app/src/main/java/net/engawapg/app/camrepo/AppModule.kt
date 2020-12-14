@@ -47,7 +47,7 @@ val appModule = module {
         )
     }
 
-    viewModel { NoteViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get(), get()) }
+    viewModel { NoteViewModel(androidApplication(), get()) }
 
     viewModel { NoteListViewModel(androidApplication(), get()) }
 

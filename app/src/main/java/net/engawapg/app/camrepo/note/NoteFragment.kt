@@ -1,10 +1,10 @@
 package net.engawapg.app.camrepo.note
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -16,31 +16,30 @@ import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
-import net.engawapg.app.camrepo.page.PageActivity
-import net.engawapg.app.camrepo.photo.PhotoActivity
-import net.engawapg.app.camrepo.slideshow.SlideshowActivity
-import org.koin.android.viewmodel.ext.android.viewModel
+import net.engawapg.app.camrepo.notelist.NoteListViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
-    EditTitleDialog.EventListener {
-    private val viewModel: NoteViewModel by viewModel()
+class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
+
+    private val noteListViewModel: NoteListViewModel by sharedViewModel()
+    private val viewModel: NoteViewModel by sharedViewModel()
     private var actionMode: ActionMode? = null
-    private  lateinit var noteItemAdapter: NoteItemAdapter
+    private lateinit var noteItemAdapter: NoteItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note)
+    }
 
-        /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
-//        viewModel.initItemList(IMAGE_SPAN_COUNT)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_note, container, false)
+    }
 
-        /* ToolBar */
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setHomeButtonEnabled(true)
-            it.title = ""
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         /* RecyclerView */
         noteItemAdapter = NoteItemAdapter(viewModel, itemTouchHelper) {
@@ -58,6 +57,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         floatingActionButton.setOnClickListener {
             onClickAddButton()
         }
+
+        noteListViewModel.selectedNote.observe(viewLifecycleOwner, Observer { noteProperty ->
+            /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
+            viewModel.initItemList(noteProperty, IMAGE_SPAN_COUNT)
+            Log.d(TAG, "${noteProperty.title} is selected." )
+            noteItemAdapter.notifyDataSetChanged()
+        })
     }
 
     override fun onResume() {
@@ -87,20 +93,20 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                     putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
                     putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
                 }
-                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
+//                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {
-                startActivity(Intent(this, PageActivity::class.java).apply {
-                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                })
+//                startActivity(Intent(this, PageActivity::class.java).apply {
+//                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
+//                })
             }
             NoteViewModel.VIEW_TYPE_PHOTO -> {
-                startActivity(Intent(this, PhotoActivity::class.java).apply {
-                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
-                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
-                })
+//                startActivity(Intent(this, PhotoActivity::class.java).apply {
+//                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
+//                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
+//                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
+//                })
             }
         }
     }
@@ -114,34 +120,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         viewModel.addPage()
         val newPageIndex = viewModel.getPageIndex(noteItemAdapter.itemCount - 1)
         Log.d(TAG, "Page added. itemCount = ${noteItemAdapter.itemCount}, pageIndex = $newPageIndex")
-        startActivity(Intent(this, PageActivity::class.java).apply {
-            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
-        })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_note, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
-            R.id.edit_list_items -> {
-                actionMode = startActionMode(actionModeCallback)
-                true
-            }
-            R.id.slideshow -> {
-                startActivity(Intent(this, SlideshowActivity::class.java).apply {
-                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, 0)
-                })
-                true
-            }
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+//        startActivity(Intent(this, PageActivity::class.java).apply {
+//            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
+//        })
     }
 
     private val actionModeCallback = object: ActionMode.Callback {
@@ -156,7 +137,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPageSelected()) {
-                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+//                    DeleteConfirmDialog().show(supportFragmentManager,
+//                        DELETE_CONFIRM_DIALOG
+//                    )
                 }
             }
             return true
@@ -239,11 +222,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel,
-                              private val itemTouchHelper: ItemTouchHelper) :BaseViewHolder(v) {
+                              private val itemTouchHelper: ItemTouchHelper
+    ) :BaseViewHolder(v) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel,
-                       itemTouchHelper: ItemTouchHelper): PageTitleViewHolder {
+                       itemTouchHelper: ItemTouchHelper
+            ): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_note_page_title, parent, false)
                 return PageTitleViewHolder(view, viewModel, itemTouchHelper)
@@ -347,10 +332,11 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     })
 
     companion object {
-        private const val TAG = "NoteActivity"
-
+        private const val TAG = "NoteFragment"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
+//        @JvmStatic
+//        fun newInstance() = NoteFragment()
     }
 }
