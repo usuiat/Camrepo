@@ -1,6 +1,5 @@
 package net.engawapg.app.camrepo.notelist
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.R
-import net.engawapg.app.camrepo.note.NoteActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 /**

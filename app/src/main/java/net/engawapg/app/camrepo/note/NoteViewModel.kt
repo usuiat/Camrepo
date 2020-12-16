@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
@@ -21,18 +22,20 @@ class NoteViewModel(app: Application, private val noteListModel: NoteListModel)
     )
 
     /* RecyclerViewを構成するアイテムのリスト */
+    val noteProperty = MutableLiveData<NoteProperty?>()
     private var noteModel: NoteModel? = null
     private var itemList: MutableList<ItemInfo>? = null
-    private var columnCount: Int = 4
+    var columnCount: Int = 4
     private var modified = false
     private var pageAdded = false
     private var lastModifiedDate: Long = 0
     private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
 
-    fun initItemList(note: NoteProperty, columnCount: Int) {
-        noteModel = NoteModel.createModel(note)
-        this.columnCount = columnCount
-        buildItemList()
+    fun initItemList() {
+        noteProperty.value?.let {
+            noteModel = NoteModel.createModel(it)
+            buildItemList()
+        }
     }
 
     fun setPageTitleListMode(mode: Boolean) {

@@ -58,10 +58,8 @@ class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener, EditTitleDia
             onClickAddButton()
         }
 
-        noteListViewModel.selectedNote.observe(viewLifecycleOwner, Observer { noteProperty ->
-            /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
-            viewModel.initItemList(noteProperty, IMAGE_SPAN_COUNT)
-            Log.d(TAG, "${noteProperty.title} is selected." )
+        viewModel.noteProperty.observe(viewLifecycleOwner, Observer {
+            viewModel.initItemList()
             noteItemAdapter.notifyDataSetChanged()
         })
     }
