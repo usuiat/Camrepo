@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_note_list.*
@@ -18,9 +20,10 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
  * Use the [NoteListFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class NoteListFragment : Fragment(), EditTitleDialog.EventListener {
+class NoteListFragment : Fragment() {
 
     private val viewModel: NoteListViewModel by sharedViewModel()
+    private val editTitleViewModel: EditTitleViewModel by sharedViewModel()
     private lateinit var noteCardAdapter: NoteCardAdapter
 
     override fun onCreateView(
@@ -42,25 +45,24 @@ class NoteListFragment : Fragment(), EditTitleDialog.EventListener {
         }
 
         floatingActionButton.setOnClickListener { onClickAddButton() }
+
+        editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
+            viewModel.createNewNote(editTitleViewModel.title, editTitleViewModel.subTitle)
+            noteCardAdapter.notifyDataSetChanged()
+        })
     }
 
     private fun onClickAddButton() {
-        val dialog = EditTitleDialog()
-        dialog.arguments = Bundle().apply {
-            putInt(EditTitleDialog.KEY_TITLE, R.string.create_new_note)
+        editTitleViewModel.apply {
+            dialogTitle = getString(R.string.create_new_note)
+            title = ""
+            subTitle = ""
         }
-        dialog.show(parentFragmentManager, EDIT_TITLE_DIALOG)
-    }
-
-    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        Log.d(TAG, "Title = ${title}, SubTitle = $subTitle")
-        viewModel.createNewNote(title, subTitle)
-//        startActivity(Intent(this, NoteActivity::class.java))
+        findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
     }
 
     companion object {
         private const val TAG = "NoteListFragment"
-        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         @JvmStatic
         fun newInstance() = NoteListFragment()
     }
@@ -101,8 +103,6 @@ class NoteListFragment : Fragment(), EditTitleDialog.EventListener {
                 if (!editMode) {
                     Log.d(TAG, "onClick Card at $position")
                     viewModel.selectNote(adapterPosition)
-//                    val intent = Intent(it.context, NoteActivity::class.java)
-//                    it.context.startActivity(intent)
                 }
             }
 

@@ -4,6 +4,7 @@ import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.page.CameraViewModel
 import net.engawapg.app.camrepo.note.NoteViewModel
+import net.engawapg.app.camrepo.notelist.EditTitleViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import net.engawapg.app.camrepo.page.PageViewModel
 import net.engawapg.app.camrepo.photo.PhotoViewModel
@@ -63,5 +64,9 @@ val appModule = module {
             androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
+    }
+
+    viewModel {
+        EditTitleViewModel(androidApplication())
     }
 }

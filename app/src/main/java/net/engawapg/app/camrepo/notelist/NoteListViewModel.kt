@@ -22,6 +22,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         currentNote = note
         selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
+        save()
     }
 
     fun save() {

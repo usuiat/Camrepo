@@ -19,7 +19,7 @@ import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
+class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener {
 
     private val noteListViewModel: NoteListViewModel by sharedViewModel()
     private val viewModel: NoteViewModel by sharedViewModel()
@@ -86,11 +86,11 @@ class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener, EditTitleDia
         when (noteItemAdapter.getItemViewType(position)) {
             NoteViewModel.VIEW_TYPE_TITLE -> {
                 val dialog = EditTitleDialog()
-                dialog.arguments = Bundle().apply {
-                    putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
-                    putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
-                    putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
-                }
+//                dialog.arguments = Bundle().apply {
+//                    putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
+//                    putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
+//                    putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
+//                }
 //                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
@@ -109,10 +109,10 @@ class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener, EditTitleDia
         }
     }
 
-    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        viewModel.setNoteTitle(title, subTitle)
-        noteItemAdapter.notifyItemChanged(0)
-    }
+//    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+//        viewModel.setNoteTitle(title, subTitle)
+//        noteItemAdapter.notifyItemChanged(0)
+//    }
 
     private fun onClickAddButton() {
         viewModel.addPage()

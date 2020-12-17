@@ -15,8 +15,7 @@ import net.engawapg.app.camrepo.note.NoteActivity
 import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
-    ,EditTitleDialog.EventListener {
+class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     private val viewModel: NoteListViewModel by viewModel()
     private var actionMode: ActionMode? = null
@@ -109,17 +108,17 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
 
     private fun onClickAddButton() {
         val dialog = EditTitleDialog()
-        dialog.arguments = Bundle().apply {
-            putInt(EditTitleDialog.KEY_TITLE, R.string.create_new_note)
-        }
+//        dialog.arguments = Bundle().apply {
+//            putInt(EditTitleDialog.KEY_TITLE, R.string.create_new_note)
+//        }
         dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
     }
 
-    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        Log.d(TAG, "Title = ${title}, SubTitle = $subTitle")
-        viewModel.createNewNote(title, subTitle)
-        startActivity(Intent(this, NoteActivity::class.java))
-    }
+//    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+//        Log.d(TAG, "Title = ${title}, SubTitle = $subTitle")
+//        viewModel.createNewNote(title, subTitle)
+//        startActivity(Intent(this, NoteActivity::class.java))
+//    }
 
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
         : RecyclerView.Adapter<NoteCardViewHolder>() {

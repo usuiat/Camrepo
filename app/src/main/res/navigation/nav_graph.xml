@@ -9,5 +9,18 @@
         android:id="@+id/noteFragment"
         android:name="net.engawapg.app.camrepo.note.NoteFragment"
         android:label="fragment_note"
-        tools:layout="@layout/fragment_note" />
+        tools:layout="@layout/fragment_note" >
+        <action
+            android:id="@+id/action_noteFragment_to_editTitleDialog"
+            app:destination="@id/editTitleDialog" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/editTitleDialog"
+        android:name="net.engawapg.app.camrepo.notelist.EditTitleDialog" >
+        <argument
+            android:name="dialogTitle"
+            app:argType="string"
+            android:defaultValue="test" />
+    </dialog>
 </navigation>
