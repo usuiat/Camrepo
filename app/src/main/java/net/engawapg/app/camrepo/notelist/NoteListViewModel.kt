@@ -4,11 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteProperty
 import java.text.SimpleDateFormat
 
-class NoteListViewModel(app: Application, private val model: NoteListModel)
+class NoteListViewModel(private val app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
 
     private var selection: MutableList<Boolean>? = null
@@ -17,7 +18,12 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
     val selectedNote = MutableLiveData<NoteProperty>()
 
     fun createNewNote(title: String, subTitle: String) {
-        val note = model.createNewNote(title, subTitle)
+        val t = if (title == "") {
+            app.getString(R.string.default_note_title)
+        } else {
+            title
+        }
+        val note = model.createNewNote(t, subTitle)
         lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
         currentNote = note
         selectedNote.value = note

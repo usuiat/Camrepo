@@ -32,20 +32,10 @@ class EditTitleDialog: DialogFragment() {
             builder.setView(view)
                 .setTitle(viewModel.dialogTitle)
                 .setPositiveButton(R.string.ok) { _, _ ->
-                    onClickOk()
+                    viewModel.onClickOk.value = true
                 }
                 .setNegativeButton(R.string.cancel) { _, _ -> Unit }
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
-    }
-
-    private fun onClickOk() {
-//        val et = dialog?.findViewById<EditText>(R.id.editTitle)
-//        val est = dialog?.findViewById<EditText>(R.id.editSubTitle)
-//        viewModel.title = et?.text.toString()
-        if (viewModel.title == "") viewModel.title = getString(R.string.default_note_title)
-//        viewModel.subTitle = est?.text.toString() /* subTitleは未入力の場合は空欄にしておく */
-
-        viewModel.onClickOk.value = true
     }
 }
