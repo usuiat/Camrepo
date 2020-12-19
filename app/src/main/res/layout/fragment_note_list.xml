@@ -7,6 +7,47 @@
     android:layout_height="match_parent"
     tools:context=".notelist.NoteListFragment">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navHeader"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:background="@color/windowBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="153dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:contentDescription="@string/desc_app_icon"
+            android:src="@drawable/ic_logo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/settingButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_setting"
+            android:scaleType="center"
+            android:src="@drawable/setting"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/editNoteListButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_edit_note_list"
+            android:src="@drawable/check"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
@@ -33,6 +74,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/navHeader" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
