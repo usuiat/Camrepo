@@ -43,9 +43,13 @@ class MainActivity : AppCompatActivity() {
         /* Navigation drawer */
         nav_view.setupWithNavController(navController)
         /* ノートが選択されたら画面を閉じる */
-        noteListViewModel.selectedNote.observe(this, Observer{
-            drawer_layout.close()
-            displayAfterCloseDrawer = DISPLAY_NOTE /* Drawer閉じ終わったらノート表示更新 */
+        noteListViewModel.selectedNote.observe(this, Observer{ note ->
+            if (note != null) {
+                drawer_layout.close()
+                displayAfterCloseDrawer = DISPLAY_NOTE /* Drawer閉じ終わったらノート表示更新 */
+            } else {
+                noteViewModel.noteProperty.value = null
+            }
         })
         /* Drawer表示状態変更時の処理 */
         drawer_layout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {

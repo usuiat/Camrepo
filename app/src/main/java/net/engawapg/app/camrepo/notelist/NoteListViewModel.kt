@@ -14,7 +14,6 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
 
     private var selection: MutableList<Boolean>? = null
     private var lastModified: Long = 0
-    private var currentNote: NoteProperty? = null
     val selectedNote = MutableLiveData<NoteProperty>()
 
     fun createNewNote(title: String, subTitle: String) {
@@ -25,7 +24,6 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
         }
         val note = model.createNewNote(t, subTitle)
         lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
-        currentNote = note
         selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
         save()
@@ -53,7 +51,6 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
     fun selectNote(index: Int) {
         val note = getItem(index)
         lastModified = note.updatedDate
-        currentNote = note
         selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
     }
@@ -85,15 +82,25 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
 
     fun deleteSelectedItems() {
         val indexes = mutableListOf<Int>()
-        selection?.forEachIndexed { index, b -> if (b) indexes.add(index) }
+        selection?.forEachIndexed { index, b ->
+            if (b) {
+                indexes.add(index)
+                if (selectedNote.value == getItem(index)) {
+                    /* 表示中のノートを削除しようとしている */
+                    Log.d(TAG, "Selected note will be deleted.")
+                    lastModified = 0
+                    selectedNote.value = null
+                }
+            }
+        }
         Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
         clearSelection()
     }
 
     fun isCurrentNoteModified(): Boolean {
-        Log.d(TAG, "updateDate = ${currentNote?.updatedDate}")
-        val date = currentNote?.updatedDate
+        val note = selectedNote.value
+        val date = note?.updatedDate
         return (date != null) && (date != lastModified)
     }
 

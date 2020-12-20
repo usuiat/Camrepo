@@ -32,10 +32,9 @@ class NoteViewModel(app: Application, private val noteListModel: NoteListModel)
     private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
 
     fun initItemList() {
-        noteProperty.value?.let {
-            noteModel = NoteModel.createModel(it)
-            buildItemList()
-        }
+        noteModel = NoteModel.createModel(noteProperty.value)
+        pageTitleListMode = false
+        buildItemList()
     }
 
     fun setPageTitleListMode(mode: Boolean) {
