@@ -25,7 +25,7 @@ import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class PageActivity : AppCompatActivity() {
     private lateinit var viewModel: PageViewModel
     private val cameraViewModel: CameraViewModel by viewModel()
     private var actionMode: ActionMode? = null
@@ -187,10 +187,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPhotos()
-        actionMode?.finish()
-    }
+//    override fun onClickDeleteButton() {
+//        viewModel.deleteSelectedPhotos()
+//        actionMode?.finish()
+//    }
 
 
     class PageItemAdapter(private val viewModel: PageViewModel,

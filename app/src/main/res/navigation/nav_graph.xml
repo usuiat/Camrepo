@@ -13,14 +13,17 @@
         <action
             android:id="@+id/action_noteFragment_to_editTitleDialog"
             app:destination="@id/editTitleDialog" />
+        <action
+            android:id="@+id/action_noteFragment_to_deleteConfirmDialog"
+            app:destination="@id/deleteConfirmDialog" />
     </fragment>
 
     <dialog
         android:id="@+id/editTitleDialog"
         android:name="net.engawapg.app.camrepo.notelist.EditTitleDialog" >
-        <argument
-            android:name="dialogTitle"
-            app:argType="string"
-            android:defaultValue="test" />
     </dialog>
+    <dialog
+        android:id="@+id/deleteConfirmDialog"
+        android:name="net.engawapg.app.camrepo.DeleteConfirmDialog"
+        android:label="DeleteConfirmDialog" />
 </navigation>

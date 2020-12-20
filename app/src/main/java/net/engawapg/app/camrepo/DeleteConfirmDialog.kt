@@ -2,13 +2,11 @@ package net.engawapg.app.camrepo
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 
 class DeleteConfirmDialog: DialogFragment() {
-
-    private lateinit var listener: EventListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -16,7 +14,9 @@ class DeleteConfirmDialog: DialogFragment() {
             val builder = AlertDialog.Builder(it)
             builder.setMessage(R.string.delete_confirm_message)
                 .setPositiveButton(R.string.delete) { _, _ ->
-                    listener.onClickDeleteButton()
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        KEY_RESULT, RESULT_DELETE
+                    )
                 }
                 .setNegativeButton(R.string.cancel) { _, _ -> Unit }
             // Create the AlertDialog object and return it
@@ -24,16 +24,8 @@ class DeleteConfirmDialog: DialogFragment() {
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-    interface EventListener {
-        fun onClickDeleteButton()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            listener = context as EventListener
-        } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() + "must implement Listener."))
-        }
+    companion object {
+        const val KEY_RESULT = "DialogFragment_Result"
+        const val RESULT_DELETE = 1
     }
 }

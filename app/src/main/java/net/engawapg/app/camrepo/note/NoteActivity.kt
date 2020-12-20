@@ -21,7 +21,7 @@ import net.engawapg.app.camrepo.photo.PhotoActivity
 import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class NoteActivity : AppCompatActivity() {
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var noteItemAdapter: NoteItemAdapter
@@ -170,10 +170,10 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPages()
-        actionMode?.finish()
-    }
+//    override fun onClickDeleteButton() {
+//        viewModel.deleteSelectedPages()
+//        actionMode?.finish()
+//    }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
                           private val itemTouchHelper: ItemTouchHelper,

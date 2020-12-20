@@ -15,7 +15,7 @@ import net.engawapg.app.camrepo.note.NoteActivity
 import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class NoteListActivity : AppCompatActivity() {
 
     private val viewModel: NoteListViewModel by viewModel()
     private var actionMode: ActionMode? = null
@@ -100,11 +100,11 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        Log.d(TAG, "onClickDeleteButton")
-        viewModel.deleteSelectedItems()
-        actionMode?.finish()
-    }
+//    override fun onClickDeleteButton() {
+//        Log.d(TAG, "onClickDeleteButton")
+//        viewModel.deleteSelectedItems()
+//        actionMode?.finish()
+//    }
 
     private fun onClickAddButton() {
         val dialog = EditTitleDialog()

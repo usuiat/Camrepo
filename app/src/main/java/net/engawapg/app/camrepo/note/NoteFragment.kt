@@ -19,7 +19,7 @@ import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener {
+class NoteFragment : Fragment() {
 
     private val noteListViewModel: NoteListViewModel by sharedViewModel()
     private val viewModel: NoteViewModel by sharedViewModel()
@@ -152,10 +152,10 @@ class NoteFragment : Fragment(), DeleteConfirmDialog.EventListener {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPages()
-        actionMode?.finish()
-    }
+//    override fun onClickDeleteButton() {
+//        viewModel.deleteSelectedPages()
+//        actionMode?.finish()
+//    }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
                           private val itemTouchHelper: ItemTouchHelper,
