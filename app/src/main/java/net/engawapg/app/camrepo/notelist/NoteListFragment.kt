@@ -139,7 +139,6 @@ class NoteListFragment : Fragment() {
 
         fun bind(position: Int, editMode: Boolean) {
             itemView.title.text = viewModel.getTitle(position)
-            itemView.subTitle.text = viewModel.getSubTitle(position)
             itemView.date.text = viewModel.getUpdateDate(position)
             itemView.cardView.setOnClickListener {
                 if (!editMode) {
@@ -149,7 +148,7 @@ class NoteListFragment : Fragment() {
             }
 
             /* CheckBox for delete operation */
-            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
+            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.GONE
             itemView.checkBox.isChecked = viewModel.getSelection(position)
             itemView.checkBox.setOnClickListener {
                 viewModel.setSelection(adapterPosition, itemView.checkBox.isChecked)
