@@ -40,5 +40,6 @@
     <string name="desc_edit_note_list" translatable="false">Edit note list</string>
     <string name="desc_close_edit_mode" translatable="false">Close Edit Mode</string>
     <string name="desc_delete_note" translatable="false">Delete Note</string>
+    <string name="desc_note_icon" translatable="false">Note Icon</string>
 
 </resources>

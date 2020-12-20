@@ -13,34 +13,56 @@
         android:layout_height="match_parent"
         android:background="?attr/selectableItemBackground">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="4dp"
-            android:singleLine="true"
-            android:text="Title"
-            android:textColor="@color/contentTextColor"
-            android:textSize="22sp"
-            app:layout_constraintEnd_toStartOf="@+id/checkBox"
+        <ImageView
+            android:id="@+id/noteIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/desc_note_icon"
+            android:scaleType="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="HardcodedText" />
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/date"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/noteTitleArea"
             android:layout_width="0dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginEnd="14dp"
-            android:text="2020/xx/xx"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            tools:ignore="HardcodedText" />
+            android:layout_height="50dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox"
+            app:layout_constraintStart_toEndOf="@id/noteIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:singleLine="true"
+                android:text="Title"
+                android:textColor="@color/contentTextColor"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/date"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="0dp"
+                android:layout_height="18dp"
+                android:text="2020/xx/xx"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                tools:ignore="HardcodedText" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <CheckBox
             android:id="@+id/checkBox"
@@ -48,7 +70,7 @@
             android:layout_height="32dp"
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/title"
+            app:layout_constraintStart_toEndOf="@+id/noteTitleArea"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

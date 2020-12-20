@@ -35,7 +35,7 @@ class NoteListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        noteCardAdapter = NoteCardAdapter(viewModel)
+        noteCardAdapter = NoteCardAdapter(viewModel, noteCardAdapterListener)
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
@@ -56,8 +56,6 @@ class NoteListFragment : Fragment() {
             ?.observe(viewLifecycleOwner) { result ->
                 onDeleteConfirmDialogResult(result)
             }
-
-        floatingActionButton.setOnClickListener { onClickAddButton() }
 
         editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
             viewModel.createNewNote(editTitleViewModel.title, editTitleViewModel.subTitle)
@@ -94,13 +92,19 @@ class NoteListFragment : Fragment() {
         }
     }
 
-    private fun onClickAddButton() {
-        editTitleViewModel.apply {
-            dialogTitle = getString(R.string.create_new_note)
-            title = ""
-            subTitle = ""
+    private val noteCardAdapterListener = object: NoteCardAdapterListener {
+        override fun onCreateNewNote() {
+            editTitleViewModel.apply {
+                dialogTitle = getString(R.string.create_new_note)
+                title = ""
+                subTitle = ""
+            }
+            findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
         }
-        findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
+
+        override fun onSelectNote(index: Int) {
+            viewModel.selectNote(index)
+        }
     }
 
     companion object {
@@ -109,7 +113,13 @@ class NoteListFragment : Fragment() {
 //        fun newInstance() = NoteListFragment()
     }
 
-    class NoteCardAdapter(private val viewModel: NoteListViewModel)
+    interface NoteCardAdapterListener {
+        fun onCreateNewNote()
+        fun onSelectNote(index: Int)
+    }
+
+    class NoteCardAdapter(private val viewModel: NoteListViewModel,
+                          private val listener: NoteCardAdapterListener)
         : RecyclerView.Adapter<NoteCardViewHolder>() {
 
         var editMode = false
@@ -119,7 +129,9 @@ class NoteListFragment : Fragment() {
             }
 
         override fun getItemCount(): Int {
-            return viewModel.getItemCount()
+            var count = viewModel.getItemCount()
+            if (!editMode) count++  /* 新規ノート作成 */
+            return count
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteCardViewHolder {
@@ -129,8 +141,19 @@ class NoteListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: NoteCardViewHolder, position: Int) {
-            holder.bind(position, editMode)
-            Log.d(TAG, "onBindViewHolder at $position on $holder")
+            if ((!editMode) and (position == 0)) {
+                holder.bindNewNote()
+                holder.itemView.cardView.setOnClickListener { listener.onCreateNewNote() }
+            } else {
+                var itemPosition = position
+                if (!editMode) itemPosition--
+                holder.bind(itemPosition, editMode)
+                holder.itemView.cardView.setOnClickListener {
+                    if (!editMode) {
+                        listener.onSelectNote(itemPosition)
+                    }
+                }
+            }
         }
     }
 
@@ -139,12 +162,19 @@ class NoteListFragment : Fragment() {
 
         fun bind(position: Int, editMode: Boolean) {
             itemView.title.text = viewModel.getTitle(position)
-            itemView.date.text = viewModel.getUpdateDate(position)
+            itemView.date.apply {
+                visibility = View.VISIBLE
+                text = viewModel.getUpdateDate(position)
+            }
             itemView.cardView.setOnClickListener {
                 if (!editMode) {
                     Log.d(TAG, "onClick Card at $position")
                     viewModel.selectNote(adapterPosition)
                 }
+            }
+            itemView.noteIcon.apply {
+                visibility = View.GONE
+                setImageResource(android.R.color.white)
             }
 
             /* CheckBox for delete operation */
@@ -152,6 +182,16 @@ class NoteListFragment : Fragment() {
             itemView.checkBox.isChecked = viewModel.getSelection(position)
             itemView.checkBox.setOnClickListener {
                 viewModel.setSelection(adapterPosition, itemView.checkBox.isChecked)
+            }
+        }
+
+        fun bindNewNote() {
+            itemView.title.text = itemView.context.getString(R.string.create_new_note)
+            itemView.date.visibility = View.GONE
+            itemView.checkBox.visibility = View.GONE
+            itemView.noteIcon.apply {
+                setImageResource(R.drawable.add)
+                visibility = View.VISIBLE
             }
         }
     }
