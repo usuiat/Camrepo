@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,9 +14,8 @@ import kotlinx.android.synthetic.main.view_note_memo.view.*
 import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_photo.view.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
-import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
-import net.engawapg.app.camrepo.notelist.EditTitleDialog
+import net.engawapg.app.camrepo.notelist.EditTitleViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -23,6 +23,7 @@ class NoteFragment : Fragment() {
 
     private val noteListViewModel: NoteListViewModel by sharedViewModel()
     private val viewModel: NoteViewModel by sharedViewModel()
+    private val editTitleViewModel: EditTitleViewModel by sharedViewModel()
     private var actionMode: ActionMode? = null
     private lateinit var noteItemAdapter: NoteItemAdapter
 
@@ -62,6 +63,13 @@ class NoteFragment : Fragment() {
             viewModel.initItemList()
             noteItemAdapter.notifyDataSetChanged()
         })
+
+        editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
+            if (editTitleViewModel.tag == TAG) {
+                viewModel.setNoteTitle(editTitleViewModel.title, editTitleViewModel.subTitle)
+                noteItemAdapter.notifyItemChanged(0)
+            }
+        })
     }
 
     override fun onResume() {
@@ -85,13 +93,13 @@ class NoteFragment : Fragment() {
     private fun onItemClick(position: Int) {
         when (noteItemAdapter.getItemViewType(position)) {
             NoteViewModel.VIEW_TYPE_TITLE -> {
-                val dialog = EditTitleDialog()
-//                dialog.arguments = Bundle().apply {
-//                    putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
-//                    putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
-//                    putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
-//                }
-//                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
+                editTitleViewModel.apply {
+                    dialogTitle = getString(R.string.edit_note_title)
+                    title = viewModel.getNoteTitle()
+                    subTitle = viewModel.getNoteSubTitle()
+                    tag = TAG
+                }
+                findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {

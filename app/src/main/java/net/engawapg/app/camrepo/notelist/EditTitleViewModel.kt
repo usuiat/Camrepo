@@ -9,4 +9,5 @@ class EditTitleViewModel(app: Application): AndroidViewModel(app) {
     var title: String = ""
     var subTitle: String = ""
     val onClickOk = MutableLiveData<Boolean>()
+    var tag: String = ""    /* 呼び出し元を区別するためのタグ */
 }

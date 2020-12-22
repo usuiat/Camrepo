@@ -61,8 +61,10 @@ class NoteListFragment : Fragment() {
             }
 
         editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
-            viewModel.createNewNote(editTitleViewModel.title, editTitleViewModel.subTitle)
-            noteCardAdapter.notifyDataSetChanged()
+            if (editTitleViewModel.tag == TAG) {
+                viewModel.createNewNote(editTitleViewModel.title, editTitleViewModel.subTitle)
+                noteCardAdapter.notifyDataSetChanged()
+            }
         })
     }
 
@@ -105,6 +107,7 @@ class NoteListFragment : Fragment() {
                 dialogTitle = getString(R.string.create_new_note)
                 title = ""
                 subTitle = ""
+                tag = TAG
             }
             findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
         }
