@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/noteFragment"
         android:name="net.engawapg.app.camrepo.note.NoteFragment"
-        android:label="fragment_note"
+        android:label=""
         tools:layout="@layout/fragment_note" >
         <action
             android:id="@+id/action_noteFragment_to_editTitleDialog"
