@@ -1,5 +1,6 @@
 package net.engawapg.app.camrepo.notelist
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import kotlinx.android.synthetic.main.fragment_note_list.*
 import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class NoteListFragment : Fragment() {
@@ -50,6 +52,7 @@ class NoteListFragment : Fragment() {
         editNoteListButton.setOnClickListener{ onClickEditNoteListButton() }
         closeEditModeButton.setOnClickListener{ onClickCloseEditModeButton() }
         deleteButton.setOnClickListener { onClickDeleteButton() }
+        settingButton.setOnClickListener { onClickSettingButton() }
         /* Observe result from DeleteConfirmDialog */
         navController.currentBackStackEntry?.savedStateHandle
             ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
@@ -90,6 +93,10 @@ class NoteListFragment : Fragment() {
             onClickCloseEditModeButton()
             viewModel.save()
         }
+    }
+
+    private fun onClickSettingButton() {
+        startActivity(Intent(context, SettingsActivity::class.java))
     }
 
     private val noteCardAdapterListener = object: NoteCardAdapterListener {
