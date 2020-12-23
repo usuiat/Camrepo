@@ -15,6 +15,7 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
     private var selection: MutableList<Boolean>? = null
     private var lastModified: Long = 0
     val selectedNote = MutableLiveData<NoteProperty>()
+    val updateIndex = MutableLiveData<Int>()
 
     fun createNewNote(title: String, subTitle: String) {
         val t = if (title == "") {
@@ -53,6 +54,14 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
         lastModified = note.updatedDate
         selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
+    }
+
+    fun updateCurrentNoteInfo() {
+        val index = model.list.indexOf(selectedNote.value)
+        Log.d(TAG, "updateCurrentNoteInfo: $index")
+        if (index >= 0) {
+            updateIndex.value = index
+        }
     }
 
     fun initSelection() {

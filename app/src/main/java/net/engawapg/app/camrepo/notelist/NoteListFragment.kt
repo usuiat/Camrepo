@@ -66,6 +66,10 @@ class NoteListFragment : Fragment() {
                 noteCardAdapter.notifyDataSetChanged()
             }
         })
+
+        viewModel.updateIndex.observe(viewLifecycleOwner, Observer {
+            noteCardAdapter.notifyNoteAtIndexChanged(it)
+        })
     }
 
     private fun onClickEditNoteListButton() {
@@ -142,6 +146,12 @@ class NoteListFragment : Fragment() {
             var count = viewModel.getItemCount()
             if (!editMode) count++  /* 新規ノート作成 */
             return count
+        }
+
+        fun notifyNoteAtIndexChanged(index: Int) {
+            var i = index
+            if (!editMode) i++
+            notifyItemChanged(i)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteCardViewHolder {
