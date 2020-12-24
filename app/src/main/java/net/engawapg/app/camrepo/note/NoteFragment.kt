@@ -60,7 +60,6 @@ class NoteFragment : Fragment() {
         }
 
         viewModel.noteProperty.observe(viewLifecycleOwner, Observer {
-            viewModel.initItemList()
             noteItemAdapter.notifyDataSetChanged()
         })
 
@@ -104,9 +103,9 @@ class NoteFragment : Fragment() {
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {
-//                startActivity(Intent(this, PageActivity::class.java).apply {
-//                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-//                })
+                val pageIndex = viewModel.getPageIndex(position)
+                val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(pageIndex)
+                findNavController().navigate(action)
             }
             NoteViewModel.VIEW_TYPE_PHOTO -> {
 //                startActivity(Intent(this, PhotoActivity::class.java).apply {
@@ -127,9 +126,8 @@ class NoteFragment : Fragment() {
         viewModel.addPage()
         val newPageIndex = viewModel.getPageIndex(noteItemAdapter.itemCount - 1)
         Log.d(TAG, "Page added. itemCount = ${noteItemAdapter.itemCount}, pageIndex = $newPageIndex")
-//        startActivity(Intent(this, PageActivity::class.java).apply {
-//            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
-//        })
+        val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(newPageIndex)
+        findNavController().navigate(action)
     }
 
     private val actionModeCallback = object: ActionMode.Callback {

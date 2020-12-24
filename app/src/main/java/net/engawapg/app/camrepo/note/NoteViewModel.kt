@@ -31,8 +31,13 @@ class NoteViewModel(app: Application, private val noteListModel: NoteListModel)
     private var lastModifiedDate: Long = 0
     private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
 
-    fun initItemList() {
-        noteModel = NoteModel.createModel(noteProperty.value)
+    fun setNote(note: NoteProperty?) {
+        initItemList(note)
+        noteProperty.value = note
+    }
+
+    private fun initItemList(note: NoteProperty?) {
+        noteModel = NoteModel.createModel(note)
         pageTitleListMode = false
         buildItemList()
     }

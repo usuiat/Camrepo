@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                 drawer_layout.close()
                 displayAfterCloseDrawer = DISPLAY_NOTE /* Drawer閉じ終わったらノート表示更新 */
             } else {
-                noteViewModel.noteProperty.value = null
+                noteViewModel.setNote(null)
             }
         })
         /* Drawer表示状態変更時の処理 */
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 super.onDrawerClosed(drawerView)
                 if (displayAfterCloseDrawer == DISPLAY_NOTE) {
                     displayAfterCloseDrawer = DISPLAY_NONE
-                    noteViewModel.noteProperty.value = noteListViewModel.selectedNote.value
+                    noteViewModel.setNote(noteListViewModel.selectedNote.value)
                 }
             }
         })

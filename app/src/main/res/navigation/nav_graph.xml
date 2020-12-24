@@ -16,14 +16,28 @@
         <action
             android:id="@+id/action_noteFragment_to_deleteConfirmDialog"
             app:destination="@id/deleteConfirmDialog" />
+        <action
+            android:id="@+id/action_noteFragment_to_pageFragment"
+            app:destination="@id/pageFragment" />
     </fragment>
 
     <dialog
         android:id="@+id/editTitleDialog"
-        android:name="net.engawapg.app.camrepo.notelist.EditTitleDialog" >
+        android:name="net.engawapg.app.camrepo.notelist.EditTitleDialog"
+        tools:layout="@layout/dialog_edit_title">
     </dialog>
     <dialog
         android:id="@+id/deleteConfirmDialog"
         android:name="net.engawapg.app.camrepo.DeleteConfirmDialog"
         android:label="DeleteConfirmDialog" />
+    <fragment
+        android:id="@+id/pageFragment"
+        android:name="net.engawapg.app.camrepo.page.PageFragment"
+        android:label="fragment_page"
+        tools:layout="@layout/fragment_page" >
+        <argument
+            android:name="PageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>
