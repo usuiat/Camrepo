@@ -86,7 +86,7 @@ class NoteListFragment : Fragment() {
 
     private fun onClickDeleteButton() {
         if (viewModel.isSelected()) {
-            findNavController().navigate(R.id.action_noteFragment_to_deleteConfirmDialog)
+            findNavController().navigate(R.id.action_global_deleteConfirmDialog)
         } else {
             onClickCloseEditModeButton()
         }

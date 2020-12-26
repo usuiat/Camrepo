@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_page.*
 import kotlinx.android.synthetic.main.view_page_memo.view.*
 import kotlinx.android.synthetic.main.view_page_photo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
+import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -29,6 +30,7 @@ class PageFragment : Fragment() {
     private val args: PageFragmentArgs by navArgs()
     private lateinit var viewModel: PageViewModel
     private val cameraViewModel: CameraViewModel by sharedViewModel()
+    private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
     private var pageIndex = 0
@@ -38,6 +40,7 @@ class PageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true) /* Toolbarにメニューあり */
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_page, container, false)
     }
@@ -74,6 +77,13 @@ class PageFragment : Fragment() {
         /* 写真操作時にキーボードを閉じるためのやつ */
         inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as InputMethodManager
+
+        /* Observe result from DeleteConfirmDialog */
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
+            ?.observe(viewLifecycleOwner) { result ->
+                onDeleteConfirmDialogResult(result)
+            }
     }
 
     override fun onPause() {
@@ -134,67 +144,65 @@ class PageFragment : Fragment() {
         }
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.menu_note, menu)
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_page, menu)
+    }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when(item.itemId) {
-//            R.id.edit_list_items -> {
-//                hideCameraFragment()
-//                actionMode = startActionMode(actionModeCallback)
-//                true
-//            }
-//            R.id.slideshow -> {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.edit_list_items -> {
+                hideCameraFragment()
+                actionMode = activity?.startActionMode(actionModeCallback)
+                true
+            }
+            R.id.slideshow -> {
 //                startActivity(Intent(this, SlideshowActivity::class.java).apply {
 //                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, pageIndex)
 //                })
-//                true
-//            }
-//            android.R.id.home -> {
-//                finish()
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
-//    private val actionModeCallback = object: ActionMode.Callback {
-//        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-//            mode?.menuInflater?.inflate(R.menu.menu_page_action_mode, menu)
-//            viewModel.initPhotoSelection()
-//            pageItemAdapter.setEditMode(true)
-//            itemTouchHelper.attachToRecyclerView(null)
-//            /* キーボード消す */
-//            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-//            return true
-//        }
-//
-//        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-//            if (item?.itemId == R.id.delete_selected_items) {
-//                if (viewModel.isPhotoSelected()) {
-//                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
-//                }
-//            }
-//            return true
-//        }
-//
-//        override fun onDestroyActionMode(mode: ActionMode?) {
-//            pageItemAdapter.setEditMode(false)
-//            itemTouchHelper.attachToRecyclerView(recyclerView)
-//            /* PageTitleにフォーカスが当たってしまうのを防ぐ */
-//            rootLayout.requestFocus()
-//        }
-//
-//        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
-//    }
+    private val actionModeCallback = object: ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_page_action_mode, menu)
+            viewModel.initPhotoSelection()
+            pageItemAdapter.setEditMode(true)
+            itemTouchHelper.attachToRecyclerView(null)
+            /* キーボード消す */
+            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            return true
+        }
 
-//    override fun onClickDeleteButton() {
-//        viewModel.deleteSelectedPhotos()
-//        actionMode?.finish()
-//    }
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.delete_selected_items) {
+                if (viewModel.isPhotoSelected()) {
+                    findNavController().navigate(R.id.action_global_deleteConfirmDialog)
+                }
+            }
+            return true
+        }
 
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            pageItemAdapter.setEditMode(false)
+            itemTouchHelper.attachToRecyclerView(recyclerView)
+            /* PageTitleにフォーカスが当たってしまうのを防ぐ */
+            rootLayout.requestFocus()
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
+    }
+
+    private fun onDeleteConfirmDialogResult(result: Int) {
+        Log.d(TAG, "onDeleteConfirmDialogResult: $result")
+        if (result == DeleteConfirmDialog.RESULT_DELETE) {
+            viewModel.deleteSelectedPhotos()
+            actionMode?.finish()
+        }
+    }
 
     class PageItemAdapter(private val viewModel: PageViewModel,
                           private val onFocusChangeListener: View.OnFocusChangeListener,
@@ -405,8 +413,6 @@ class PageFragment : Fragment() {
     companion object {
         private const val TAG = "PageFragment"
         private const val IMAGE_SPAN_COUNT = 4
-        const val KEY_PAGE_INDEX = "KeyPageIndex"
-        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
 //        @JvmStatic
 //        fun newInstance() = PageFragment()
     }

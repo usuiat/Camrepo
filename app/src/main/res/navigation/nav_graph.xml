@@ -14,9 +14,6 @@
             android:id="@+id/action_noteFragment_to_editTitleDialog"
             app:destination="@id/editTitleDialog" />
         <action
-            android:id="@+id/action_noteFragment_to_deleteConfirmDialog"
-            app:destination="@id/deleteConfirmDialog" />
-        <action
             android:id="@+id/action_noteFragment_to_pageFragment"
             app:destination="@id/pageFragment" />
     </fragment>
@@ -40,4 +37,7 @@
             app:argType="integer"
             android:defaultValue="0" />
     </fragment>
+    <action
+        android:id="@+id/action_global_deleteConfirmDialog"
+        app:destination="@id/deleteConfirmDialog"/>
 </navigation>
