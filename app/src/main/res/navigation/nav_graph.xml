@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/pageFragment"
         android:name="net.engawapg.app.camrepo.page.PageFragment"
-        android:label="fragment_page"
+        android:label=""
         tools:layout="@layout/fragment_page" >
         <argument
             android:name="PageIndex"
