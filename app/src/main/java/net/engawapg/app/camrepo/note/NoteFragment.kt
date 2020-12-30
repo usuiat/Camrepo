@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.android.synthetic.main.fragment_note.*
 import kotlinx.android.synthetic.main.view_note_memo.view.*
 import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_photo.view.*
