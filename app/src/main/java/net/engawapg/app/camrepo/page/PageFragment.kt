@@ -161,9 +161,8 @@ class PageFragment : Fragment() {
                 true
             }
             R.id.slideshow -> {
-//                startActivity(Intent(this, SlideshowActivity::class.java).apply {
-//                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, pageIndex)
-//                })
+                val action = PageFragmentDirections.actionPageFragmentToSlideshowActivity(pageIndex)
+                findNavController().navigate(action)
                 true
             }
             else -> super.onOptionsItemSelected(item)

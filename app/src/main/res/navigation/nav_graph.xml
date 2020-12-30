@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_noteFragment_to_photoPagerFragment"
             app:destination="@id/photoPagerFragment" />
+        <action
+            android:id="@+id/action_noteFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
     </fragment>
 
     <dialog
@@ -42,6 +45,9 @@
         <action
             android:id="@+id/action_pageFragment_to_photoPagerFragment"
             app:destination="@id/photoPagerFragment" />
+        <action
+            android:id="@+id/action_pageFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
     </fragment>
     <action
         android:id="@+id/action_global_deleteConfirmDialog"
@@ -64,4 +70,14 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </fragment>
+    <activity
+        android:id="@+id/slideshowActivity"
+        android:name="net.engawapg.app.camrepo.slideshow.SlideshowActivity"
+        android:label=""
+        tools:layout="@layout/activity_slideshow" >
+        <argument
+            android:name="PageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
 </navigation>

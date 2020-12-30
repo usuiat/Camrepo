@@ -157,6 +157,7 @@ class NoteFragment : Fragment() {
                 true
             }
             R.id.slideshow -> {
+                findNavController().navigate(R.id.action_noteFragment_to_slideshowActivity)
                 true
             }
             else -> super.onOptionsItemSelected(item)
