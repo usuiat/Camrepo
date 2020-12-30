@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.android.synthetic.main.activity_slideshow.*
 import kotlinx.coroutines.Job
@@ -21,6 +22,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class SlideshowActivity : AppCompatActivity() {
 
+    private val args: SlideshowActivityArgs by navArgs()
     private val viewModel: SlideshowViewModel by viewModel()
     private var isFullScreen = false
     private lateinit var hideSystemUiJob: Job
@@ -65,7 +67,7 @@ class SlideshowActivity : AppCompatActivity() {
         }
 
         /* Get page index */
-        val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
+        val pageIndex = args.PageIndex
 
         /* ToolBar */
         setSupportActionBar(toolbar)

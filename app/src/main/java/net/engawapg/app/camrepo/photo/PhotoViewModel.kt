@@ -12,15 +12,14 @@ class PhotoViewModel(app: Application, private val noteModel: NoteModel)
 
     private var pageIndex = 0
     private var wholeOfNote = false
-    private val photoList = mutableListOf<PhotoInfo>()
+    private lateinit var photoList: MutableList<PhotoInfo>
 
     fun initModel(pageIdx: Int) {
         pageIndex = pageIdx
-        if (pageIdx < 0){
-            wholeOfNote = true
-        }
+        wholeOfNote = (pageIdx < 0)
 
         if (wholeOfNote) {
+            photoList = mutableListOf()
             val pageNum = noteModel.getPageNum()
             for (page in 0 until pageNum) {
                 val photoNum = noteModel.getPhotoCount(page)

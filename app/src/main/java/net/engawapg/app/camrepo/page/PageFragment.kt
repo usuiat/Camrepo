@@ -1,54 +1,58 @@
 package net.engawapg.app.camrepo.page
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
+import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_page.*
+import kotlinx.android.synthetic.main.fragment_page.*
 import kotlinx.android.synthetic.main.view_page_memo.view.*
 import kotlinx.android.synthetic.main.view_page_photo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
-import net.engawapg.app.camrepo.photo.PhotoActivity
-import net.engawapg.app.camrepo.slideshow.SlideshowActivity
+import net.engawapg.app.camrepo.note.NoteViewModel
 import org.koin.android.viewmodel.ext.android.getViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
-class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+class PageFragment : Fragment() {
+
+    private val args: PageFragmentArgs by navArgs()
     private lateinit var viewModel: PageViewModel
-    private val cameraViewModel: CameraViewModel by viewModel()
+    private val noteViewModel: NoteViewModel by sharedViewModel()
+    private val cameraViewModel: CameraViewModel by sharedViewModel()
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
     private var pageIndex = 0
     private lateinit var inputMethodManager: InputMethodManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_page)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true) /* Toolbarにメニューあり */
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_page, container, false)
+    }
 
-        /* Get PageIndex */
-        pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        pageIndex = args.PageIndex
+        Log.d(TAG, "PageIndex = $pageIndex")
         viewModel = getViewModel { parametersOf(pageIndex, IMAGE_SPAN_COUNT) }
-
-        /* ToolBar */
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setHomeButtonEnabled(true)
-            it.title = ""
-        }
 
         /* RecyclerView */
         pageItemAdapter = PageItemAdapter(viewModel, onFocusChangeListenerForRecyclerView) { position ->
@@ -64,7 +68,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         /* 写真追加イベントの監視 */
-        cameraViewModel.eventAddImagePageIndex.observe(this, Observer { index ->
+        cameraViewModel.eventAddImagePageIndex.observe(viewLifecycleOwner, Observer { index ->
             if (index == pageIndex) {
                 pageItemAdapter.notifyDataSetChanged()
                 recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
@@ -73,11 +77,25 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         })
 
         /* 写真操作時にキーボードを閉じるためのやつ */
-        inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE)
+                as InputMethodManager
+
+        /* Observe result from DeleteConfirmDialog */
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
+            ?.observe(viewLifecycleOwner) { result ->
+                onDeleteConfirmDialogResult(result)
+            }
     }
 
     override fun onPause() {
+        val modified = viewModel.modified
         viewModel.save()
+        if (modified) {
+            noteViewModel.pageModified.value = true
+        }
+        /* キーボード消す */
+        inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         super.onPause()
     }
 
@@ -85,11 +103,10 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
             showCameraFragment()
         } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
-            val intent = Intent(this, PhotoActivity::class.java)
-            intent.putExtra(PhotoActivity.KEY_PAGE_INDEX, pageIndex)
             val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
-            intent.putExtra(PhotoActivity.KEY_PHOTO_INDEX, photoIndex)
-            startActivity(intent)
+            val action = PageFragmentDirections
+                .actionPageFragmentToPhotoPagerFragment(pageIndex, photoIndex, false)
+            findNavController().navigate(action)
         }
     }
 
@@ -101,15 +118,15 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     }
 
     private fun showCameraFragment() {
-        var cf = supportFragmentManager.findFragmentById(cameraFragmentId)
+        var cf = childFragmentManager.findFragmentById(cameraFragmentId)
         if (cf == null) {
             /* キーボード消す */
-            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             /* EditTextからフォーカスを外す */
             rootLayout.requestFocus()
 
             cf = CameraFragment.newInstance()
-            supportFragmentManager.beginTransaction()
+            childFragmentManager.beginTransaction()
                 .add(R.id.cameraFragmentContainer, cf)
                 .runOnCommit {
                     /* カメラアイコンが見えるようにスクロール */
@@ -122,35 +139,30 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     }
 
     private fun hideCameraFragment() {
-        val cf = supportFragmentManager.findFragmentById(cameraFragmentId)
+        val cf = childFragmentManager.findFragmentById(cameraFragmentId)
         if (cf != null) {
-            supportFragmentManager.beginTransaction()
+            childFragmentManager.beginTransaction()
                 .remove(cf)
                 .commit()
             cameraFragmentId = 0
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_note, menu)
-        return true
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_page, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.edit_list_items -> {
                 hideCameraFragment()
-                actionMode = startActionMode(actionModeCallback)
+                actionMode = activity?.startActionMode(actionModeCallback)
                 true
             }
             R.id.slideshow -> {
-                startActivity(Intent(this, SlideshowActivity::class.java).apply {
-                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, pageIndex)
-                })
-                true
-            }
-            android.R.id.home -> {
-                finish()
+                val action = PageFragmentDirections.actionPageFragmentToSlideshowActivity(pageIndex)
+                findNavController().navigate(action)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -164,14 +176,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             pageItemAdapter.setEditMode(true)
             itemTouchHelper.attachToRecyclerView(null)
             /* キーボード消す */
-            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             return true
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPhotoSelected()) {
-                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+                    findNavController().navigate(R.id.action_global_deleteConfirmDialog)
                 }
             }
             return true
@@ -187,11 +199,13 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPhotos()
-        actionMode?.finish()
+    private fun onDeleteConfirmDialogResult(result: Int) {
+        Log.d(TAG, "onDeleteConfirmDialogResult: $result")
+        if (result == DeleteConfirmDialog.RESULT_DELETE) {
+            viewModel.deleteSelectedPhotos()
+            actionMode?.finish()
+        }
     }
-
 
     class PageItemAdapter(private val viewModel: PageViewModel,
                           private val onFocusChangeListener: View.OnFocusChangeListener,
@@ -380,7 +394,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
             super.onSelectedChanged(viewHolder, actionState)
             Log.d(TAG, "ItemTouchHelper onSelectedChanged")
-            inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             rootLayout.requestFocus()
         }
 
@@ -400,10 +414,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
     })
 
     companion object {
+        private const val TAG = "PageFragment"
         private const val IMAGE_SPAN_COUNT = 4
-        const val KEY_PAGE_INDEX = "KeyPageIndex"
-        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
-
-        private const val TAG = "PageActivity"
+//        @JvmStatic
+//        fun newInstance() = PageFragment()
     }
 }

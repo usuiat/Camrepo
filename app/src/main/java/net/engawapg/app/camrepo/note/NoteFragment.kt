@@ -1,46 +1,45 @@
 package net.engawapg.app.camrepo.note
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_note.*
+import kotlinx.android.synthetic.main.fragment_note.*
 import kotlinx.android.synthetic.main.view_note_memo.view.*
 import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_photo.view.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
-import net.engawapg.app.camrepo.notelist.EditTitleDialog
-import net.engawapg.app.camrepo.page.PageActivity
-import net.engawapg.app.camrepo.photo.PhotoActivity
-import net.engawapg.app.camrepo.slideshow.SlideshowActivity
-import org.koin.android.viewmodel.ext.android.viewModel
+import net.engawapg.app.camrepo.notelist.EditTitleViewModel
+import net.engawapg.app.camrepo.notelist.NoteListViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
-    EditTitleDialog.EventListener {
-    private val viewModel: NoteViewModel by viewModel()
+class NoteFragment : Fragment() {
+
+    private val noteListViewModel: NoteListViewModel by sharedViewModel()
+    private val viewModel: NoteViewModel by sharedViewModel()
+    private val editTitleViewModel: EditTitleViewModel by sharedViewModel()
     private var actionMode: ActionMode? = null
-    private  lateinit var noteItemAdapter: NoteItemAdapter
+    private lateinit var noteItemAdapter: NoteItemAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true) /* Toolbarにメニューあり */
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_note, container, false)
+    }
 
-        /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
-        viewModel.initItemList(IMAGE_SPAN_COUNT)
-
-        /* ToolBar */
-        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setHomeButtonEnabled(true)
-            it.title = ""
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         /* RecyclerView */
         noteItemAdapter = NoteItemAdapter(viewModel, itemTouchHelper) {
@@ -58,6 +57,33 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         floatingActionButton.setOnClickListener {
             onClickAddButton()
         }
+
+        viewModel.noteProperty.observe(viewLifecycleOwner, Observer {
+            noteItemAdapter.notifyDataSetChanged()
+        })
+
+        editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
+            if (editTitleViewModel.tag == TAG) {
+                viewModel.setNoteTitle(editTitleViewModel.title, editTitleViewModel.subTitle)
+                noteItemAdapter.notifyItemChanged(0)
+                noteListViewModel.updateCurrentNoteInfo()
+            }
+        })
+
+        viewModel.pageModified.observe(viewLifecycleOwner, Observer {
+            if (viewModel.pageModified.value == true) {
+                viewModel.buildItemList()
+                noteItemAdapter.notifyDataSetChanged()
+                Log.d(TAG, "pageModified")
+                viewModel.pageModified.value = false
+            }
+        })
+
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
+            ?.observe(viewLifecycleOwner) { result ->
+                onDeleteConfirmDialogResult(result)
+            }
     }
 
     override fun onResume() {
@@ -81,63 +107,57 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     private fun onItemClick(position: Int) {
         when (noteItemAdapter.getItemViewType(position)) {
             NoteViewModel.VIEW_TYPE_TITLE -> {
-                val dialog = EditTitleDialog()
-                dialog.arguments = Bundle().apply {
-                    putInt(EditTitleDialog.KEY_TITLE, R.string.edit_note_title)
-                    putString(EditTitleDialog.KEY_NOTE_TITLE, viewModel.getNoteTitle())
-                    putString(EditTitleDialog.KEY_NOTE_SUB_TITLE, viewModel.getNoteSubTitle())
+                editTitleViewModel.apply {
+                    dialogTitle = getString(R.string.edit_note_title)
+                    title = viewModel.getNoteTitle()
+                    subTitle = viewModel.getNoteSubTitle()
+                    tag = TAG
                 }
-                dialog.show(supportFragmentManager, EDIT_TITLE_DIALOG)
+                findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {
-                startActivity(Intent(this, PageActivity::class.java).apply {
-                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                })
+                val pageIndex = viewModel.getPageIndex(position)
+                val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(pageIndex)
+                findNavController().navigate(action)
             }
             NoteViewModel.VIEW_TYPE_PHOTO -> {
-                startActivity(Intent(this, PhotoActivity::class.java).apply {
-                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
-                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
-                })
+                val action = NoteFragmentDirections.actionNoteFragmentToPhotoPagerFragment(
+                    viewModel.getPageIndex(position),
+                    viewModel.getPhotoIndex(position),
+                    true
+                )
+                findNavController().navigate(action)
             }
         }
     }
 
-    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        viewModel.setNoteTitle(title, subTitle)
-        noteItemAdapter.notifyItemChanged(0)
-    }
+//    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
+//        viewModel.setNoteTitle(title, subTitle)
+//        noteItemAdapter.notifyItemChanged(0)
+//    }
 
     private fun onClickAddButton() {
         viewModel.addPage()
         val newPageIndex = viewModel.getPageIndex(noteItemAdapter.itemCount - 1)
         Log.d(TAG, "Page added. itemCount = ${noteItemAdapter.itemCount}, pageIndex = $newPageIndex")
-        startActivity(Intent(this, PageActivity::class.java).apply {
-            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
-        })
+        val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(newPageIndex)
+        findNavController().navigate(action)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_note, menu)
-        return true
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_note, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.edit_list_items -> {
-                actionMode = startActionMode(actionModeCallback)
+                actionMode = activity?.startActionMode(actionModeCallback)
                 true
             }
             R.id.slideshow -> {
-                startActivity(Intent(this, SlideshowActivity::class.java).apply {
-                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, 0)
-                })
-                true
-            }
-            android.R.id.home -> {
-                finish()
+                findNavController().navigate(R.id.action_noteFragment_to_slideshowActivity)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -156,7 +176,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPageSelected()) {
-                    DeleteConfirmDialog().show(supportFragmentManager, DELETE_CONFIRM_DIALOG)
+                    findNavController().navigate(R.id.action_global_deleteConfirmDialog)
                 }
             }
             return true
@@ -171,9 +191,11 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPages()
-        actionMode?.finish()
+    private fun onDeleteConfirmDialogResult(result: Int) {
+        if (result == DeleteConfirmDialog.RESULT_DELETE) {
+            viewModel.deleteSelectedPages()
+            actionMode?.finish()
+        }
     }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
@@ -239,11 +261,13 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     }
 
     class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel,
-                              private val itemTouchHelper: ItemTouchHelper) :BaseViewHolder(v) {
+                              private val itemTouchHelper: ItemTouchHelper
+    ) :BaseViewHolder(v) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel,
-                       itemTouchHelper: ItemTouchHelper): PageTitleViewHolder {
+                       itemTouchHelper: ItemTouchHelper
+            ): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val view = layoutInflater.inflate(R.layout.view_note_page_title, parent, false)
                 return PageTitleViewHolder(view, viewModel, itemTouchHelper)
@@ -347,10 +371,9 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     })
 
     companion object {
-        private const val TAG = "NoteActivity"
-
-        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
+        private const val TAG = "NoteFragment"
         private const val IMAGE_SPAN_COUNT = 4
-        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
+//        @JvmStatic
+//        fun newInstance() = NoteFragment()
     }
 }

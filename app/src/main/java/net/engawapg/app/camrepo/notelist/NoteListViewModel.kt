@@ -3,24 +3,31 @@ package net.engawapg.app.camrepo.notelist
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.model.NoteListModel
-import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.model.NoteProperty
 import java.text.SimpleDateFormat
 
-class NoteListViewModel(app: Application, private val model: NoteListModel)
+class NoteListViewModel(private val app: Application, private val model: NoteListModel)
     : AndroidViewModel(app) {
 
     private var selection: MutableList<Boolean>? = null
     private var lastModified: Long = 0
-    private var currentNote: NoteProperty? = null
+    val selectedNote = MutableLiveData<NoteProperty>()
+    val updateIndex = MutableLiveData<Int>()
 
     fun createNewNote(title: String, subTitle: String) {
-        val note = model.createNewNote(title, subTitle)
+        val t = if (title == "") {
+            app.getString(R.string.default_note_title)
+        } else {
+            title
+        }
+        val note = model.createNewNote(t, subTitle)
         lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
-        currentNote = note
+        selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
-        NoteModel.createModel(note)
+        save()
     }
 
     fun save() {
@@ -45,9 +52,16 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
     fun selectNote(index: Int) {
         val note = getItem(index)
         lastModified = note.updatedDate
-        currentNote = note
+        selectedNote.value = note
         Log.d(TAG, "updateDate = $lastModified")
-        NoteModel.createModel(note)
+    }
+
+    fun updateCurrentNoteInfo() {
+        val index = model.list.indexOf(selectedNote.value)
+        Log.d(TAG, "updateCurrentNoteInfo: $index")
+        if (index >= 0) {
+            updateIndex.value = index
+        }
     }
 
     fun initSelection() {
@@ -77,15 +91,25 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
 
     fun deleteSelectedItems() {
         val indexes = mutableListOf<Int>()
-        selection?.forEachIndexed { index, b -> if (b) indexes.add(index) }
+        selection?.forEachIndexed { index, b ->
+            if (b) {
+                indexes.add(index)
+                if (selectedNote.value == getItem(index)) {
+                    /* 表示中のノートを削除しようとしている */
+                    Log.d(TAG, "Selected note will be deleted.")
+                    lastModified = 0
+                    selectedNote.value = null
+                }
+            }
+        }
         Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
         clearSelection()
     }
 
     fun isCurrentNoteModified(): Boolean {
-        Log.d(TAG, "updateDate = ${currentNote?.updatedDate}")
-        val date = currentNote?.updatedDate
+        val note = selectedNote.value
+        val date = note?.updatedDate
         return (date != null) && (date != lastModified)
     }
 

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/noteFragment">
+
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="net.engawapg.app.camrepo.note.NoteFragment"
+        android:label=""
+        tools:layout="@layout/fragment_note" >
+        <action
+            android:id="@+id/action_noteFragment_to_editTitleDialog"
+            app:destination="@id/editTitleDialog" />
+        <action
+            android:id="@+id/action_noteFragment_to_pageFragment"
+            app:destination="@id/pageFragment" />
+        <action
+            android:id="@+id/action_noteFragment_to_photoPagerFragment"
+            app:destination="@id/photoPagerFragment" />
+        <action
+            android:id="@+id/action_noteFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
+        <action
+            android:id="@+id/action_noteFragment_to_settingsActivity"
+            app:destination="@id/settingsActivity" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/editTitleDialog"
+        android:name="net.engawapg.app.camrepo.notelist.EditTitleDialog"
+        tools:layout="@layout/dialog_edit_title">
+    </dialog>
+    <dialog
+        android:id="@+id/deleteConfirmDialog"
+        android:name="net.engawapg.app.camrepo.DeleteConfirmDialog"
+        android:label="DeleteConfirmDialog" />
+    <fragment
+        android:id="@+id/pageFragment"
+        android:name="net.engawapg.app.camrepo.page.PageFragment"
+        android:label=""
+        tools:layout="@layout/fragment_page" >
+        <argument
+            android:name="PageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_pageFragment_to_photoPagerFragment"
+            app:destination="@id/photoPagerFragment" />
+        <action
+            android:id="@+id/action_pageFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_deleteConfirmDialog"
+        app:destination="@id/deleteConfirmDialog"/>
+    <fragment
+        android:id="@+id/photoPagerFragment"
+        android:name="net.engawapg.app.camrepo.photo.PhotoPagerFragment"
+        android:label=""
+        tools:layout="@layout/fragment_photo_pager" >
+        <argument
+            android:name="PageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="PhotoIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="WholeOfNote"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <activity
+        android:id="@+id/slideshowActivity"
+        android:name="net.engawapg.app.camrepo.slideshow.SlideshowActivity"
+        android:label=""
+        tools:layout="@layout/activity_slideshow" >
+        <argument
+            android:name="PageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
+    <activity
+        android:id="@+id/settingsActivity"
+        android:name="net.engawapg.app.camrepo.settings.SettingsActivity"
+        android:label="settings_activity"
+        tools:layout="@layout/settings_activity" />
+</navigation>

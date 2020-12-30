@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".notelist.NoteListActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:logo="@drawable/ic_logo" />
+    tools:context=".note.NoteFragment">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -25,12 +14,12 @@
         android:layout_marginEnd="@dimen/floating_button_margin"
         android:layout_marginBottom="@dimen/floating_button_margin"
         android:clickable="true"
+        android:contentDescription="@string/desc_add_new_page"
         android:focusable="true"
         app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/new_note"
-        android:contentDescription="@string/create_new_note" />
+        app:layout_constraintBottom_toBottomOf="@id/recyclerView"
+        app:layout_constraintEnd_toEndOf="@id/recyclerView"
+        app:srcCompat="@drawable/new_page" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -41,9 +30,18 @@
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
         android:verticalScrollbarPosition="defaultPosition"
+        app:layout_constraintBottom_toTopOf="@+id/cameraFragmentContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/cameraFragmentContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
