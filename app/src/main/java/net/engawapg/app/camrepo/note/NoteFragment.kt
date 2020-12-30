@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -14,6 +15,7 @@ import kotlinx.android.synthetic.main.view_note_memo.view.*
 import kotlinx.android.synthetic.main.view_note_page_title.view.*
 import kotlinx.android.synthetic.main.view_note_photo.view.*
 import kotlinx.android.synthetic.main.view_note_title.view.*
+import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.notelist.EditTitleViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
@@ -31,6 +33,7 @@ class NoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true) /* Toolbarにメニューあり */
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_note, container, false)
     }
@@ -75,6 +78,12 @@ class NoteFragment : Fragment() {
                 viewModel.pageModified.value = false
             }
         })
+
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
+            ?.observe(viewLifecycleOwner) { result ->
+                onDeleteConfirmDialogResult(result)
+            }
     }
 
     override fun onResume() {
@@ -135,6 +144,24 @@ class NoteFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_note, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.edit_list_items -> {
+                actionMode = activity?.startActionMode(actionModeCallback)
+                true
+            }
+            R.id.slideshow -> {
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.menu_note_action_mode, menu)
@@ -147,9 +174,7 @@ class NoteFragment : Fragment() {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPageSelected()) {
-//                    DeleteConfirmDialog().show(supportFragmentManager,
-//                        DELETE_CONFIRM_DIALOG
-//                    )
+                    findNavController().navigate(R.id.action_global_deleteConfirmDialog)
                 }
             }
             return true
@@ -164,10 +189,12 @@ class NoteFragment : Fragment() {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-//    override fun onClickDeleteButton() {
-//        viewModel.deleteSelectedPages()
-//        actionMode?.finish()
-//    }
+    private fun onDeleteConfirmDialogResult(result: Int) {
+        if (result == DeleteConfirmDialog.RESULT_DELETE) {
+            viewModel.deleteSelectedPages()
+            actionMode?.finish()
+        }
+    }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
                           private val itemTouchHelper: ItemTouchHelper,
@@ -343,9 +370,7 @@ class NoteFragment : Fragment() {
 
     companion object {
         private const val TAG = "NoteFragment"
-        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val IMAGE_SPAN_COUNT = 4
-        private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
 //        @JvmStatic
 //        fun newInstance() = NoteFragment()
     }
