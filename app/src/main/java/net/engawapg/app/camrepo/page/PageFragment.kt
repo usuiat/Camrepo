@@ -103,11 +103,10 @@ class PageFragment : Fragment() {
         if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
             showCameraFragment()
         } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
-//            val intent = Intent(this, PhotoActivity::class.java)
-//            intent.putExtra(PhotoActivity.KEY_PAGE_INDEX, pageIndex)
-//            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
-//            intent.putExtra(PhotoActivity.KEY_PHOTO_INDEX, photoIndex)
-//            startActivity(intent)
+            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
+            val action = PageFragmentDirections
+                .actionPageFragmentToPhotoPagerFragment(pageIndex, photoIndex, false)
+            findNavController().navigate(action)
         }
     }
 

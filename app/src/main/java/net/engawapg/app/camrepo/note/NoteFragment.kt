@@ -122,11 +122,12 @@ class NoteFragment : Fragment() {
                 findNavController().navigate(action)
             }
             NoteViewModel.VIEW_TYPE_PHOTO -> {
-//                startActivity(Intent(this, PhotoActivity::class.java).apply {
-//                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-//                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
-//                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
-//                })
+                val action = NoteFragmentDirections.actionNoteFragmentToPhotoPagerFragment(
+                    viewModel.getPageIndex(position),
+                    viewModel.getPhotoIndex(position),
+                    true
+                )
+                findNavController().navigate(action)
             }
         }
     }
