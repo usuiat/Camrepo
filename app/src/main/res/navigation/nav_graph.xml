@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_noteFragment_to_slideshowActivity"
             app:destination="@id/slideshowActivity" />
+        <action
+            android:id="@+id/action_noteFragment_to_settingsActivity"
+            app:destination="@id/settingsActivity" />
     </fragment>
 
     <dialog
@@ -80,4 +83,9 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
+    <activity
+        android:id="@+id/settingsActivity"
+        android:name="net.engawapg.app.camrepo.settings.SettingsActivity"
+        android:label="settings_activity"
+        tools:layout="@layout/settings_activity" />
 </navigation>
