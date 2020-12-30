@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.view_page_photo.view.*
 import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.note.NoteViewModel
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
@@ -29,6 +30,7 @@ class PageFragment : Fragment() {
 
     private val args: PageFragmentArgs by navArgs()
     private lateinit var viewModel: PageViewModel
+    private val noteViewModel: NoteViewModel by sharedViewModel()
     private val cameraViewModel: CameraViewModel by sharedViewModel()
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
@@ -87,11 +89,14 @@ class PageFragment : Fragment() {
     }
 
     override fun onPause() {
+        val modified = viewModel.modified
         viewModel.save()
+        if (modified) {
+            noteViewModel.pageModified.value = true
+        }
         /* キーボード消す */
         inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         super.onPause()
-        Log.d(TAG, "onPause")
     }
 
     private fun onItemClick(position: Int) {

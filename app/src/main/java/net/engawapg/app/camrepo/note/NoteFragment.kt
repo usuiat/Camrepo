@@ -27,10 +27,6 @@ class NoteFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private lateinit var noteItemAdapter: NoteItemAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +64,15 @@ class NoteFragment : Fragment() {
                 viewModel.setNoteTitle(editTitleViewModel.title, editTitleViewModel.subTitle)
                 noteItemAdapter.notifyItemChanged(0)
                 noteListViewModel.updateCurrentNoteInfo()
+            }
+        })
+
+        viewModel.pageModified.observe(viewLifecycleOwner, Observer {
+            if (viewModel.pageModified.value == true) {
+                viewModel.buildItemList()
+                noteItemAdapter.notifyDataSetChanged()
+                Log.d(TAG, "pageModified")
+                viewModel.pageModified.value = false
             }
         })
     }

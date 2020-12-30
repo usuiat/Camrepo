@@ -27,6 +27,7 @@ class NoteViewModel(app: Application, private val noteListModel: NoteListModel)
     private var itemList: MutableList<ItemInfo>? = null
     var columnCount: Int = 4
     private var modified = false
+    val pageModified = MutableLiveData<Boolean>()
     private var pageAdded = false
     private var lastModifiedDate: Long = 0
     private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
