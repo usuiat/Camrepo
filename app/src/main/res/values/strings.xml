@@ -41,5 +41,6 @@
     <string name="desc_close_edit_mode" translatable="false">Close Edit Mode</string>
     <string name="desc_delete_note" translatable="false">Delete Note</string>
     <string name="desc_note_icon" translatable="false">Note Icon</string>
+    <string name="desc_add_new_note" translatable="false">Add new note</string>
 
 </resources>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/noteFragment">
+    app:startDestination="@id/noteListFragment">
 
     <fragment
         android:id="@+id/noteFragment"
@@ -22,9 +22,9 @@
         <action
             android:id="@+id/action_noteFragment_to_slideshowActivity"
             app:destination="@id/slideshowActivity" />
-        <action
-            android:id="@+id/action_noteFragment_to_settingsActivity"
-            app:destination="@id/settingsActivity" />
+        <argument
+            android:name="fileName"
+            app:argType="string" />
     </fragment>
 
     <dialog
@@ -88,4 +88,16 @@
         android:name="net.engawapg.app.camrepo.settings.SettingsActivity"
         android:label="settings_activity"
         tools:layout="@layout/settings_activity" />
+    <fragment
+        android:id="@+id/noteListFragment"
+        android:name="net.engawapg.app.camrepo.notelist.NoteListFragment"
+        android:label=""
+        tools:layout="@layout/fragment_note_list" >
+        <action
+            android:id="@+id/action_noteListFragment_to_noteFragment"
+            app:destination="@id/noteFragment" />
+        <action
+            android:id="@+id/action_noteListFragment_to_settingsActivity"
+            app:destination="@id/settingsActivity" />
+    </fragment>
 </navigation>

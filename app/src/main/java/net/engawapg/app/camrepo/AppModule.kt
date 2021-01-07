@@ -50,7 +50,7 @@ val appModule = module {
 
     viewModel { NoteViewModel(androidApplication(), get()) }
 
-    viewModel { NoteListViewModel(androidApplication(), get()) }
+    viewModel { NoteListViewModel(get()) }
 
     viewModel {
         SlideshowViewModel(

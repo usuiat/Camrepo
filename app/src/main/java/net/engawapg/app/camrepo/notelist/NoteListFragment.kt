@@ -2,91 +2,119 @@ package net.engawapg.app.camrepo.notelist
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_note_list.*
-import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
+import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class NoteListFragment : Fragment() {
 
     private val viewModel: NoteListViewModel by sharedViewModel()
-    private val editTitleViewModel: EditTitleViewModel by sharedViewModel()
     private lateinit var noteCardAdapter: NoteCardAdapter
+    private var actionMode: ActionMode? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_note_list, container, false)
+        val binding = DataBindingUtil.inflate<FragmentNoteListBinding>(
+            inflater, R.layout.fragment_note_list, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        setHasOptionsMenu(true)
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        noteCardAdapter = NoteCardAdapter(viewModel, noteCardAdapterListener)
+        /* Toolbar */
+        (activity as AppCompatActivity?)?.supportActionBar?.setLogo(R.drawable.ic_logo)
+
+        noteCardAdapter = NoteCardAdapter(viewModel, viewLifecycleOwner)
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = noteCardAdapter
         }
 
-        /* Get a NavController */
-        val navHostFragment = parentFragmentManager.findFragmentById(R.id.nav_host_fragment)
-                as NavHostFragment
-        val navController = navHostFragment.navController
+        viewModel.onSelectNote.observe(viewLifecycleOwner, Observer {
+            onSelectNote(it)
+        })
+        viewModel.onCreateNote.observe(viewLifecycleOwner, Observer {
+            onCreateNote(it)
+        })
 
-        editNoteListButton.setOnClickListener{ onClickEditNoteListButton() }
-        closeEditModeButton.setOnClickListener{ onClickCloseEditModeButton() }
-        deleteButton.setOnClickListener { onClickDeleteButton() }
-        settingButton.setOnClickListener { onClickSettingButton() }
         /* Observe result from DeleteConfirmDialog */
-        navController.currentBackStackEntry?.savedStateHandle
+        findNavController().currentBackStackEntry?.savedStateHandle
             ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
             ?.observe(viewLifecycleOwner) { result ->
                 onDeleteConfirmDialogResult(result)
             }
+    }
 
-        editTitleViewModel.onClickOk.observe(viewLifecycleOwner, Observer {
-            if (editTitleViewModel.tag == TAG) {
-                viewModel.createNewNote(editTitleViewModel.title, editTitleViewModel.subTitle)
-                noteCardAdapter.notifyDataSetChanged()
+    override fun onPause() {
+        viewModel.save()
+        super.onPause()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_note_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.edit_list_items -> {
+                actionMode = activity?.startActionMode(actionModeCallback)
+                true
             }
-        })
-
-        viewModel.updateIndex.observe(viewLifecycleOwner, Observer {
-            noteCardAdapter.notifyNoteAtIndexChanged(it)
-        })
+            R.id.settings -> {
+                findNavController().navigate(R.id.action_noteListFragment_to_settingsActivity)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
-    private fun onClickEditNoteListButton() {
-        viewModel.initSelection()
-        noteCardAdapter.editMode = true
-        editModeBar.visibility = View.VISIBLE
-    }
+    private val actionModeCallback = object: ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_note_list_action_mode, menu)
+            viewModel.setEditMode(true)
+            noteCardAdapter.notifyDataSetChanged()
+            return true
+        }
 
-    private fun onClickCloseEditModeButton() {
-        viewModel.clearSelection()
-        noteCardAdapter.editMode = false
-        editModeBar.visibility = View.INVISIBLE
-    }
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.delete_selected_items) {
+                if (viewModel.isSelected()) {
+                    findNavController().navigate(R.id.action_global_deleteConfirmDialog)
+                }
+            }
+            return true
+        }
 
-    private fun onClickDeleteButton() {
-        if (viewModel.isSelected()) {
-            findNavController().navigate(R.id.action_global_deleteConfirmDialog)
-        } else {
-            onClickCloseEditModeButton()
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            viewModel.setEditMode(false)
+            noteCardAdapter.notifyDataSetChanged()
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
         }
     }
 
@@ -94,29 +122,17 @@ class NoteListFragment : Fragment() {
         Log.d(TAG, "onDeleteConfirmDialogResult: $result")
         if (result == DeleteConfirmDialog.RESULT_DELETE) {
             viewModel.deleteSelectedItems()
-            onClickCloseEditModeButton()
-            viewModel.save()
+            actionMode?.finish()
         }
     }
 
-    private fun onClickSettingButton() {
-        findNavController().navigate(R.id.action_noteFragment_to_settingsActivity)
+    private fun onSelectNote(fileName: String) {
+        Log.d(TAG, "onSelectNote fileName=$fileName")
     }
 
-    private val noteCardAdapterListener = object: NoteCardAdapterListener {
-        override fun onCreateNewNote() {
-            editTitleViewModel.apply {
-                dialogTitle = getString(R.string.create_new_note)
-                title = ""
-                subTitle = ""
-                tag = TAG
-            }
-            findNavController().navigate(R.id.action_noteFragment_to_editTitleDialog)
-        }
-
-        override fun onSelectNote(index: Int) {
-            viewModel.selectNote(index)
-        }
+    private fun onCreateNote(fileName: String) {
+        Log.d(TAG, "onCreateNote fileName=$fileName")
+        noteCardAdapter.notifyItemInserted(0)
     }
 
     companion object {
@@ -125,92 +141,29 @@ class NoteListFragment : Fragment() {
 //        fun newInstance() = NoteListFragment()
     }
 
-    interface NoteCardAdapterListener {
-        fun onCreateNewNote()
-        fun onSelectNote(index: Int)
-    }
-
     class NoteCardAdapter(private val viewModel: NoteListViewModel,
-                          private val listener: NoteCardAdapterListener)
+                          private val lifecycleOwner: LifecycleOwner)
         : RecyclerView.Adapter<NoteCardViewHolder>() {
 
-        var editMode = false
-            set(value) {
-                field = value
-                notifyDataSetChanged()
-            }
-
         override fun getItemCount(): Int {
-            var count = viewModel.getItemCount()
-            if (!editMode) count++  /* 新規ノート作成 */
-            return count
-        }
-
-        fun notifyNoteAtIndexChanged(index: Int) {
-            var i = index
-            if (!editMode) i++
-            notifyItemChanged(i)
+            return viewModel.getItemCount()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteCardViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val view = layoutInflater.inflate(R.layout.view_note_card, parent, false)
-            return NoteCardViewHolder(view, viewModel)
+            val binding = DataBindingUtil.inflate<ViewNoteCardBinding>(
+                layoutInflater, R.layout.view_note_card, parent, false)
+            binding.lifecycleOwner = lifecycleOwner
+            binding.viewModel = viewModel
+            return NoteCardViewHolder(binding)
         }
 
         override fun onBindViewHolder(holder: NoteCardViewHolder, position: Int) {
-            if ((!editMode) and (position == 0)) {
-                holder.bindNewNote()
-                holder.itemView.cardView.setOnClickListener { listener.onCreateNewNote() }
-            } else {
-                var itemPosition = position
-                if (!editMode) itemPosition--
-                holder.bind(itemPosition, editMode)
-                holder.itemView.cardView.setOnClickListener {
-                    if (!editMode) {
-                        listener.onSelectNote(itemPosition)
-                    }
-                }
-            }
+            holder.binding.item = viewModel.getItem(position)
+            holder.binding.executePendingBindings()
         }
     }
 
-    class NoteCardViewHolder(v: View, private val viewModel: NoteListViewModel)
-        : RecyclerView.ViewHolder(v) {
-
-        fun bind(position: Int, editMode: Boolean) {
-            itemView.title.text = viewModel.getTitle(position)
-            itemView.date.apply {
-                visibility = View.VISIBLE
-                text = viewModel.getUpdateDate(position)
-            }
-            itemView.cardView.setOnClickListener {
-                if (!editMode) {
-                    Log.d(TAG, "onClick Card at $position")
-                    viewModel.selectNote(adapterPosition)
-                }
-            }
-            itemView.noteIcon.apply {
-                visibility = View.GONE
-                setImageResource(android.R.color.white)
-            }
-
-            /* CheckBox for delete operation */
-            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.GONE
-            itemView.checkBox.isChecked = viewModel.getSelection(position)
-            itemView.checkBox.setOnClickListener {
-                viewModel.setSelection(adapterPosition, itemView.checkBox.isChecked)
-            }
-        }
-
-        fun bindNewNote() {
-            itemView.title.text = itemView.context.getString(R.string.create_new_note)
-            itemView.date.visibility = View.GONE
-            itemView.checkBox.visibility = View.GONE
-            itemView.noteIcon.apply {
-                setImageResource(R.drawable.add)
-                visibility = View.VISIBLE
-            }
-        }
-    }
+    class NoteCardViewHolder(val binding: ViewNoteCardBinding)
+        : RecyclerView.ViewHolder(binding.root)
 }

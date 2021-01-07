@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.JsonReader
 import android.util.JsonWriter
 import android.util.Log
+import net.engawapg.app.camrepo.R
 import java.io.*
 
 class NoteListModel(private val app: Application) {
@@ -77,7 +78,8 @@ class NoteListModel(private val app: Application) {
     fun getNote(fileName: String): NoteProperty? = list.find { it.fileName == fileName }
 
     fun createNewNote(title: String, subTitle: String): NoteProperty {
-        val note = NoteProperty.createNewNote(title)
+        val t = if (title != "") title else app.getString(R.string.default_note_title)
+        val note = NoteProperty.createNewNote(t)
         note.subTitle = subTitle
         list.add(0, note) /* 新規ノートは一番上に追加 */
         return note

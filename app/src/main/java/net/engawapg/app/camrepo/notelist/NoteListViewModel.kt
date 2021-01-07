@@ -1,33 +1,58 @@
 package net.engawapg.app.camrepo.notelist
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import net.engawapg.app.camrepo.R
+import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteProperty
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-class NoteListViewModel(private val app: Application, private val model: NoteListModel)
-    : AndroidViewModel(app) {
+data class NoteListItem(
+    val fileName: String,
+    val title: String,
+    val dateString: String,
+    var select: Boolean = false
+) {
+    constructor(noteProperty: NoteProperty): this(
+        noteProperty.fileName, noteProperty.title, dateFormat.format(noteProperty.updatedDate)
+    )
 
-    private var selection: MutableList<Boolean>? = null
-    private var lastModified: Long = 0
-    val selectedNote = MutableLiveData<NoteProperty>()
-    val updateIndex = MutableLiveData<Int>()
+    companion object {
+        val dateFormat: DateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM,
+            SimpleDateFormat.MEDIUM)
+    }
+}
 
-    fun createNewNote(title: String, subTitle: String) {
-        val t = if (title == "") {
-            app.getString(R.string.default_note_title)
-        } else {
-            title
+class NoteListViewModel(private val model: NoteListModel): ViewModel() {
+
+    val onSelectNote = MutableLiveData<String>()
+    val onCreateNote = MutableLiveData<String>()
+    val editMode = MutableLiveData<Boolean>().apply { value = false }
+    private var itemList: List<NoteListItem>
+
+    init {
+        itemList = model.list.map { noteProperty -> NoteListItem(noteProperty) }
+    }
+
+    fun createNewNote() {
+        val note = model.createNewNote("", "")
+        val item = NoteListItem(note)
+        itemList = listOf(item) + itemList
+        onCreateNote.value = note.fileName
+    }
+
+    fun selectNote(fileName: String) {
+        if (editMode.value == false) {
+            onSelectNote.value = fileName
         }
-        val note = model.createNewNote(t, subTitle)
-        lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
-        selectedNote.value = note
-        Log.d(TAG, "updateDate = $lastModified")
-        save()
+    }
+
+    fun setEditMode(mode: Boolean) {
+        if (!mode) {
+            clearSelection()
+        }
+        editMode.value = mode
     }
 
     fun save() {
@@ -36,81 +61,23 @@ class NoteListViewModel(private val app: Application, private val model: NoteLis
 
     fun getItemCount() = model.list.size
 
-    private fun getItem(index: Int) = model.list[index]
-
-    fun getTitle(index: Int) = getItem(index).title
-
-    fun getSubTitle(index: Int) = getItem(index).subTitle
-
-    fun getUpdateDate(index: Int) :String {
-        val date = getItem(index).updatedDate
-        val df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM,
-                                                      SimpleDateFormat.MEDIUM)
-        return df.format(date)
+    fun getItem(index: Int): NoteListItem {
+        return itemList[index]
     }
 
-    fun selectNote(index: Int) {
-        val note = getItem(index)
-        lastModified = note.updatedDate
-        selectedNote.value = note
-        Log.d(TAG, "updateDate = $lastModified")
-    }
-
-    fun updateCurrentNoteInfo() {
-        val index = model.list.indexOf(selectedNote.value)
-        Log.d(TAG, "updateCurrentNoteInfo: $index")
-        if (index >= 0) {
-            updateIndex.value = index
-        }
-    }
-
-    fun initSelection() {
-        selection = MutableList(getItemCount()){false}
-    }
-
-    fun clearSelection() {
-        selection = null
-    }
-
-    fun setSelection(index: Int, sel: Boolean) {
-        selection?.let {
-            if (index < it.size) {
-                it[index] = sel
-                Log.d(TAG, "setSelection at $index, $sel")
-            }
-        }
-    }
-
-    fun getSelection(index: Int): Boolean {
-        return selection?.getOrNull(index) ?: false
+    private fun clearSelection() {
+        itemList.forEach { it.select = false }
     }
 
     fun isSelected(): Boolean {
-        return selection?.contains(true) ?: false
+        return itemList.any { it.select }
     }
 
     fun deleteSelectedItems() {
-        val indexes = mutableListOf<Int>()
-        selection?.forEachIndexed { index, b ->
-            if (b) {
-                indexes.add(index)
-                if (selectedNote.value == getItem(index)) {
-                    /* 表示中のノートを削除しようとしている */
-                    Log.d(TAG, "Selected note will be deleted.")
-                    lastModified = 0
-                    selectedNote.value = null
-                }
-            }
-        }
+        val indexes = itemList.mapIndexedNotNull { index, item -> if (item.select) index else null }
         Log.d(TAG, "Delete at $indexes")
         model.deleteNotesAt(indexes)
-        clearSelection()
-    }
-
-    fun isCurrentNoteModified(): Boolean {
-        val note = selectedNote.value
-        val date = note?.updatedDate
-        return (date != null) && (date != lastModified)
+        itemList = itemList.filter { item -> !item.select }
     }
 
     companion object {

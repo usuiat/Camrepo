@@ -66,7 +66,7 @@ class NoteFragment : Fragment() {
             if (editTitleViewModel.tag == TAG) {
                 viewModel.setNoteTitle(editTitleViewModel.title, editTitleViewModel.subTitle)
                 noteItemAdapter.notifyItemChanged(0)
-                noteListViewModel.updateCurrentNoteInfo()
+//                noteListViewModel.updateCurrentNoteInfo()
             }
         })
 

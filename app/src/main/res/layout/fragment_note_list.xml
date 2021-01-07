@@ -1,99 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/windowBackground"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".notelist.NoteListFragment">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.notelist.NoteListViewModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/navHeader"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="match_parent"
         android:background="@color/windowBackground"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:tooltipText="@string/app_name"
+        tools:context=".notelist.NoteListFragment">
 
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="153dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:contentDescription="@string/desc_app_icon"
-            android:src="@drawable/ic_logo"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/recycler_view_padding_bottom"
+            android:scrollbarStyle="insideOverlay"
+            android:scrollbars="vertical"
+            android:verticalScrollbarPosition="defaultPosition"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/settingButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/desc_setting"
-            android:scaleType="center"
-            android:src="@drawable/setting"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/floating_button_margin"
+            android:layout_marginBottom="@dimen/floating_button_margin"
+            android:clickable="true"
+            android:contentDescription="@string/desc_add_new_note"
+            android:src="@drawable/add"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="@{viewModel.editMode ? View.GONE : View.VISIBLE}"
+            android:onClick="@{() -> viewModel.createNewNote()}"/>
 
-        <ImageButton
-            android:id="@+id/editNoteListButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/desc_edit_note_list"
-            android:src="@drawable/check"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/editModeBar"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:background="@color/windowBackground"
-            android:orientation="horizontal"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageButton
-                android:id="@+id/closeEditModeButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/desc_close_edit_mode"
-                android:scaleType="center"
-                android:src="@drawable/close_action"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageButton
-                android:id="@+id/deleteButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/desc_delete_note"
-                android:src="@drawable/delete"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/recycler_view_padding_bottom"
-        android:scrollbarStyle="insideOverlay"
-        android:scrollbars="vertical"
-        android:verticalScrollbarPosition="defaultPosition"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/navHeader" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
