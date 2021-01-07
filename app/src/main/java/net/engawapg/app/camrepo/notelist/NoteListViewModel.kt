@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteProperty
+import net.engawapg.app.camrepo.util.Event
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -26,8 +27,8 @@ data class NoteListItem(
 
 class NoteListViewModel(private val model: NoteListModel): ViewModel() {
 
-    val onSelectNote = MutableLiveData<String>()
-    val onCreateNote = MutableLiveData<String>()
+    val onSelectNote = MutableLiveData<Event<String>>()
+    val onCreateNote = MutableLiveData<Event<String>>()
     val editMode = MutableLiveData<Boolean>().apply { value = false }
     private var itemList: List<NoteListItem>
 
@@ -39,12 +40,12 @@ class NoteListViewModel(private val model: NoteListModel): ViewModel() {
         val note = model.createNewNote("", "")
         val item = NoteListItem(note)
         itemList = listOf(item) + itemList
-        onCreateNote.value = note.fileName
+        onCreateNote.value = Event(note.fileName)
     }
 
     fun selectNote(fileName: String) {
         if (editMode.value == false) {
-            onSelectNote.value = fileName
+            onSelectNote.value = Event(fileName)
         }
     }
 

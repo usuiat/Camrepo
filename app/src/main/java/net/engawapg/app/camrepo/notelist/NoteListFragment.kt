@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
+import net.engawapg.app.camrepo.util.EventObserver
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class NoteListFragment : Fragment() {
@@ -52,10 +52,10 @@ class NoteListFragment : Fragment() {
             adapter = noteCardAdapter
         }
 
-        viewModel.onSelectNote.observe(viewLifecycleOwner, Observer {
+        viewModel.onSelectNote.observe(viewLifecycleOwner, EventObserver {
             onSelectNote(it)
         })
-        viewModel.onCreateNote.observe(viewLifecycleOwner, Observer {
+        viewModel.onCreateNote.observe(viewLifecycleOwner, EventObserver {
             onCreateNote(it)
         })
 
@@ -128,11 +128,18 @@ class NoteListFragment : Fragment() {
 
     private fun onSelectNote(fileName: String) {
         Log.d(TAG, "onSelectNote fileName=$fileName")
+        navigateToNoteFragment(fileName)
     }
 
     private fun onCreateNote(fileName: String) {
         Log.d(TAG, "onCreateNote fileName=$fileName")
-        noteCardAdapter.notifyItemInserted(0)
+//        noteCardAdapter.notifyItemInserted(0)
+        navigateToNoteFragment(fileName)
+    }
+
+    private fun navigateToNoteFragment(fileName: String) {
+        val action = NoteListFragmentDirections.actionNoteListFragmentToNoteFragment(fileName)
+        findNavController().navigate(action)
     }
 
     companion object {
