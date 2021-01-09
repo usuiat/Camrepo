@@ -3,7 +3,6 @@ package net.engawapg.app.camrepo.notelist
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -41,9 +40,6 @@ class NoteListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        /* Toolbar */
-        (activity as AppCompatActivity?)?.supportActionBar?.setLogo(R.drawable.ic_logo)
 
         noteCardAdapter = NoteCardAdapter(viewModel, viewLifecycleOwner)
         recyclerView.apply {

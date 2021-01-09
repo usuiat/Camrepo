@@ -3,8 +3,10 @@ package net.engawapg.app.camrepo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -26,6 +28,20 @@ class MainActivity : AppCompatActivity() {
         /* Toolbar */
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        supportActionBar?.setLogo(R.drawable.ic_logo)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            onDestinationChanged(destination)
+        }
+    }
+    
+    private fun onDestinationChanged(destination: NavDestination) {
+        /* NoteListFragmentのToolbarだけにLogoを表示する */
+        supportActionBar?.setDisplayUseLogoEnabled(destination.id == R.id.noteListFragment)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     companion object {
