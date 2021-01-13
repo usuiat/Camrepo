@@ -1,9 +1,12 @@
 package net.engawapg.app.camrepo.note
 
-import android.net.Uri
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.util.Event
@@ -18,8 +21,17 @@ class NotePageTitleItem(val pageTitle: String, val pageIndex: Int)
     var select = false
 }
 
-class NotePhotoItem(val photoUri: Uri, val pageIndex: Int, val photoIndex: Int)
-    : NoteItem(NoteViewModel.VIEW_TYPE_PHOTO)
+class NotePhotoItem(private val imageInfo: ImageInfo, val pageIndex: Int, val photoIndex: Int)
+    : NoteItem(NoteViewModel.VIEW_TYPE_PHOTO) {
+    val bmp = MutableLiveData<Bitmap>()
+    fun loadPhoto(context: Context, defaultDrawableId: Int) {
+        var bitmap = imageInfo.getBitmapThumbnailWithResolver(context.contentResolver)
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(context.resources, defaultDrawableId)
+        }
+        bmp.value = bitmap
+    }
+}
 
 class NoteMemoItem(var memo: String, val pageIndex: Int): NoteItem(NoteViewModel.VIEW_TYPE_MEMO)
 
@@ -91,7 +103,7 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
                 for (photoIdx in 0 until photoCount) {
                     val info = noteModel.getPhotoAt(pageIdx, photoIdx)
                     if (info != null) {
-                        list.add(NotePhotoItem(info.uri, pageIdx, photoIdx))
+                        list.add(NotePhotoItem(info, pageIdx, photoIdx))
                         count++
                     }
                 }
@@ -133,11 +145,6 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
         noteModel?.deletePagesAt(indexes)
         buildItemList()
     }
-
-//    fun getPhotoBitmap(itemIndex: Int, resolver: ContentResolver): Bitmap? {
-//        val imageInfo = getPhoto(itemIndex)
-//        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
-//    }
 
 //    fun isModifiedAfterLastDisplayedTime(): Boolean {
 //        val date = noteModel?.let {

@@ -177,20 +177,15 @@ class NoteFragment : Fragment() {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = when(viewType) {
                 NoteViewModel.VIEW_TYPE_TITLE ->
-                    DataBindingUtil.inflate<ViewNoteTitleBinding>(
-                        layoutInflater, R.layout.view_note_title, parent, false)
+                    ViewNoteTitleBinding.inflate(layoutInflater, parent, false)
                 NoteViewModel.VIEW_TYPE_PAGE_TITLE ->
-                    DataBindingUtil.inflate<ViewNotePageTitleBinding>(
-                        layoutInflater, R.layout.view_note_page_title, parent, false)
+                    ViewNotePageTitleBinding.inflate(layoutInflater, parent, false)
                 NoteViewModel.VIEW_TYPE_PHOTO ->
-                    DataBindingUtil.inflate<ViewNotePhotoBinding>(
-                        layoutInflater, R.layout.view_note_photo, parent, false)
+                    ViewNotePhotoBinding.inflate(layoutInflater, parent, false)
                 NoteViewModel.VIEW_TYPE_MEMO ->
-                    DataBindingUtil.inflate<ViewNoteMemoBinding>(
-                        layoutInflater, R.layout.view_note_memo, parent, false)
+                    ViewNoteMemoBinding.inflate(layoutInflater, parent, false)
                 else ->
-                    DataBindingUtil.inflate<ViewNoteBlankBinding>(
-                        layoutInflater, R.layout.view_note_blank, parent, false)
+                    ViewNoteBlankBinding.inflate(layoutInflater, parent, false)
             }
             binding.lifecycleOwner = lifecycleOwner
             val holder = NoteItemViewHolder(binding)
@@ -223,7 +218,9 @@ class NoteFragment : Fragment() {
                 }
                 is ViewNotePhotoBinding -> {
                     holder.binding.viewModel = viewModel
-                    holder.binding.item = viewModel.getItem(position) as NotePhotoItem
+                    val item = viewModel.getItem(position) as NotePhotoItem
+                    item.loadPhoto(holder.itemView.context, R.drawable.imagenotfound)
+                    holder.binding.item = item
                 }
                 is ViewNoteMemoBinding -> {
                     holder.binding.viewModel = viewModel
@@ -239,21 +236,6 @@ class NoteFragment : Fragment() {
     }
 
     class NoteItemViewHolder(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root)
-
-//    class PhotoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
-//
-//        override fun bind(position: Int, editMode: Boolean) {
-//            val resolver = itemView.context.contentResolver
-//            val bmp = viewModel.getPhotoBitmap(position, resolver)
-//
-//            if (bmp != null) {
-//                itemView.imageView.setImageBitmap(bmp)
-//            } else {
-//                itemView.imageView.setImageResource(R.drawable.imagenotfound)
-//                Log.d(TAG, "Image is not exist @position = $position.")
-//            }
-//        }
-//    }
 
     inner class NoteItemSpanSizeLookup: GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
