@@ -48,7 +48,9 @@ val appModule = module {
         )
     }
 
-    viewModel { NoteViewModel(androidApplication(), get()) }
+    viewModel { (noteFileName: String) ->
+        NoteViewModel(noteFileName, get())
+    }
 
     viewModel { NoteListViewModel(get()) }
 
@@ -67,6 +69,6 @@ val appModule = module {
     }
 
     viewModel {
-        EditTitleViewModel(androidApplication())
+        EditTitleViewModel(getScope(Constants.SCOPE_ID_NOTE).get(), get())
     }
 }

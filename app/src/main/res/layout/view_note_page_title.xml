@@ -1,72 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
-    app:cardBackgroundColor="@color/cardBackground"
-    app:cardCornerRadius="0dp"
-    app:cardElevation="3dp"
-    app:cardPreventCornerOverlap="false">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.note.NoteViewModel" />
+        <variable
+            name="item"
+            type="net.engawapg.app.camrepo.note.NotePageTitleItem" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground">
+        android:layout_marginTop="4dp"
+        app:cardBackgroundColor="@color/cardBackground"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="3dp"
+        app:cardPreventCornerOverlap="false"
+        android:onClick="@{() -> viewModel.selectItem(item)}">
 
-        <TextView
-            android:id="@+id/pageTitle"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="18dp"
-            android:background="@drawable/frame_text_view_underline"
-            android:ems="10"
-            android:gravity="start|top"
-            android:paddingBottom="4dp"
-            android:textColor="@color/contentTextColor"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/editButton"
-            app:layout_constraintStart_toEndOf="@+id/dragHandle"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="?attr/selectableItemBackground">
 
-        <CheckBox
-            android:id="@+id/pageCheckBox"
-            android:layout_width="32dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintStart_toEndOf="@+id/editButton"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/pageTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="18dp"
+                android:background="@drawable/frame_text_view_underline"
+                android:ems="10"
+                android:gravity="start|top"
+                android:paddingBottom="4dp"
+                android:textColor="@color/contentTextColor"
+                android:textSize="22sp"
+                android:text="@{item.pageTitle}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/editButton"
+                app:layout_constraintStart_toEndOf="@+id/dragHandle"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/editButton"
-            android:layout_width="32dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="12dp"
-            android:contentDescription="@string/desc_edit_button"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/pageCheckBox"
-            app:layout_constraintStart_toEndOf="@+id/pageTitle"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/edit" />
+            <CheckBox
+                android:id="@+id/pageCheckBox"
+                android:layout_width="32dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
+                android:visibility="@{viewModel.editMode ? View.VISIBLE : View.GONE}"
+                android:checked="@={item.select}"
+                app:layout_constraintStart_toEndOf="@+id/editButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/dragHandle"
-            android:layout_width="32dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/drag_handle"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/pageTitle"
-            app:srcCompat="@drawable/draghandle" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            <ImageView
+                android:id="@+id/editButton"
+                android:layout_width="32dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="@string/desc_edit_button"
+                android:scaleType="center"
+                android:visibility="@{viewModel.editMode ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/pageCheckBox"
+                app:layout_constraintStart_toEndOf="@+id/pageTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/edit" />
+
+            <ImageView
+                android:id="@+id/dragHandle"
+                android:layout_width="32dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/drag_handle"
+                android:scaleType="center"
+                android:visibility="@{viewModel.editMode ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/pageTitle"
+                app:srcCompat="@drawable/draghandle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

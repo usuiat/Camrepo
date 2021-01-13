@@ -33,8 +33,14 @@ class NoteListViewModel(private val model: NoteListModel): ViewModel() {
     private var itemList: List<NoteListItem>
 
     init {
-        itemList = model.list.map { noteProperty -> NoteListItem(noteProperty) }
+        itemList = createItemList()
     }
+
+    fun update() {
+        itemList = createItemList()
+    }
+
+    private fun createItemList() = model.list.map { noteProperty -> NoteListItem(noteProperty) }
 
     fun createNewNote() {
         val note = model.createNewNote("", "")

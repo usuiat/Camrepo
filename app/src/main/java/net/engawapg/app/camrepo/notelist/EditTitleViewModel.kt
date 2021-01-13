@@ -1,13 +1,20 @@
 package net.engawapg.app.camrepo.notelist
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import net.engawapg.app.camrepo.model.NoteListModel
+import net.engawapg.app.camrepo.model.NoteModel
 
-class EditTitleViewModel(app: Application): AndroidViewModel(app) {
-    var dialogTitle: String = ""
-    var title: String = ""
-    var subTitle: String = ""
-    val onClickOk = MutableLiveData<Boolean>()
-    var tag: String = ""    /* 呼び出し元を区別するためのタグ */
+class EditTitleViewModel(private val noteModel: NoteModel, private val noteListModel: NoteListModel)
+    : ViewModel() {
+    var title: String = noteModel.title
+    var subTitle: String = noteModel.subTitle
+
+    fun save() {
+        noteModel.title = title
+        noteModel.subTitle = subTitle
+        noteModel.save()
+
+        noteListModel.updateNoteTitle(noteModel.fileName, title, subTitle)
+        noteListModel.save()
+    }
 }

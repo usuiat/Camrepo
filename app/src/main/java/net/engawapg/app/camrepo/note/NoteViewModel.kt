@@ -1,192 +1,157 @@
 package net.engawapg.app.camrepo.note
 
-import android.app.Application
-import android.content.ContentResolver
-import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import net.engawapg.app.camrepo.model.ImageInfo
+import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
-import net.engawapg.app.camrepo.model.NoteProperty
+import net.engawapg.app.camrepo.util.Event
 
-class NoteViewModel(app: Application, private val noteListModel: NoteListModel)
-    : AndroidViewModel(app) {
+open class NoteItem(val viewType: Int)
 
-    data class ItemInfo(
-        val viewType: Int,  /* RecyclerViewのViewType */
-        val pageIndex: Int, /* ページ番号 */
-        val subIndex: Int,   /* ページ内の要素（写真）の番号 */
-        var selected: Boolean
-    )
+class NoteTitleItem(var title: String, var subTitle: String)
+    : NoteItem(NoteViewModel.VIEW_TYPE_TITLE)
+
+class NotePageTitleItem(val pageTitle: String, val pageIndex: Int)
+    : NoteItem(NoteViewModel.VIEW_TYPE_PAGE_TITLE) {
+    var select = false
+}
+
+class NotePhotoItem(val photoUri: Uri, val pageIndex: Int, val photoIndex: Int)
+    : NoteItem(NoteViewModel.VIEW_TYPE_PHOTO)
+
+class NoteMemoItem(var memo: String, val pageIndex: Int): NoteItem(NoteViewModel.VIEW_TYPE_MEMO)
+
+class NoteBlankItem(val pageIndex: Int): NoteItem(NoteViewModel.VIEW_TYPE_BLANK)
+
+data class PhotoIndex(val pageIndex: Int, val photoIndex: Int)
+
+class NoteViewModel(noteFileName: String, private val noteListModel: NoteListModel): ViewModel() {
 
     /* RecyclerViewを構成するアイテムのリスト */
-    val noteProperty = MutableLiveData<NoteProperty?>()
-    private var noteModel: NoteModel? = null
-    private var itemList: MutableList<ItemInfo>? = null
-    var columnCount: Int = 4
-    private var modified = false
-    val pageModified = MutableLiveData<Boolean>()
-    private var pageAdded = false
-    private var lastModifiedDate: Long = 0
-    private var pageTitleListMode = false /* ページタイトルの一覧を表示するモード */
+    private val noteModel: NoteModel?
+    val onClickTitle = MutableLiveData<Event<String>>()
+    val onSelectPage = MutableLiveData<Event<Int>>()
+    val onSelectPhoto = MutableLiveData<Event<PhotoIndex>>()
+    val editMode = MutableLiveData<Boolean>().apply { value = false }
+    private lateinit var itemList: List<NoteItem>
+    private var columnCount: Int = 4
 
-    fun setNote(note: NoteProperty?) {
-        initItemList(note)
-        noteProperty.value = note
-    }
-
-    private fun initItemList(note: NoteProperty?) {
-        noteModel = NoteModel.createModel(note)
-        pageTitleListMode = false
+    init {
+        Log.d(TAG, "NoteViewModel Init")
+        val noteProperty = noteListModel.getNote(noteFileName)
+        noteModel = NoteModel.createModel(noteProperty)
         buildItemList()
     }
 
-    fun setPageTitleListMode(mode: Boolean) {
-        pageTitleListMode = mode
+    fun createNewPage() {
+        Log.d(TAG, "createNewPage")
+        val pageIndex = noteModel?.createNewPage()
+        if (pageIndex != null) {
+            buildItemList()
+            onSelectPage.value = Event(pageIndex)
+        }
+    }
+
+    fun selectItem(item: NoteItem) {
+        if (editMode.value == false) {
+            when (item) {
+                is NoteTitleItem -> onClickTitle.value = Event("onClickTitle")
+                is NotePageTitleItem -> onSelectPage.value = Event(item.pageIndex)
+                is NotePhotoItem -> onSelectPhoto.value = Event(PhotoIndex(item.pageIndex, item.photoIndex))
+                is NoteBlankItem -> onSelectPage.value = Event(item.pageIndex)
+                is NoteMemoItem -> onSelectPage.value = Event(item.pageIndex)
+            }
+        }
+    }
+
+    fun setEditMode(mode: Boolean) {
+        editMode.value = mode
         buildItemList()
     }
 
     fun buildItemList() {
-        val list = mutableListOf<ItemInfo>()
-        if (!pageTitleListMode) {
-            list.add(ItemInfo(VIEW_TYPE_TITLE, 0, 0, false)) /* 先頭はタイトル */
-        }
-
-        val n = noteModel?.getPageNum() ?: 0
-        for (pageIdx in 0 until n) {
-            list.add(ItemInfo(VIEW_TYPE_PAGE_TITLE, pageIdx, 0, false)) /* ページの先頭はページタイトル */
-
-            if (pageTitleListMode) {
-                continue
+        val list = mutableListOf<NoteItem>()
+        if (noteModel != null) {
+            if (editMode.value == false) {
+                list.add(NoteTitleItem(noteModel.title, noteModel.subTitle)) // ノートタイトル
             }
 
-            /* 写真 */
-            val photoCount = noteModel?.getPhotoCount(pageIdx) ?: 0
-            for (photoIdx in 0 until photoCount) {
-                list.add(ItemInfo(VIEW_TYPE_PHOTO, pageIdx, photoIdx, false))
-            }
+            val n = noteModel.getPageNum()
+            for (pageIdx in 0 until n) {
+                list.add(NotePageTitleItem(noteModel.getTitle(pageIdx), pageIdx))
+                if (editMode.value == true) {
+                    continue
+                }
 
-            /* カードビューをいびつな形にしないための空欄 */
-            val blankCount = columnCount - (photoCount % columnCount)
-            for (blankIdx in 0 until blankCount) {
-                list.add(ItemInfo(VIEW_TYPE_BLANK, pageIdx, blankIdx, false))
-            }
+                /* 写真 */
+                val photoCount = noteModel.getPhotoCount(pageIdx)
+                var count = 0
+                for (photoIdx in 0 until photoCount) {
+                    val info = noteModel.getPhotoAt(pageIdx, photoIdx)
+                    if (info != null) {
+                        list.add(NotePhotoItem(info.uri, pageIdx, photoIdx))
+                        count++
+                    }
+                }
 
-            list.add(ItemInfo(VIEW_TYPE_MEMO, pageIdx, 0, false)) /* メモ欄 */
+                /* カードビューをいびつな形にしないための空欄 */
+                val blankCount = columnCount - (count % columnCount)
+                for (blankIdx in 0 until blankCount) {
+                    list.add(NoteBlankItem(pageIdx))
+                }
+
+                list.add(NoteMemoItem(noteModel.getMemo(pageIdx), pageIdx))
+            }
         }
 
         itemList = list
     }
 
-    fun addPage() {
-        Log.d(TAG, "before createNewPage: itemList.size = ${itemList?.size}")
-        noteModel?.createNewPage()
-        buildItemList()
-        modified = true
-        pageAdded = true
-        Log.d(TAG, "after  createNewPage: itemList.size = ${itemList?.size}")
+    fun getItemCount() = itemList.size
+
+    fun getViewType(index: Int): Int {
+        return itemList[index].viewType
     }
 
-    fun isPageAdded(): Boolean {
-        val added = pageAdded
-        pageAdded = false
-        return added
-    }
+    fun getItem(index: Int): NoteItem? = itemList[index]
 
     fun movePage(from:Int, to:Int) {
         noteModel?.movePage(from, to)
-        modified = true
+        buildItemList()
     }
-
-    fun setPageSelection(index: Int, sel: Boolean) {
-        itemList?.let {
-            if (index < it.size) {
-                it[index].selected = sel
-            }
-        }
-    }
-
-    fun getPageSelection(index: Int) = itemList?.getOrNull(index)?.selected ?: false
 
     fun isPageSelected(): Boolean {
-        return itemList?.find { item -> item.selected } != null
+        return itemList.filterIsInstance<NotePageTitleItem>().any { it.select }
     }
 
     fun deleteSelectedPages() {
-        val indexes = mutableListOf<Int>()
-        itemList?.forEachIndexed { index, item -> if (item.selected) indexes.add(index) }
+        val indexes = itemList.filterIsInstance<NotePageTitleItem>()
+            .mapIndexedNotNull { index, item -> if (item.select) index else null }
         Log.d(TAG, "Delete at $indexes")
         noteModel?.deletePagesAt(indexes)
-        modified = true
+        buildItemList()
     }
 
-    fun getNoteTitle() = noteModel?.title ?: ""
-    fun getNoteSubTitle() = noteModel?.subTitle ?: ""
+//    fun getPhotoBitmap(itemIndex: Int, resolver: ContentResolver): Bitmap? {
+//        val imageInfo = getPhoto(itemIndex)
+//        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
+//    }
 
-    fun setNoteTitle(title: String, subTitle: String) {
-        noteModel?.title = title
-        noteModel?.subTitle = subTitle
-        noteModel?.let {
-            noteListModel.updateNoteTitle(it.fileName, title, subTitle)
-        }
-        modified = true
-    }
-
-    fun getItemCount() = itemList?.size ?: 0
-
-    fun getViewType(index: Int): Int {
-        return itemList?.let { it[index].viewType } ?: 0
-    }
-
-    fun getPageIndex(itemIndex: Int) = itemList?.let { it[itemIndex].pageIndex } ?: 0
-
-    fun getPageTitle(itemIndex: Int): String {
-        return itemList?.let {
-            val pageIndex = it[itemIndex].pageIndex
-            noteModel?.getTitle(pageIndex) ?: ""
-        } ?: ""
-    }
-
-    fun getMemo(itemIndex: Int): String {
-        return itemList?.let {
-            val pageIndex = it[itemIndex].pageIndex
-            noteModel?.getMemo(pageIndex) ?: ""
-        } ?: ""
-    }
-
-    fun getPhotoIndex(itemIndex: Int) = itemList?.let { it[itemIndex].subIndex } ?: 0
-
-    private fun getPhoto(itemIndex: Int): ImageInfo? {
-        return itemList?.let {
-            val pageIndex = it[itemIndex].pageIndex
-            val photoIndex = it[itemIndex].subIndex
-            noteModel?.getPhotoAt(pageIndex, photoIndex)
-        }
-    }
-
-    fun getPhotoBitmap(itemIndex: Int, resolver: ContentResolver): Bitmap? {
-        val imageInfo = getPhoto(itemIndex)
-        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
-    }
-
-    fun isModifiedAfterLastDisplayedTime(): Boolean {
-        val date = noteModel?.let {
-            noteListModel.getNote(it.fileName)?.updatedDate ?: 0
-        } ?: 0
-        return (date != 0L) && (lastModifiedDate != 0L) && (date != lastModifiedDate)
-    }
+//    fun isModifiedAfterLastDisplayedTime(): Boolean {
+//        val date = noteModel?.let {
+//            noteListModel.getNote(it.fileName)?.updatedDate ?: 0
+//        } ?: 0
+//        return (date != 0L) && (lastModifiedDate != 0L) && (date != lastModifiedDate)
+//    }
 
     fun save() {
         noteModel?.let {
-            if (modified) {
-                it.save()
-                modified = false
-                noteListModel.updateLastModifiedDate(it.fileName)
-                noteListModel.save()
-            }
-            lastModifiedDate = noteListModel.getNote(it.fileName)?.updatedDate ?: 0
+            it.save()
+            noteListModel.updateLastModifiedDate(it.fileName)
+            noteListModel.save()
+//            lastModifiedDate = noteListModel.getNote(it.fileName)?.updatedDate ?: 0
         }
     }
 

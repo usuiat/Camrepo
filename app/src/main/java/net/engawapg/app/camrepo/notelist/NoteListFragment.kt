@@ -16,11 +16,11 @@ import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
 import net.engawapg.app.camrepo.util.EventObserver
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteListFragment : Fragment() {
 
-    private val viewModel: NoteListViewModel by sharedViewModel()
+    private val viewModel: NoteListViewModel by viewModel()
     private lateinit var noteCardAdapter: NoteCardAdapter
     private var actionMode: ActionMode? = null
 
@@ -129,7 +129,6 @@ class NoteListFragment : Fragment() {
 
     private fun onCreateNote(fileName: String) {
         Log.d(TAG, "onCreateNote fileName=$fileName")
-//        noteCardAdapter.notifyItemInserted(0)
         navigateToNoteFragment(fileName)
     }
 
