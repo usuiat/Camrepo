@@ -2,12 +2,12 @@ package net.engawapg.app.camrepo.page
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
+import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -16,11 +16,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_page.*
-import kotlinx.android.synthetic.main.view_page_memo.view.*
-import kotlinx.android.synthetic.main.view_page_photo.view.*
-import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.*
+import net.engawapg.app.camrepo.util.EventObserver
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
@@ -53,9 +52,7 @@ class PageFragment : Fragment() {
         viewModel = getViewModel { parametersOf(pageIndex, IMAGE_SPAN_COUNT) }
 
         /* RecyclerView */
-        pageItemAdapter = PageItemAdapter(viewModel, onFocusChangeListenerForRecyclerView) { position ->
-            onItemClick( position )
-        }
+        pageItemAdapter = PageItemAdapter(viewModel, viewLifecycleOwner)
 
         recyclerView.apply {
             layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
@@ -68,9 +65,9 @@ class PageFragment : Fragment() {
         /* 写真追加イベントの監視 */
         cameraViewModel.eventAddImagePageIndex.observe(viewLifecycleOwner, Observer { index ->
             if (index == pageIndex) {
+                viewModel.reload()
                 pageItemAdapter.notifyDataSetChanged()
-                recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
-                viewModel.modified = true
+                recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
             }
         })
 
@@ -78,7 +75,18 @@ class PageFragment : Fragment() {
         inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE)
                 as InputMethodManager
 
-        /* Observe result from DeleteConfirmDialog */
+        viewModel.onClickPhoto.observe(viewLifecycleOwner, EventObserver { photoIndex ->
+            findNavController().navigate(
+                PageFragmentDirections.actionPageFragmentToPhotoPagerFragment(
+                    pageIndex, photoIndex, false))
+        })
+        viewModel.onClickAddPhoto.observe(viewLifecycleOwner, EventObserver {
+            showCameraFragment()
+        })
+        viewModel.onEditTextFocused.observe(viewLifecycleOwner, EventObserver {
+            hideCameraFragment()
+        })
+
         findNavController().currentBackStackEntry?.savedStateHandle
             ?.getLiveData<Int>(DeleteConfirmDialog.KEY_RESULT)
             ?.observe(viewLifecycleOwner) { result ->
@@ -87,32 +95,10 @@ class PageFragment : Fragment() {
     }
 
     override fun onPause() {
-        val modified = viewModel.modified
         viewModel.save()
-        if (modified) {
-//            noteViewModel.pageModified.value = true
-        }
         /* キーボード消す */
         inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         super.onPause()
-    }
-
-    private fun onItemClick(position: Int) {
-        if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
-            showCameraFragment()
-        } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
-            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
-            val action = PageFragmentDirections
-                .actionPageFragmentToPhotoPagerFragment(pageIndex, photoIndex, false)
-            findNavController().navigate(action)
-        }
-    }
-
-    private val onFocusChangeListenerForRecyclerView = View.OnFocusChangeListener { v, hasFocus ->
-        if (hasFocus &&
-            ((v.tag == PageTitleViewHolder.TAG_PATE_TITLE) || (v.tag == MemoViewHolder.TAG_MEMO))) {
-            hideCameraFragment()
-        }
     }
 
     private fun showCameraFragment() {
@@ -128,7 +114,7 @@ class PageFragment : Fragment() {
                 .add(R.id.cameraFragmentContainer, cf)
                 .runOnCommit {
                     /* カメラアイコンが見えるようにスクロール */
-                    recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
+                    recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
                 }
                 .commit()
             cameraFragmentId = cf.id
@@ -170,8 +156,8 @@ class PageFragment : Fragment() {
     private val actionModeCallback = object: ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.menu_page_action_mode, menu)
-            viewModel.initPhotoSelection()
-            pageItemAdapter.setEditMode(true)
+            viewModel.setEditMode(true)
+            pageItemAdapter.notifyDataSetChanged()
             itemTouchHelper.attachToRecyclerView(null)
             /* キーボード消す */
             inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
@@ -188,7 +174,8 @@ class PageFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            pageItemAdapter.setEditMode(false)
+            viewModel.setEditMode(false)
+            pageItemAdapter.notifyDataSetChanged()
             itemTouchHelper.attachToRecyclerView(recyclerView)
             /* PageTitleにフォーカスが当たってしまうのを防ぐ */
             rootLayout.requestFocus()
@@ -206,155 +193,50 @@ class PageFragment : Fragment() {
     }
 
     class PageItemAdapter(private val viewModel: PageViewModel,
-                          private val onFocusChangeListener: View.OnFocusChangeListener,
-                          private val onItemClick: ((Int)->Unit))
-        : RecyclerView.Adapter<BaseViewHolder>() {
+                          private val lifecycleOwner: LifecycleOwner)
+        : RecyclerView.Adapter<PageItemViewHolder>() {
 
-        private var editMode = false
-        fun setEditMode(mode: Boolean) {
-            editMode = mode
-            notifyDataSetChanged()
-        }
+        override fun getItemCount() = viewModel.getItemCount()
 
-        override fun getItemCount() = viewModel.getItemCount(editMode)
+        override fun getItemViewType(position: Int) = viewModel.getViewType(position)
 
-        override fun getItemViewType(position: Int) = viewModel.getViewType(position, editMode)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-            return when (viewType) {
-                PageViewModel.VIEW_TYPE_PAGE_TITLE -> PageTitleViewHolder.create(parent, viewModel, onFocusChangeListener)
-                PageViewModel.VIEW_TYPE_PHOTO -> PhotoViewHolder.create(parent, viewModel)
-                PageViewModel.VIEW_TYPE_ADD_PHOTO -> AddPhotoViewHolder.create(parent)
-                PageViewModel.VIEW_TYPE_MEMO -> MemoViewHolder.create(parent, viewModel, onFocusChangeListener)
-                else -> BaseViewHolder.create(parent)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageItemViewHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val binding = when(viewType) {
+                PageViewModel.VIEW_TYPE_PAGE_TITLE -> ViewPageTitleBinding.inflate(inflater, parent, false)
+                PageViewModel.VIEW_TYPE_PHOTO -> ViewPagePhotoBinding.inflate(inflater, parent, false)
+                PageViewModel.VIEW_TYPE_ADD_PHOTO -> ViewPageAddPhotoBinding.inflate(inflater, parent, false)
+                PageViewModel.VIEW_TYPE_MEMO -> ViewPageMemoBinding.inflate(inflater, parent, false)
+                else -> ViewPageBlankBinding.inflate(inflater, parent, false)
             }
+            binding.lifecycleOwner = lifecycleOwner
+            return PageItemViewHolder(binding)
         }
 
-        override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-            holder.bind(position, editMode)
-            holder.itemView.setOnClickListener {
-                onItemClick(holder.adapterPosition)
-            }
-        }
-    }
-
-    open class BaseViewHolder(v: View): RecyclerView.ViewHolder(v) {
-        companion object {
-            fun create(parent: ViewGroup): BaseViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_blank, parent, false)
-                return BaseViewHolder(view)
-            }
-        }
-
-        open fun bind(position: Int, editMode: Boolean) {}
-    }
-
-    class PageTitleViewHolder(v: View,
-                              private val viewModel: PageViewModel,
-                              private val onFocusChangeListener: View.OnFocusChangeListener)
-        : BaseViewHolder(v) {
-
-        companion object {
-            fun create(parent: ViewGroup,
-                       viewModel: PageViewModel,
-                       onFocusChangeListener: View.OnFocusChangeListener): PageTitleViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_title, parent, false)
-                return PageTitleViewHolder(view, viewModel, onFocusChangeListener)
-            }
-            const val TAG_PATE_TITLE = "TagPageTitle"
-        }
-
-        override fun bind(position: Int, editMode: Boolean) {
-            itemView.pageTitle.apply {
-                setText(viewModel.getPageTitle())
-                isEnabled = !editMode
-                addTextChangedListener(object: TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                        viewModel.setPageTitle(s.toString())
+        override fun onBindViewHolder(holder: PageItemViewHolder, position: Int) {
+            when (holder.binding) {
+                is ViewPageTitleBinding -> {
+                    holder.binding.viewModel = viewModel
+                }
+                is ViewPagePhotoBinding -> {
+                    holder.binding.viewModel = viewModel
+                    viewModel.getPhotoItem(position)?.let {
+                        it.loadPhoto(holder.itemView.context, R.drawable.imagenotfound)
+                        holder.binding.item = it
                     }
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                })
-                onFocusChangeListener = this@PageTitleViewHolder.onFocusChangeListener
-                tag = TAG_PATE_TITLE
-            }
-        }
-    }
-
-    class PhotoViewHolder(v: View, private val viewModel: PageViewModel): BaseViewHolder(v) {
-
-        companion object {
-            fun create(parent: ViewGroup, viewModel: PageViewModel): PhotoViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_photo, parent, false)
-                return PhotoViewHolder(view, viewModel)
-            }
-        }
-
-        override fun bind(position: Int, editMode: Boolean) {
-            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, editMode)
-            val resolver = itemView.context.contentResolver
-            val bmp = viewModel.getPhotoBitmap(photoIndex, resolver)
-
-            if (bmp != null) {
-                itemView.imageView.setImageBitmap(bmp)
-            } else {
-                itemView.imageView.setImageResource(R.drawable.imagenotfound)
-            }
-
-            itemView.checkBox.apply {
-                visibility = if (editMode) View.VISIBLE else View.INVISIBLE
-                isChecked = viewModel.getPhotoSelection(position)
-                setOnClickListener {
-                    viewModel.setPhotoSelection(adapterPosition, isChecked)
+                }
+                is ViewPageAddPhotoBinding -> {
+                    holder.binding.viewModel = viewModel
+                }
+                is ViewPageMemoBinding -> {
+                    holder.binding.viewModel = viewModel
                 }
             }
+            holder.binding.executePendingBindings()
         }
     }
 
-    class AddPhotoViewHolder(v: View): BaseViewHolder(v) {
-
-        companion object {
-            fun create(parent: ViewGroup): AddPhotoViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_add_photo, parent, false)
-                return AddPhotoViewHolder(view)
-            }
-        }
-    }
-
-    class MemoViewHolder(v: View, private val viewModel: PageViewModel,
-                         private val onFocusChangeListener: View.OnFocusChangeListener)
-        : BaseViewHolder(v) {
-
-        companion object {
-            fun create(parent: ViewGroup, viewModel: PageViewModel,
-                       onFocusChangeListener: View.OnFocusChangeListener): MemoViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_memo, parent, false)
-                return MemoViewHolder(view, viewModel, onFocusChangeListener)
-            }
-            const val TAG_MEMO = "TagMemo"
-        }
-
-        override fun bind(position: Int, editMode: Boolean) {
-            itemView.memo.apply {
-                setText(viewModel.getMemo())
-                isEnabled = !editMode
-                addTextChangedListener(object: TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                        viewModel.setMemo(s.toString())
-                    }
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int ) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                })
-                onFocusChangeListener = this@MemoViewHolder.onFocusChangeListener
-                tag = TAG_MEMO
-            }
-        }
-    }
+    class PageItemViewHolder(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root)
 
     inner class PageItemSpanSizeLookup: GridLayoutManager.SpanSizeLookup() {
         override fun getSpanSize(position: Int): Int {
@@ -373,7 +255,7 @@ class PageFragment : Fragment() {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ): Int {
-            if (viewHolder is PhotoViewHolder) {
+            if (viewHolder.itemViewType == PageViewModel.VIEW_TYPE_PHOTO) {
                 val drag = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
                         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                 return ItemTouchHelper.Callback.makeMovementFlags(drag, 0)
@@ -386,7 +268,7 @@ class PageFragment : Fragment() {
             current: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            return (target is PhotoViewHolder)
+            return (target.itemViewType == PageViewModel.VIEW_TYPE_PHOTO)
         }
 
         override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {

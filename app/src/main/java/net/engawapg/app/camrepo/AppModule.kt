@@ -26,7 +26,6 @@ val appModule = module {
 
     viewModel { (pageIndex: Int, columnCount: Int) ->
         PageViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get(),
             get(),
             pageIndex,
