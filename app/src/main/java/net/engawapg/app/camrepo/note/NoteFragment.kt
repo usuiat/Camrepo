@@ -93,10 +93,18 @@ class NoteFragment : Fragment() {
                 viewModel.buildItemList()
                 noteItemAdapter.notifyDataSetChanged()
             }
+
+        if (viewModel.checkUpdate()) {
+            Log.d(TAG, "Note has been updated.")
+            noteItemAdapter.notifyDataSetChanged()
+        }
+
+        Log.d(TAG, "onViewCreated")
     }
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG, "onResume")
 //        if (viewModel.isPageAdded()) {
 //            noteItemAdapter.notifyDataSetChanged()
 //            recyclerView.scrollToPosition(noteItemAdapter.itemCount - 1)

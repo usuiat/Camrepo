@@ -10,12 +10,14 @@ import net.engawapg.app.camrepo.R
 import org.koin.core.qualifier.named
 import org.koin.java.KoinJavaComponent.getKoin
 import java.io.*
+import java.util.*
 
 class NoteModel(private val app: Application) {
 
     lateinit var fileName: String
     lateinit var title: String
     lateinit var subTitle: String
+    var date: Long = 0
     private var pageSerialNumber: Int  = 0
     fun init(_fileName: String, _title: String, _subTitle:String) {
         fileName = _fileName
@@ -27,18 +29,32 @@ class NoteModel(private val app: Application) {
         }
     }
 
+    private fun updateDate() {
+        date = Date().time
+    }
+
     private val pages = mutableListOf<PageInfo>()
     fun getPageNum() = pages.size
-    fun getPage(index: Int) = pages.getOrNull(index)
+    private fun getPage(index: Int) = pages.getOrNull(index)
 
     fun getMemo(pageIndex: Int): String = getPage(pageIndex)?.memo ?: ""
     fun setMemo(pageIndex: Int, value: String) {
-        getPage(pageIndex)?.memo = value
+        getPage(pageIndex)?.let { page ->
+            if (page.memo != value) {
+                page.memo = value
+                updateDate()
+            }
+        }
     }
 
     fun getTitle(pageIndex: Int): String = getPage(pageIndex)?.title ?: ""
     fun setTitle(pageIndex: Int, value: String) {
-        getPage(pageIndex)?.title = value
+        getPage(pageIndex)?.let { page ->
+            if (page.title != value) {
+                page.title = value
+                updateDate()
+            }
+        }
     }
 
     fun getPhotoCount(pageIndex: Int): Int = getPage(pageIndex)?.photos?.size ?: 0
@@ -47,15 +63,18 @@ class NoteModel(private val app: Application) {
 
     fun addPhotoAt(pageIndex: Int, imageInfo: ImageInfo) {
         getPage(pageIndex)?.addPhoto(imageInfo)
+        updateDate()
         Log.d(TAG, "addPhoto page=$pageIndex")
     }
 
     fun deletePhotosAt(pageIndex: Int, indexes: List<Int>) {
         getPage(pageIndex)?.deletePhotosAt(indexes)
+        updateDate()
     }
     
     fun movePhoto(pageIndex: Int, from: Int, to: Int) {
         getPage(pageIndex)?.movePhoto(from, to)
+        updateDate()
     }
 
     /* 新しく作ったページのインデックスを返す */
@@ -64,6 +83,7 @@ class NoteModel(private val app: Application) {
         pageSerialNumber++
         page.title = app.getString(R.string.default_page_title) + " $pageSerialNumber"
         pages.add(page)
+        updateDate()
         return pages.size - 1
     }
 
@@ -72,11 +92,13 @@ class NoteModel(private val app: Application) {
         for (i in sorted) {
             pages.removeAt(i)
         }
+        updateDate()
     }
 
     fun movePage(from: Int, to: Int) {
         val page = pages.removeAt(from)
         pages.add(to, page)
+        updateDate()
     }
 
     /* ファイルが存在しない場合は false を返す */
@@ -92,6 +114,7 @@ class NoteModel(private val app: Application) {
                 while (reader.hasNext()) {
                     when (reader.nextName()) {
                         "page_serial_number" -> {pageSerialNumber = reader.nextInt()}
+                        "date" -> {date = reader.nextLong()}
                         "pages" -> loadPages(reader)
                         else -> reader.skipValue()
                     }
@@ -154,8 +177,8 @@ class NoteModel(private val app: Application) {
         JsonWriter(BufferedWriter(FileWriter(file))).use { writer ->
             writer.setIndent("    ")
             writer.beginObject()
-            writer.name("note_title").value(title)
             writer.name("page_serial_number").value(pageSerialNumber)
+            writer.name("date").value(date)
             writer.name("pages")
             savePages(writer)
             writer.endObject()

@@ -49,11 +49,13 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
     val editMode = MutableLiveData<Boolean>().apply { value = false }
     private lateinit var itemList: List<NoteItem>
     private var columnCount: Int = 4
+    private var lastModifiedDate: Long = 0
 
     init {
         Log.d(TAG, "NoteViewModel Init")
         val noteProperty = noteListModel.getNote(noteFileName)
         noteModel = NoteModel.createModel(noteProperty)
+        lastModifiedDate = noteModel?.date ?: 0
         buildItemList()
     }
 
@@ -81,6 +83,16 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
     fun setEditMode(mode: Boolean) {
         editMode.value = mode
         buildItemList()
+    }
+
+    fun checkUpdate(): Boolean {
+        val date = noteModel?.date ?: 0
+        if (date > lastModifiedDate) {
+            lastModifiedDate = date
+            buildItemList()
+            return true
+        }
+        return false
     }
 
     fun buildItemList() {
