@@ -158,19 +158,10 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
         buildItemList()
     }
 
-//    fun isModifiedAfterLastDisplayedTime(): Boolean {
-//        val date = noteModel?.let {
-//            noteListModel.getNote(it.fileName)?.updatedDate ?: 0
-//        } ?: 0
-//        return (date != 0L) && (lastModifiedDate != 0L) && (date != lastModifiedDate)
-//    }
-
     fun save() {
         noteModel?.let {
             it.save()
-            noteListModel.updateLastModifiedDate(it.fileName)
             noteListModel.save()
-//            lastModifiedDate = noteListModel.getNote(it.fileName)?.updatedDate ?: 0
         }
     }
 

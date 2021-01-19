@@ -13,8 +13,6 @@ class EditTitleViewModel(private val noteModel: NoteModel, private val noteListM
         noteModel.title = title
         noteModel.subTitle = subTitle
         noteModel.save()
-
-        noteListModel.updateNoteTitle(noteModel.fileName, title, subTitle)
         noteListModel.save()
     }
 }

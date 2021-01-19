@@ -30,13 +30,9 @@ class NoteListViewModel(private val model: NoteListModel): ViewModel() {
     val onSelectNote = MutableLiveData<Event<String>>()
     val onCreateNote = MutableLiveData<Event<String>>()
     val editMode = MutableLiveData<Boolean>().apply { value = false }
-    private var itemList: List<NoteListItem>
+    private var itemList: List<NoteListItem> = listOf()
 
-    init {
-        itemList = createItemList()
-    }
-
-    fun update() {
+    fun updateList() {
         itemList = createItemList()
     }
 

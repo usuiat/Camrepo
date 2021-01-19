@@ -14,15 +14,28 @@ import java.util.*
 
 class NoteModel(private val app: Application) {
 
-    lateinit var fileName: String
-    lateinit var title: String
-    lateinit var subTitle: String
-    var date: Long = 0
+    lateinit var noteProperty: NoteProperty
+    val fileName: String
+        get() = noteProperty.fileName
+    var title: String
+        get() = noteProperty.title
+        set(value) {
+            noteProperty.title = value
+        }
+    var subTitle: String
+        get() = noteProperty.subTitle
+        set(value) {
+            noteProperty.subTitle = value
+        }
+    var date: Long
+        get() = noteProperty.updatedDate
+        set(value) {
+            noteProperty.updatedDate = value
+        }
     private var pageSerialNumber: Int  = 0
-    fun init(_fileName: String, _title: String, _subTitle:String) {
-        fileName = _fileName
-        title = _title
-        subTitle = _subTitle
+
+    fun init(property: NoteProperty) {
+        noteProperty = property
         if(!load()) {
             /* ファイルが存在しない（新規作成）の場合は空のページを一つ作る */
             createNewPage()
@@ -114,7 +127,6 @@ class NoteModel(private val app: Application) {
                 while (reader.hasNext()) {
                     when (reader.nextName()) {
                         "page_serial_number" -> {pageSerialNumber = reader.nextInt()}
-                        "date" -> {date = reader.nextLong()}
                         "pages" -> loadPages(reader)
                         else -> reader.skipValue()
                     }
@@ -178,7 +190,6 @@ class NoteModel(private val app: Application) {
             writer.setIndent("    ")
             writer.beginObject()
             writer.name("page_serial_number").value(pageSerialNumber)
-            writer.name("date").value(date)
             writer.name("pages")
             savePages(writer)
             writer.endObject()
@@ -216,7 +227,7 @@ class NoteModel(private val app: Application) {
                 val noteSession = getKoin()
                     .getOrCreateScope(Constants.SCOPE_ID_NOTE, named(Constants.SCOPE_NAME_NOTE))
                 noteModel = noteSession.get()
-                noteModel?.init(noteProperty.fileName, noteProperty.title, noteProperty.subTitle)
+                noteModel?.init(noteProperty)
                 Log.d(TAG, "create NoteModel")
             } else {
                 noteModel = null

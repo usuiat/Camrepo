@@ -102,20 +102,6 @@ class NoteFragment : Fragment() {
         Log.d(TAG, "onViewCreated")
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume")
-//        if (viewModel.isPageAdded()) {
-//            noteItemAdapter.notifyDataSetChanged()
-//            recyclerView.scrollToPosition(noteItemAdapter.itemCount - 1)
-//        }
-//        if (viewModel.isModifiedAfterLastDisplayedTime()) {
-//            Log.d(TAG, "Note Updated")
-//            viewModel.buildItemList()
-//            noteItemAdapter.notifyDataSetChanged()
-//        }
-    }
-
     override fun onPause() {
         viewModel.save()
         super.onPause()

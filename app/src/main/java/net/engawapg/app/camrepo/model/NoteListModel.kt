@@ -81,24 +81,8 @@ class NoteListModel(private val app: Application) {
         val t = if (title != "") title else app.getString(R.string.default_note_title)
         val note = NoteProperty.createNewNote(t)
         note.subTitle = subTitle
-        list.add(0, note) /* 新規ノートは一番上に追加 */
+        list.add(note)
         return note
-    }
-
-    fun updateNoteTitle(fileName: String, title: String, subTitle: String) {
-        val note = list.find { it.fileName == fileName }
-        note?.title = title
-        note?.subTitle = subTitle
-    }
-
-    fun updateLastModifiedDate(fileName: String) {
-        val note = list.find { it.fileName == fileName }
-        note?.let {
-            it.updateLastModifiedDate()
-            /* 更新したノートを先頭に移動 */
-            list.remove(it)
-            list.add(0, it)
-        }
     }
 
     fun deleteNotesAt(indexes: List<Int>) {

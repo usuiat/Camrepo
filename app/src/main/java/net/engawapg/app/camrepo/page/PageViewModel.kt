@@ -149,7 +149,6 @@ class PageViewModel(private val noteModel: NoteModel,
 
     fun save(){
         noteModel.save()
-        noteListModel.updateLastModifiedDate(noteModel.fileName)
         noteListModel.save()
     }
 
