@@ -35,14 +35,12 @@ val appModule = module {
 
     viewModel {
         CameraViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 
     viewModel {
         PhotoViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
@@ -55,14 +53,12 @@ val appModule = module {
 
     viewModel {
         SlideshowViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 
     viewModel {
         SlideViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
