@@ -7,18 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.android.synthetic.main.fragment_photo_pager.*
 import net.engawapg.app.camrepo.R
+import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class PhotoPagerFragment : Fragment() {
 
     private val args: PhotoPagerFragmentArgs by navArgs()
-    private val viewModel: PhotoViewModel by sharedViewModel()
+    private val viewModel: PhotoViewModel by sharedViewModel(owner={from(this)})
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,15 +45,13 @@ class PhotoPagerFragment : Fragment() {
 
         photoPager.registerOnPageChangeCallback(pageChangeCallback)
         photoPager.offscreenPageLimit = 1
-        activity?.let {
-            photoPager.adapter = PhotoAdapter(it, viewModel)
-        }
+        photoPager.adapter = PhotoAdapter(this, viewModel)
         val position = viewModel.getPosition(pageIndex, photoIndex)
         photoPager.setCurrentItem(position, false)
     }
 
-    class PhotoAdapter(fa: FragmentActivity, private val viewModel: PhotoViewModel)
-        : FragmentStateAdapter(fa) {
+    class PhotoAdapter(fragment: Fragment, private val viewModel: PhotoViewModel)
+        : FragmentStateAdapter(fragment) {
 
         override fun getItemCount() = viewModel.getPhotoCount()
         override fun createFragment(position: Int): Fragment {
