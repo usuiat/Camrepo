@@ -21,6 +21,7 @@ import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.util.EventObserver
 import org.koin.android.viewmodel.ext.android.getViewModel
+import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -28,7 +29,7 @@ class PageFragment : Fragment() {
 
     private val args: PageFragmentArgs by navArgs()
     private lateinit var viewModel: PageViewModel
-    private val cameraViewModel: CameraViewModel by sharedViewModel()
+    private val cameraViewModel: CameraViewModel by sharedViewModel(owner={from(this)})
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
