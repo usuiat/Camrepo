@@ -64,6 +64,11 @@ class NoteListFragment : Fragment() {
             }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.deselectNote()
+    }
+
     override fun onPause() {
         viewModel.save()
         super.onPause()

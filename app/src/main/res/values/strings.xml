@@ -26,6 +26,7 @@
     <!-- Shared Preference -->
     <string name="preference_file" translatable="false">net.engawapg.app.Camrepo.PREFERENCE_FILE</string>
     <string name="preference_key_flash_mode" translatable="false">PREFERENCE_KEY_FLASH_MODE</string>
+    <string name="preference_key_selected_file" translatable="false">PREFERENCE_KEY_SELECTED_FILE</string>
 
     <!-- About App Preferences -->
     <string name="about_app_header">About App</string>

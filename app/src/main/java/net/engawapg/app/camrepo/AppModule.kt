@@ -49,7 +49,7 @@ val appModule = module {
         NoteViewModel(noteFileName, get())
     }
 
-    viewModel { NoteListViewModel(get()) }
+    viewModel { NoteListViewModel(get(), androidApplication()) }
 
     viewModel {
         SlideshowViewModel(

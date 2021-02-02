@@ -1,8 +1,11 @@
 package net.engawapg.app.camrepo.notelist
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteProperty
 import net.engawapg.app.camrepo.util.Event
@@ -25,12 +28,33 @@ data class NoteListItem(
     }
 }
 
-class NoteListViewModel(private val model: NoteListModel): ViewModel() {
+class NoteListViewModel(private val model: NoteListModel, app: Application): AndroidViewModel(app) {
 
     val onSelectNote = MutableLiveData<Event<String>>()
     val onCreateNote = MutableLiveData<Event<String>>()
     val editMode = MutableLiveData<Boolean>().apply { value = false }
     private var itemList: List<NoteListItem> = listOf()
+
+    init {
+        Log.d(TAG, "Init")
+        getSavedSelectedNoteFileName()?.let { onSelectNote.value = Event(it) }
+    }
+
+    private fun getSavedSelectedNoteFileName(): String? {
+        val app = getApplication<Application>()
+        val prefName = app.getString(R.string.preference_file)
+        val key = app.getString(R.string.preference_key_selected_file)
+        val pref= app.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        return pref.getString(key, null)
+    }
+
+    private fun saveSelectedNoteFileName(fileName: String?) {
+        val app = getApplication<Application>()
+        val prefName = app.getString(R.string.preference_file)
+        val key = app.getString(R.string.preference_key_selected_file)
+        val pref= app.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        pref.edit().putString(key, fileName).apply()
+    }
 
     fun updateList() {
         itemList = createItemList()
@@ -42,13 +66,19 @@ class NoteListViewModel(private val model: NoteListModel): ViewModel() {
         val note = model.createNewNote("", "")
         val item = NoteListItem(note)
         itemList = listOf(item) + itemList
+        saveSelectedNoteFileName(note.fileName)
         onCreateNote.value = Event(note.fileName)
     }
 
     fun selectNote(fileName: String) {
         if (editMode.value == false) {
+            saveSelectedNoteFileName(fileName)
             onSelectNote.value = Event(fileName)
         }
+    }
+
+    fun deselectNote() {
+        saveSelectedNoteFileName(null)
     }
 
     fun setEditMode(mode: Boolean) {
