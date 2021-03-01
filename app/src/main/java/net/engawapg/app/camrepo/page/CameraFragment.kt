@@ -253,8 +253,8 @@ class CameraFragment : Fragment()  {
                 Log.d(TAG, "largest = $largest")
                 imageReader = ImageReader.newInstance(largest.width, largest.height,
                     ImageFormat.JPEG, /*maxImages*/ 2).apply {
-                    setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
-                }
+                        setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+                    }
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
@@ -322,7 +322,7 @@ class CameraFragment : Fragment()  {
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
         Log.d(TAG, "onImageAvailable")
 
-        val image = it.acquireNextImage()
+        val image = it.acquireLatestImage() ?: return@OnImageAvailableListener
         val dirname = "CameraNote"
         val df = SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH)
         val filename = "img" + df.format(Date()) + ".jpg"
@@ -561,6 +561,7 @@ class CameraFragment : Fragment()  {
         private fun capturePicture(result: CaptureResult) {
             val afState = result.get(CaptureResult.CONTROL_AF_STATE)
             if (afState == null) {
+                state = STATE_PICTURE_TAKEN
                 captureStillPicture()
             } else if (afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED
                 || afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
@@ -678,10 +679,6 @@ class CameraFragment : Fragment()  {
             activity?.runOnUiThread { doShutterEffect() }
 
             captureSession?.apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                    stopRepeating()
-                    abortCaptures()
-                }
                 captureBuilder?.build()?.let {
                     capture(it, captureCallback, null)
                 }

@@ -59,7 +59,8 @@ class ImageSaver(
             val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val folder = File(path, dirname)
             if (!folder.exists()) {
-                folder.mkdir()
+                val result = folder.mkdirs()
+                Log.d(TAG, "mkdirs result = $result")
             }
 
             val file = File(folder, filename)
