@@ -324,7 +324,7 @@ class CameraFragment : Fragment()  {
         Log.d(TAG, "onImageAvailable")
 
         val image = it.acquireLatestImage() ?: return@OnImageAvailableListener
-        val dirname = "CameraNote"
+        val dirname = getString(R.string.app_folder_name)
         val df = SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH)
         val filename = "img" + df.format(Date()) + ".jpg"
 
