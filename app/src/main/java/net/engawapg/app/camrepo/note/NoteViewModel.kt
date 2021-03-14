@@ -47,7 +47,7 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
     val onSelectPage = MutableLiveData<Event<Int>>()
     val onSelectPhoto = MutableLiveData<Event<PhotoIndex>>()
     val editMode = MutableLiveData<Boolean>().apply { value = false }
-    private lateinit var itemList: List<NoteItem>
+    private lateinit var itemList: MutableList<NoteItem>
     private var columnCount: Int = 4
     private var lastModifiedDate: Long = 0
 
@@ -143,7 +143,8 @@ class NoteViewModel(noteFileName: String, private val noteListModel: NoteListMod
 
     fun movePage(from:Int, to:Int) {
         noteModel?.movePage(from, to)
-        buildItemList()
+        val item = itemList.removeAt(from)
+        itemList.add(to, item)
     }
 
     fun isPageSelected(): Boolean {
