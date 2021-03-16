@@ -513,12 +513,13 @@ class CameraFragment : Fragment()  {
                     Log.d(TAG, " setAutoFlash FLASH_REQUEST_AUTO")
                     requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                         CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+                    requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
                 }
                 FLASH_MODE_ON -> {
                     Log.d(TAG, " setAutoFlash FLASH_REQUEST_ON")
                     requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                        CaptureRequest.CONTROL_AE_MODE_ON)
-                    requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH)
+                        CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH)
+                    requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF)
                 }
                 FLASH_MODE_OFF -> {
                     Log.d(TAG, " setAutoFlash FLASH_REQUEST_OFF")
@@ -618,6 +619,7 @@ class CameraFragment : Fragment()  {
             // This is how to tell the camera to trigger.
             previewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
                 CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START)
+            setAutoFlash(previewRequestBuilder)
             // Tell #captureCallback to wait for the precapture sequence to be set.
             state = STATE_WAITING_PRECAPTURE
             captureSession?.capture(previewRequestBuilder.build(), captureCallback,
@@ -660,11 +662,13 @@ class CameraFragment : Fragment()  {
                         CaptureRequest.CONTROL_AF_MODE,
                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
                     )
-                }?.also { setAutoFlash(it) }
+                }
             }
             else {
                 null
             }
+
+            captureBuilder?.let { setAutoFlash(it) }
 
             val captureCallback = object : CameraCaptureSession.CaptureCallback() {
 
@@ -699,7 +703,6 @@ class CameraFragment : Fragment()  {
             // Reset the auto-focus trigger
             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
                 CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
-            setAutoFlash(previewRequestBuilder)
             captureSession?.capture(previewRequestBuilder.build(), captureCallback,
                 backgroundHandler)
             // After this, the camera will go back to the normal state of preview.
