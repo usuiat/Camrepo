@@ -97,14 +97,14 @@ class CameraFragment : Fragment()  {
     }
 
     private val surfaceTextureListener = object: TextureView.SurfaceTextureListener {
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
             openCamera(width, height)
         }
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
             Log.i(TAG, "onSurfaceTextureSizeChanged($width, $height)")
         }
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?) = true
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) = Unit
+        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture) = true
+        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) = Unit
     }
 
     override fun onPause() {
@@ -426,7 +426,7 @@ class CameraFragment : Fragment()  {
             val texture = textureView.surfaceTexture
 
             // We configure the size of default buffer to be the size of camera preview we want.
-            texture.setDefaultBufferSize(previewSize.width, previewSize.height)
+            texture?.setDefaultBufferSize(previewSize.width, previewSize.height)
 
             // This is the output Surface we need to start preview.
             val surface = Surface(texture)
