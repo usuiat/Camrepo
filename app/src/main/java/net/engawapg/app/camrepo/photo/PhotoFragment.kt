@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.fragment_photo.*
 import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.FragmentPhotoBinding
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 private const val ARG_PHOTO_INDEX = "photoIndex"
@@ -20,6 +20,8 @@ private const val ARG_PHOTO_INDEX = "photoIndex"
  * create an instance of this fragment.
  */
 class PhotoFragment : Fragment() {
+    private var _binding: FragmentPhotoBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: PhotoViewModel by sharedViewModel()
     private var photoIndex = 0
 
@@ -33,9 +35,14 @@ class PhotoFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_photo, container, false)
+    ): View {
+        _binding = FragmentPhotoBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,9 +55,9 @@ class PhotoFragment : Fragment() {
             val resolver = context?.contentResolver
             val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it) }
             if (bmp != null) {
-                photoView.setImageBitmap(bmp)
+                binding.photoView.setImageBitmap(bmp)
             } else {
-                photoView.setImageResource(R.drawable.imagenotfound)
+                binding.photoView.setImageResource(R.drawable.imagenotfound)
             }
         }
     }

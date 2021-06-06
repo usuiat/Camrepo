@@ -8,13 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_note.*
-import kotlinx.android.synthetic.main.view_note_memo.view.*
-import kotlinx.android.synthetic.main.view_note_page_title.view.*
-import kotlinx.android.synthetic.main.view_note_photo.view.*
-import kotlinx.android.synthetic.main.view_note_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
 import net.engawapg.app.camrepo.page.PageActivity
 import net.engawapg.app.camrepo.photo.PhotoActivity
@@ -23,19 +19,22 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
     EditTitleDialog.EventListener {
+
+    private lateinit var binding: ActivityNoteBinding
     private val viewModel: NoteViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private  lateinit var noteItemAdapter: NoteItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note)
+        binding = ActivityNoteBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         /* ViewModelに写真の列数を設定し、recyclerView表示用リストを作成する。 */
         viewModel.initItemList(IMAGE_SPAN_COUNT)
 
         /* ToolBar */
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
@@ -46,16 +45,16 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         noteItemAdapter = NoteItemAdapter(viewModel, itemTouchHelper) {
             onItemClick(it)
         }
-        recyclerView.apply {
+        binding.recyclerView.apply {
             layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
                 spanSizeLookup = NoteItemSpanSizeLookup()
             }
             adapter = noteItemAdapter
         }
 
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
-        floatingActionButton.setOnClickListener {
+        binding.floatingActionButton.setOnClickListener {
             onClickAddButton()
         }
     }
@@ -64,7 +63,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         super.onResume()
         if (viewModel.isPageAdded()) {
             noteItemAdapter.notifyDataSetChanged()
-            recyclerView.scrollToPosition(noteItemAdapter.itemCount - 1)
+            binding.recyclerView.scrollToPosition(noteItemAdapter.itemCount - 1)
         }
         if (viewModel.isModifiedAfterLastDisplayedTime()) {
             Log.d(TAG, "Note Updated")
@@ -149,7 +148,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             mode?.menuInflater?.inflate(R.menu.menu_note_action_mode, menu)
             viewModel.setPageTitleListMode(true)
             noteItemAdapter.setEditMode(true)
-            floatingActionButton.visibility = View.INVISIBLE
+            binding.floatingActionButton.visibility = View.INVISIBLE
             return true
         }
 
@@ -165,7 +164,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         override fun onDestroyActionMode(mode: ActionMode?) {
             viewModel.setPageTitleListMode(false)
             noteItemAdapter.setEditMode(false)
-            floatingActionButton.visibility = View.VISIBLE
+            binding.floatingActionButton.visibility = View.VISIBLE
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
@@ -222,40 +221,43 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
-    class TitleViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+    class TitleViewHolder(private val binding: ViewNoteTitleBinding,
+                          private val viewModel: NoteViewModel) :BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel): TitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_title, parent, false)
-                return TitleViewHolder(view, viewModel)
+                val binding = ViewNoteTitleBinding.inflate(layoutInflater, parent, false)
+                return TitleViewHolder(binding, viewModel)
             }
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.title.text = viewModel.getNoteTitle()
-            itemView.subtitle.text = viewModel.getNoteSubTitle()
+            binding.title.text = viewModel.getNoteTitle()
+            binding.subtitle.text = viewModel.getNoteSubTitle()
         }
     }
 
-    class PageTitleViewHolder(v: View, private val viewModel: NoteViewModel,
-                              private val itemTouchHelper: ItemTouchHelper) :BaseViewHolder(v) {
+    class PageTitleViewHolder(private val binding: ViewNotePageTitleBinding,
+                              private val viewModel: NoteViewModel,
+                              private val itemTouchHelper: ItemTouchHelper)
+        :BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel,
                        itemTouchHelper: ItemTouchHelper): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_page_title, parent, false)
-                return PageTitleViewHolder(view, viewModel, itemTouchHelper)
+                val binding = ViewNotePageTitleBinding.inflate(layoutInflater, parent, false)
+                return PageTitleViewHolder(binding, viewModel, itemTouchHelper)
             }
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.pageTitle.text = viewModel.getPageTitle(position)
-            itemView.editButton.apply {
+            binding.pageTitle.text = viewModel.getPageTitle(position)
+            binding.editButton.apply {
                 visibility = if (editMode) View.GONE else View.VISIBLE
             }
-            itemView.pageCheckBox.apply {
+            binding.pageCheckBox.apply {
                 visibility = if (editMode) View.VISIBLE else View.GONE
                 if (editMode) {
                     isChecked = viewModel.getPageSelection(position)
@@ -264,7 +266,7 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
                     }
                 }
             }
-            itemView.dragHandle.apply {
+            binding.dragHandle.apply {
                 visibility = if (editMode) View.VISIBLE else View.GONE
                 setOnTouchListener { v, event ->
                     if (event.actionMasked == MotionEvent.ACTION_DOWN) {
@@ -278,13 +280,14 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
         }
     }
 
-    class PhotoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+    class PhotoViewHolder(private val binding: ViewNotePhotoBinding,
+                          private val viewModel: NoteViewModel) :BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel): PhotoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_photo, parent, false)
-                return PhotoViewHolder(view, viewModel)
+                val binding = ViewNotePhotoBinding.inflate(layoutInflater, parent, false)
+                return PhotoViewHolder(binding, viewModel)
             }
         }
 
@@ -293,26 +296,27 @@ class NoteActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener,
             val bmp = viewModel.getPhotoBitmap(position, resolver)
 
             if (bmp != null) {
-                itemView.imageView.setImageBitmap(bmp)
+                binding.imageView.setImageBitmap(bmp)
             } else {
-                itemView.imageView.setImageResource(R.drawable.imagenotfound)
+                binding.imageView.setImageResource(R.drawable.imagenotfound)
                 Log.d(TAG, "Image is not exist @position = $position.")
             }
         }
     }
 
-    class MemoViewHolder(v: View, private val viewModel: NoteViewModel) :BaseViewHolder(v) {
+    class MemoViewHolder(private val binding: ViewNoteMemoBinding,
+                         private val viewModel: NoteViewModel) :BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: NoteViewModel): MemoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_note_memo, parent, false)
-                return MemoViewHolder(view, viewModel)
+                val binding = ViewNoteMemoBinding.inflate(layoutInflater, parent, false)
+                return MemoViewHolder(binding, viewModel)
             }
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.memo.text = viewModel.getMemo(position)
+            binding.memo.text = viewModel.getMemo(position)
         }
     }
 

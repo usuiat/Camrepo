@@ -22,9 +22,9 @@ import android.util.SparseIntArray
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.camera_fragment.*
 import net.engawapg.app.camrepo.PermissionHelper
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.CameraFragmentBinding
 import net.engawapg.app.camrepo.model.ImageInfo
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.lang.Long.signum
@@ -40,27 +40,34 @@ import java.util.concurrent.TimeUnit
  */
 class CameraFragment : Fragment()  {
 
+    private var _binding: CameraFragmentBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: CameraViewModel by sharedViewModel()
     private lateinit var permissionHelper: PermissionHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.camera_fragment, container, false)
+    ): View {
+        _binding = CameraFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        shutterButton.setOnClickListener {
+        binding.shutterButton.setOnClickListener {
             viewModel.onPressShutter()
             lockFocus()
         }
-        closeCameraButton.setOnClickListener {
+        binding.closeCameraButton.setOnClickListener {
             parentFragmentManager.beginTransaction().remove(this).commit()
         }
-        flashButton.setOnClickListener {
+        binding.flashButton.setOnClickListener {
             toggleFlashMode()
         }
 
@@ -88,11 +95,11 @@ class CameraFragment : Fragment()  {
         super.onResume()
         startBackgroundThread()
 
-        if (textureView.isAvailable) {
-            openCamera(textureView.width, textureView.height)
+        if (binding.textureView.isAvailable) {
+            openCamera(binding.textureView.width, binding.textureView.height)
         }
         else {
-            textureView.surfaceTextureListener = surfaceTextureListener
+            binding.textureView.surfaceTextureListener = surfaceTextureListener
         }
     }
 
@@ -119,7 +126,7 @@ class CameraFragment : Fragment()  {
         ValueAnimator.ofObject(ArgbEvaluator(), color1, color2).apply {
             duration = 100
             addUpdateListener {
-                maskView.setBackgroundColor(it.animatedValue as Int)
+                binding.maskView.setBackgroundColor(it.animatedValue as Int)
             }
             start()
         }
@@ -391,7 +398,7 @@ class CameraFragment : Fragment()  {
             }
         }
         Log.d(TAG, "matrix = $matrix")
-        textureView.setTransform(matrix)
+        binding.textureView.setTransform(matrix)
     }
 
     /**
@@ -423,7 +430,7 @@ class CameraFragment : Fragment()  {
      */
     private fun createCameraPreviewSession() {
         try {
-            val texture = textureView.surfaceTexture
+            val texture = binding.textureView.surfaceTexture
 
             // We configure the size of default buffer to be the size of camera preview we want.
             texture?.setDefaultBufferSize(previewSize.width, previewSize.height)
@@ -502,7 +509,7 @@ class CameraFragment : Fragment()  {
             FLASH_MODE_ON -> R.drawable.flash_on
             else -> R.drawable.flash_auto
         }
-        flashButton.setImageResource(imageRes)
+        binding.flashButton.setImageResource(imageRes)
     }
 
     private fun setAutoFlash(requestBuilder: CaptureRequest.Builder) {

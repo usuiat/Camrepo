@@ -8,17 +8,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.android.synthetic.main.activity_photo.*
-import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.ActivityPhotoBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class PhotoActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityPhotoBinding
     private val viewModel: PhotoViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_photo)
+        binding = ActivityPhotoBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
         val photoIndex = intent.getIntExtra(KEY_PHOTO_INDEX, 0)
@@ -34,18 +35,18 @@ class PhotoActivity : AppCompatActivity() {
         }
 
         /* ToolBar */
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeButtonEnabled(true)
             title = ""
         }
 
-        photoPager.registerOnPageChangeCallback(pageChangeCallback)
-        photoPager.offscreenPageLimit = 1
-        photoPager.adapter = PhotoAdapter(this, viewModel)
+        binding.photoPager.registerOnPageChangeCallback(pageChangeCallback)
+        binding.photoPager.offscreenPageLimit = 1
+        binding.photoPager.adapter = PhotoAdapter(this, viewModel)
         val position = viewModel.getPosition(pageIndex, photoIndex)
-        photoPager.setCurrentItem(position, false)
+        binding.photoPager.setCurrentItem(position, false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

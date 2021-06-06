@@ -7,11 +7,13 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.dialog_edit_title.view.*
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.DialogEditTitleBinding
 
 class EditTitleDialog: DialogFragment() {
 
+    private var _binding: DialogEditTitleBinding? = null
+    private val binding get() = _binding!!
     private lateinit var listener: EventListener
 
     @SuppressLint("InflateParams")
@@ -20,21 +22,21 @@ class EditTitleDialog: DialogFragment() {
         val noteTitle = arguments?.getString(KEY_NOTE_TITLE) ?: ""
         val noteSubTitle = arguments?.getString(KEY_NOTE_SUB_TITLE) ?: ""
 
-        return activity?.let {
-            val inflater = requireActivity().layoutInflater
-            val view = inflater.inflate(R.layout.dialog_edit_title, null)
-            view.editTitle.setText(noteTitle)
-            view.editSubTitle.setText(noteSubTitle)
+        _binding = DialogEditTitleBinding.inflate(requireActivity().layoutInflater)
+        binding.editTitle.setText(noteTitle)
+        binding.editSubTitle.setText(noteSubTitle)
 
-            val builder = AlertDialog.Builder(it)
-            builder.setView(view)
-                .setTitle(titleId)
-                .setPositiveButton(R.string.ok) { _, _ ->
-                    onClickOk()
-                }
-                .setNegativeButton(R.string.cancel) { _, _ -> Unit }
-            builder.create()
-        } ?: throw IllegalStateException("Activity cannot be null")
+        return AlertDialog.Builder(requireActivity())
+            .setView(binding.root)
+            .setTitle(titleId)
+            .setPositiveButton(R.string.ok) { _, _ -> onClickOk() }
+            .setNegativeButton(R.string.cancel) { _, _ -> }
+            .create()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun onClickOk() {

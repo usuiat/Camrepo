@@ -7,10 +7,10 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_note_list.*
-import kotlinx.android.synthetic.main.view_note_card.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.ActivityNoteListBinding
+import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
 import net.engawapg.app.camrepo.note.NoteActivity
 import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -18,24 +18,26 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
     ,EditTitleDialog.EventListener {
 
+    private lateinit var binding: ActivityNoteListBinding
     private val viewModel: NoteListViewModel by viewModel()
     private var actionMode: ActionMode? = null
     private lateinit var noteCardAdapter: NoteCardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_note_list)
-        setSupportActionBar(toolbar)
+        binding = ActivityNoteListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = ""
 
         noteCardAdapter = NoteCardAdapter(viewModel)
-        recyclerView.apply {
+        binding.recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = noteCardAdapter
         }
 
-        floatingActionButton.setOnClickListener { onClickAddButton() }
+        binding.floatingActionButton.setOnClickListener { onClickAddButton() }
         Log.d(TAG, "onCreate")
     }
 
@@ -43,7 +45,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
         super.onResume()
         if (viewModel.isCurrentNoteModified()) {
             noteCardAdapter.notifyDataSetChanged()
-            recyclerView.scrollToPosition(0)
+            binding.recyclerView.scrollToPosition(0)
         }
     }
 
@@ -77,7 +79,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
             mode?.menuInflater?.inflate(R.menu.menu_note_list_action_mode, menu)
             viewModel.initSelection()
             noteCardAdapter.setEditMode(true)
-            floatingActionButton.visibility = View.INVISIBLE
+            binding.floatingActionButton.visibility = View.INVISIBLE
             return true
         }
 
@@ -94,7 +96,7 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
             actionMode = null
             viewModel.clearSelection()
             noteCardAdapter.setEditMode(false)
-            floatingActionButton.visibility = View.VISIBLE
+            binding.floatingActionButton.visibility = View.VISIBLE
             Log.d(TAG, "onDestroyActionMode")
         }
 
@@ -136,8 +138,8 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteCardViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val view = layoutInflater.inflate(R.layout.view_note_card, parent, false)
-            return NoteCardViewHolder(view, viewModel)
+            val binding = ViewNoteCardBinding.inflate(layoutInflater, parent, false)
+            return NoteCardViewHolder(binding, viewModel)
         }
 
         override fun onBindViewHolder(holder: NoteCardViewHolder, position: Int) {
@@ -146,14 +148,14 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
         }
     }
 
-    class NoteCardViewHolder(v: View, private val viewModel: NoteListViewModel)
-        : RecyclerView.ViewHolder(v) {
+    class NoteCardViewHolder(private val binding: ViewNoteCardBinding, private val viewModel: NoteListViewModel)
+        : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(position: Int, editMode: Boolean) {
-            itemView.title.text = viewModel.getTitle(position)
-            itemView.subTitle.text = viewModel.getSubTitle(position)
-            itemView.date.text = viewModel.getUpdateDate(position)
-            itemView.cardView.setOnClickListener {
+            binding.title.text = viewModel.getTitle(position)
+            binding.subTitle.text = viewModel.getSubTitle(position)
+            binding.date.text = viewModel.getUpdateDate(position)
+            binding.cardView.setOnClickListener {
                 if (!editMode) {
                     Log.d(TAG, "onClick Card at $position")
                     viewModel.selectNote(adapterPosition)
@@ -163,10 +165,10 @@ class NoteListActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener
             }
 
             /* CheckBox for delete operation */
-            itemView.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
-            itemView.checkBox.isChecked = viewModel.getSelection(position)
-            itemView.checkBox.setOnClickListener {
-                viewModel.setSelection(adapterPosition, itemView.checkBox.isChecked)
+            binding.checkBox.visibility = if (editMode) View.VISIBLE else View.INVISIBLE
+            binding.checkBox.isChecked = viewModel.getSelection(position)
+            binding.checkBox.setOnClickListener {
+                viewModel.setSelection(adapterPosition, binding.checkBox.isChecked)
             }
         }
     }

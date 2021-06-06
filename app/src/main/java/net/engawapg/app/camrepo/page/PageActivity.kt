@@ -9,16 +9,15 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_page.*
-import kotlinx.android.synthetic.main.view_page_memo.view.*
-import kotlinx.android.synthetic.main.view_page_photo.view.*
-import kotlinx.android.synthetic.main.view_page_title.view.*
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.ActivityPageBinding
+import net.engawapg.app.camrepo.databinding.ViewPageMemoBinding
+import net.engawapg.app.camrepo.databinding.ViewPagePhotoBinding
+import net.engawapg.app.camrepo.databinding.ViewPageTitleBinding
 import net.engawapg.app.camrepo.photo.PhotoActivity
 import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.getViewModel
@@ -26,6 +25,8 @@ import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
+
+    private lateinit var binding: ActivityPageBinding
     private lateinit var viewModel: PageViewModel
     private val cameraViewModel: CameraViewModel by viewModel()
     private var actionMode: ActionMode? = null
@@ -36,14 +37,15 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_page)
+        binding = ActivityPageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         /* Get PageIndex */
         pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
         viewModel = getViewModel { parametersOf(pageIndex, IMAGE_SPAN_COUNT) }
 
         /* ToolBar */
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
@@ -55,19 +57,19 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             onItemClick( position )
         }
 
-        recyclerView.apply {
+        binding.recyclerView.apply {
             layoutManager = GridLayoutManager(context, IMAGE_SPAN_COUNT).apply {
                 spanSizeLookup = PageItemSpanSizeLookup()
             }
             adapter = pageItemAdapter
         }
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         /* 写真追加イベントの監視 */
-        cameraViewModel.eventAddImagePageIndex.observe(this, Observer { index ->
+        cameraViewModel.eventAddImagePageIndex.observe(this, { index ->
             if (index == pageIndex) {
                 pageItemAdapter.notifyDataSetChanged()
-                recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
+                binding.recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
                 viewModel.modified = true
             }
         })
@@ -106,14 +108,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             /* キーボード消す */
             inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
             /* EditTextからフォーカスを外す */
-            rootLayout.requestFocus()
+            binding.rootLayout.requestFocus()
 
             cf = CameraFragment.newInstance()
             supportFragmentManager.beginTransaction()
                 .add(R.id.cameraFragmentContainer, cf)
                 .runOnCommit {
                     /* カメラアイコンが見えるようにスクロール */
-                    recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
+                    binding.recyclerView.scrollToPosition(viewModel.getItemCount(false) - 2)
                 }
                 .commit()
             cameraFragmentId = cf.id
@@ -179,9 +181,9 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             pageItemAdapter.setEditMode(false)
-            itemTouchHelper.attachToRecyclerView(recyclerView)
+            itemTouchHelper.attachToRecyclerView(binding.recyclerView)
             /* PageTitleにフォーカスが当たってしまうのを防ぐ */
-            rootLayout.requestFocus()
+            binding.rootLayout.requestFocus()
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
@@ -238,24 +240,24 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
-    class PageTitleViewHolder(v: View,
+    class PageTitleViewHolder(private val binding: ViewPageTitleBinding,
                               private val viewModel: PageViewModel,
                               private val onFocusChangeListener: View.OnFocusChangeListener)
-        : BaseViewHolder(v) {
+        : BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup,
                        viewModel: PageViewModel,
                        onFocusChangeListener: View.OnFocusChangeListener): PageTitleViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_title, parent, false)
-                return PageTitleViewHolder(view, viewModel, onFocusChangeListener)
+                val binding = ViewPageTitleBinding.inflate(layoutInflater, parent, false)
+                return PageTitleViewHolder(binding, viewModel, onFocusChangeListener)
             }
             const val TAG_PATE_TITLE = "TagPageTitle"
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.pageTitle.apply {
+            binding.pageTitle.apply {
                 setText(viewModel.getPageTitle())
                 isEnabled = !editMode
                 addTextChangedListener(object: TextWatcher {
@@ -271,13 +273,14 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
     }
 
-    class PhotoViewHolder(v: View, private val viewModel: PageViewModel): BaseViewHolder(v) {
+    class PhotoViewHolder(private val binding: ViewPagePhotoBinding,
+                          private val viewModel: PageViewModel): BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: PageViewModel): PhotoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_photo, parent, false)
-                return PhotoViewHolder(view, viewModel)
+                val binding = ViewPagePhotoBinding.inflate(layoutInflater, parent, false)
+                return PhotoViewHolder(binding, viewModel)
             }
         }
 
@@ -287,12 +290,12 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             val bmp = viewModel.getPhotoBitmap(photoIndex, resolver)
 
             if (bmp != null) {
-                itemView.imageView.setImageBitmap(bmp)
+                binding.imageView.setImageBitmap(bmp)
             } else {
-                itemView.imageView.setImageResource(R.drawable.imagenotfound)
+                binding.imageView.setImageResource(R.drawable.imagenotfound)
             }
 
-            itemView.checkBox.apply {
+            binding.checkBox.apply {
                 visibility = if (editMode) View.VISIBLE else View.INVISIBLE
                 isChecked = viewModel.getPhotoSelection(position)
                 setOnClickListener {
@@ -313,22 +316,23 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
         }
     }
 
-    class MemoViewHolder(v: View, private val viewModel: PageViewModel,
+    class MemoViewHolder(private val binding: ViewPageMemoBinding,
+                         private val viewModel: PageViewModel,
                          private val onFocusChangeListener: View.OnFocusChangeListener)
-        : BaseViewHolder(v) {
+        : BaseViewHolder(binding.root) {
 
         companion object {
             fun create(parent: ViewGroup, viewModel: PageViewModel,
                        onFocusChangeListener: View.OnFocusChangeListener): MemoViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val view = layoutInflater.inflate(R.layout.view_page_memo, parent, false)
-                return MemoViewHolder(view, viewModel, onFocusChangeListener)
+                val binding = ViewPageMemoBinding.inflate(layoutInflater, parent, false)
+                return MemoViewHolder(binding, viewModel, onFocusChangeListener)
             }
             const val TAG_MEMO = "TagMemo"
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            itemView.memo.apply {
+            binding.memo.apply {
                 setText(viewModel.getMemo())
                 isEnabled = !editMode
                 addTextChangedListener(object: TextWatcher {
@@ -381,7 +385,7 @@ class PageActivity : AppCompatActivity(), DeleteConfirmDialog.EventListener {
             super.onSelectedChanged(viewHolder, actionState)
             Log.d(TAG, "ItemTouchHelper onSelectedChanged")
             inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-            rootLayout.requestFocus()
+            binding.rootLayout.requestFocus()
         }
 
         override fun onMove(

@@ -10,10 +10,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_slideshow.*
-import kotlinx.android.synthetic.main.view_slide_photo_grid.view.*
 import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.FragmentSlideshowBinding
+import net.engawapg.app.camrepo.databinding.ViewSlidePhotoGridBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 import kotlin.math.ceil
 import kotlin.math.sqrt
@@ -26,6 +26,8 @@ private const val ARG_PAGE_INDEX = "ArgPageIndex"
  * create an instance of this fragment.
  */
 class SlideshowFragment : Fragment() {
+    private var _binding: FragmentSlideshowBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SlideViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,38 +41,43 @@ class SlideshowFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_slideshow, container, false)
+    ): View {
+        _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        textView_title.text = viewModel.getPageTitle()
+        binding.textViewTitle.text = viewModel.getPageTitle()
 
         val memo = viewModel.getPageMemo()
         val isMemoEmpty = memo.isEmpty()
         if (isMemoEmpty) {
-            group_memo.visibility = View.GONE
+            binding.groupMemo.visibility = View.GONE
         } else {
-            group_memo.visibility = View.VISIBLE
-            textView_memo.text = memo
+            binding.groupMemo.visibility = View.VISIBLE
+            binding.textViewMemo.text = memo
         }
 
         val photoCount = viewModel.getPhotoCount()
         if (photoCount == 0) {
-            photoGrid.visibility = View.GONE
+            binding.photoGrid.visibility = View.GONE
         } else {
             if ((photoCount == 1) and isMemoEmpty) {
                 /* 写真が1枚だけの時は両側にスペースを配置して中央寄せにする */
-                group_space_photo.visibility = View.VISIBLE
+                binding.groupSpacePhoto.visibility = View.VISIBLE
             } else {
-                group_space_photo.visibility = View.GONE
+                binding.groupSpacePhoto.visibility = View.GONE
             }
-            photoGrid.visibility = View.VISIBLE
+            binding.photoGrid.visibility = View.VISIBLE
             val span = getPhotoGridSpan(isMemoEmpty)
-            photoGrid.layoutManager = GridLayoutManager(context, span)
-            photoGrid.adapter = PhotoGridAdapter(viewModel, viewLifecycleOwner, span)
+            binding.photoGrid.layoutManager = GridLayoutManager(context, span)
+            binding.photoGrid.adapter = PhotoGridAdapter(viewModel, viewLifecycleOwner, span)
         }
     }
 
@@ -120,10 +127,10 @@ class SlideshowFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoGridViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val view = layoutInflater.inflate(R.layout.view_slide_photo_grid, parent, false)
+            val binding = ViewSlidePhotoGridBinding.inflate(layoutInflater, parent, false)
             val width = parent.width / span
             Log.d(TAG, "PhotoGrid width = $width")
-            return PhotoGridViewHolder(view, width)
+            return PhotoGridViewHolder(binding, width)
         }
 
         override fun onBindViewHolder(holder: PhotoGridViewHolder, position: Int) {
@@ -132,14 +139,15 @@ class SlideshowFragment : Fragment() {
                 val resolver = holder.itemView.context.contentResolver
                 val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it, holder.size) }
                 if (bmp != null) {
-                    holder.itemView.imageView.setImageBitmap(bmp)
+                    holder.binding.imageView.setImageBitmap(bmp)
                 } else {
-                    holder.itemView.imageView.setImageResource(R.drawable.imagenotfound)
+                    holder.binding.imageView.setImageResource(R.drawable.imagenotfound)
                 }
             }
         }
     }
 
-    class PhotoGridViewHolder(v: View, val size: Int): RecyclerView.ViewHolder(v)
+    class PhotoGridViewHolder(val binding: ViewSlidePhotoGridBinding, val size: Int)
+        : RecyclerView.ViewHolder(binding.root)
 
 }

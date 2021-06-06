@@ -12,22 +12,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import kotlinx.android.synthetic.main.activity_slideshow.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.engawapg.app.camrepo.R
+import net.engawapg.app.camrepo.databinding.ActivitySlideshowBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SlideshowActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySlideshowBinding
     private val viewModel: SlideshowViewModel by viewModel()
     private var isFullScreen = false
     private lateinit var hideSystemUiJob: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_slideshow)
+        binding = ActivitySlideshowBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         /* 画面の切り欠きがあるエリアにはレイアウトしない */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -36,23 +37,23 @@ class SlideshowActivity : AppCompatActivity() {
         }
 
         /* ウィンドウ領域の変更を検知し、StatusBarの下端にToolBarの上端を合わせる。*/
-        fullScreenContent.setOnApplyWindowInsetsListener { _, insets ->
+        binding.fullScreenContent.setOnApplyWindowInsetsListener { _, insets ->
             Log.d(TAG, "System Inset Top ${insets.systemWindowInsetTop}")
-            val mlp = toolbar.layoutParams as ViewGroup.MarginLayoutParams
+            val mlp = binding.toolbar.layoutParams as ViewGroup.MarginLayoutParams
             mlp.setMargins(0, insets.systemWindowInsetTop, 0, 0)
-            toolbar.layoutParams = mlp
+            binding.toolbar.layoutParams = mlp
             insets
         }
 
         /* ToolBarはSystemUIの表示状態に合わせる */
         /* タップ検出リスナーで処理してしまうと、タップ以外でSystemUI状態が変わった場合を見逃してしまう */
-        fullScreenContent.setOnSystemUiVisibilityChangeListener { visibility ->
+        binding.fullScreenContent.setOnSystemUiVisibilityChangeListener { visibility ->
             if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
-                toolbar.visibility = View.VISIBLE
-                uiBackGround.visibility = View.VISIBLE
+                binding.toolbar.visibility = View.VISIBLE
+                binding.uiBackGround.visibility = View.VISIBLE
             } else {
-                toolbar.visibility = View.INVISIBLE
-                uiBackGround.visibility = View.INVISIBLE
+                binding.toolbar.visibility = View.INVISIBLE
+                binding.uiBackGround.visibility = View.INVISIBLE
             }
         }
 
@@ -68,7 +69,7 @@ class SlideshowActivity : AppCompatActivity() {
         val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
 
         /* ToolBar */
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
@@ -76,14 +77,14 @@ class SlideshowActivity : AppCompatActivity() {
         }
 
         /* Pager */
-        slidePager.apply {
+        binding.slidePager.apply {
             offscreenPageLimit = 1
             adapter = SlideAdapter(this@SlideshowActivity, viewModel)
             setCurrentItem(pageIndex, false)
         }
 
         /* タップ（だけ）を検出し、StatusBarなどの表示・非表示を切り替える */
-        rootLayout.setSingleTapListener(object: TouchDetectLayout.SingleTapListener {
+        binding.rootLayout.setSingleTapListener(object: TouchDetectLayout.SingleTapListener {
             override fun onSingleTap() {
                 hideSystemUiJob.cancel() /* 最初の自動全画面化処理のキャンセル */
                 toggleSystemUI()
@@ -112,7 +113,7 @@ class SlideshowActivity : AppCompatActivity() {
 
     private fun hideSystemUI() {
         Log.d(TAG, "Hide System UI")
-        fullScreenContent.systemUiVisibility = (
+        binding.fullScreenContent.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_IMMERSIVE or
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
@@ -124,7 +125,7 @@ class SlideshowActivity : AppCompatActivity() {
 
     private fun showSystemUI() {
         Log.d(TAG, "Show System UI")
-        fullScreenContent.systemUiVisibility = (
+        binding.fullScreenContent.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
