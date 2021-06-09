@@ -35,5 +35,6 @@
     <string name="desc_edit_button" translatable="false">Edit Button</string>
     <string name="request_camera_permission_message_sdk29">This app needs permission to access camera to take photos.</string>
     <string name="app_folder_name" translatable="false">Camrepo</string>
+    <string name="desc_create_new_page">Create New Page</string>
 
 </resources>
