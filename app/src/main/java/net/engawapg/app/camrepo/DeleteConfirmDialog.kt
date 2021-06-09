@@ -18,7 +18,7 @@ class DeleteConfirmDialog: DialogFragment() {
                 .setPositiveButton(R.string.delete) { _, _ ->
                     listener.onClickDeleteButton()
                 }
-                .setNegativeButton(R.string.cancel) { _, _ -> Unit }
+                .setNegativeButton(R.string.cancel) { _, _ -> }
             // Create the AlertDialog object and return it
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -30,10 +30,15 @@ class DeleteConfirmDialog: DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try {
-            listener = context as EventListener
+        listener = try {
+            context as EventListener
         } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() + "must implement Listener."))
+            try {
+                // TODO parentFragmentがEventListenerとは限らない。Navigation Componentに適したやり方に変える。
+                parentFragment as EventListener
+            } catch (e: ClassCastException) {
+                throw ClassCastException((context.toString() + "must implement Listener."))
+            }
         }
     }
 }

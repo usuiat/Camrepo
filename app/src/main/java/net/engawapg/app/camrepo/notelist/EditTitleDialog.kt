@@ -55,10 +55,15 @@ class EditTitleDialog: DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        try {
-            listener = context as EventListener
+        listener = try {
+            context as EventListener
         } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() + "must implement Listener."))
+            try {
+                // TODO parentFragmentがEventListenerとは限らない。Navigation Componentに適したやり方に変える。
+                parentFragment as EventListener
+            } catch (e: ClassCastException) {
+                throw ClassCastException((context.toString() + "must implement Listener."))
+            }
         }
     }
 
