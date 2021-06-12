@@ -26,6 +26,7 @@ import net.engawapg.app.camrepo.PermissionHelper
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.CameraFragmentBinding
 import net.engawapg.app.camrepo.model.ImageInfo
+import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.lang.Long.signum
 import java.text.SimpleDateFormat
@@ -42,7 +43,7 @@ class CameraFragment : Fragment()  {
 
     private var _binding: CameraFragmentBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: CameraViewModel by sharedViewModel()
+    private val viewModel: CameraViewModel by sharedViewModel(owner = { from(requireParentFragment()) })
     private lateinit var permissionHelper: PermissionHelper
 
     override fun onCreateView(

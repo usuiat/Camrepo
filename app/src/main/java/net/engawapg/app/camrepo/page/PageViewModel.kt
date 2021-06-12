@@ -10,7 +10,7 @@ import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 
 class PageViewModel(app: Application, private val noteModel: NoteModel,
-                    private val noteListModel: NoteListModel, private val pageIndex: Int,
+                    private val noteListModel: NoteListModel, val pageIndex: Int,
                     private val columnCount: Int)
     : AndroidViewModel(app) {
 
