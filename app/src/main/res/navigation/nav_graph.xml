@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/noteListFragment">
+
+    <fragment
+        android:id="@+id/noteListFragment"
+        android:name="net.engawapg.app.camrepo.notelist.NoteListFragment"
+        android:label="fragment_note_list"
+        tools:layout="@layout/fragment_note_list" >
+        <action
+            android:id="@+id/action_noteListFragment_to_noteFragment"
+            app:destination="@id/noteFragment" />
+        <action
+            android:id="@+id/action_noteListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="net.engawapg.app.camrepo.note.NoteFragment"
+        android:label="fragment_note"
+        tools:layout="@layout/fragment_note" >
+        <action
+            android:id="@+id/action_noteFragment_to_pageFragment"
+            app:destination="@id/pageFragment" />
+        <action
+            android:id="@+id/action_noteFragment_to_photoPagerFragment"
+            app:destination="@id/photoPagerFragment" >
+            <argument
+                android:name="wholeOfNote"
+                android:defaultValue="true" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="net.engawapg.app.camrepo.settings.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/pageFragment"
+        android:name="net.engawapg.app.camrepo.page.PageFragment"
+        android:label="fragment_page"
+        tools:layout="@layout/fragment_page" >
+        <argument
+            android:name="pageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_pageFragment_to_photoPagerFragment"
+            app:destination="@id/photoPagerFragment" >
+            <argument
+                android:name="wholeOfNote"
+                android:defaultValue="false" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/photoPagerFragment"
+        android:name="net.engawapg.app.camrepo.photo.PhotoPagerFragment"
+        android:label="fragment_photo_pager"
+        tools:layout="@layout/fragment_photo_pager" >
+        <argument
+            android:name="pageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="photoIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="wholeOfNote"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
+</navigation>

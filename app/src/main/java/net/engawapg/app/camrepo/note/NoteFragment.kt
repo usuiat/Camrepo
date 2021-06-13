@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,6 @@ import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
-import net.engawapg.app.camrepo.page.PageActivity
-import net.engawapg.app.camrepo.photo.PhotoActivity
 import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -21,7 +20,6 @@ class NoteFragment: Fragment(),
     DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
 
     companion object {
-        fun newInstance() = NoteFragment()
         private const val IMAGE_SPAN_COUNT = 4
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
@@ -125,16 +123,16 @@ class NoteFragment: Fragment(),
             }
             NoteViewModel.VIEW_TYPE_PAGE_TITLE, NoteViewModel.VIEW_TYPE_MEMO,
             NoteViewModel.VIEW_TYPE_BLANK -> {
-                startActivity(Intent(activity, PageActivity::class.java).apply {
-                    putExtra(PageActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                })
+                val pageIndex = viewModel.getPageIndex(position)
+                val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(pageIndex)
+                findNavController().navigate(action)
             }
             NoteViewModel.VIEW_TYPE_PHOTO -> {
-                startActivity(Intent(activity, PhotoActivity::class.java).apply {
-                    putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.getPageIndex(position))
-                    putExtra(PhotoActivity.KEY_PHOTO_INDEX, viewModel.getPhotoIndex(position))
-                    putExtra(PhotoActivity.KEY_WHOLE_OF_NOTE, true)
-                })
+                val action = NoteFragmentDirections.actionNoteFragmentToPhotoPagerFragment(
+                    pageIndex = viewModel.getPageIndex(position),
+                    photoIndex = viewModel.getPhotoIndex(position)
+                )
+                findNavController().navigate(action)
             }
         }
     }
@@ -148,9 +146,8 @@ class NoteFragment: Fragment(),
         viewModel.addPage()
         val newPageIndex = viewModel.getPageIndex(noteItemAdapter.itemCount - 1)
         Log.d("NoteFragment", "Page added. itemCount = ${noteItemAdapter.itemCount}, pageIndex = $newPageIndex")
-        startActivity(Intent(activity, PageActivity::class.java).apply {
-            putExtra(PageActivity.KEY_PAGE_INDEX, newPageIndex)
-        })
+        val action = NoteFragmentDirections.actionNoteFragmentToPageFragment(newPageIndex)
+        findNavController().navigate(action)
     }
 
     private val actionModeCallback = object: ActionMode.Callback {

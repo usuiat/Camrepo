@@ -1,25 +1,23 @@
 package net.engawapg.app.camrepo.notelist
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
-import net.engawapg.app.camrepo.note.NoteActivity
-import net.engawapg.app.camrepo.settings.SettingsActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteListFragment: Fragment(),
     DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
 
     companion object {
-        fun newInstance() = NoteListFragment()
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
     }
@@ -82,7 +80,7 @@ class NoteListFragment: Fragment(),
                 true
             }
             R.id.settings -> {
-                startActivity(Intent(activity, SettingsActivity::class.java))
+                findNavController().navigate(R.id.action_noteListFragment_to_settingsFragment)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -134,7 +132,7 @@ class NoteListFragment: Fragment(),
 
     override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
         viewModel.createNewNote(title, subTitle)
-        startActivity(Intent(activity, NoteActivity::class.java))
+        findNavController().navigate(R.id.action_noteListFragment_to_noteFragment)
     }
 
     class NoteCardAdapter(private val viewModel: NoteListViewModel)
@@ -173,8 +171,8 @@ class NoteListFragment: Fragment(),
                 if (!editMode) {
                     Log.d("NoteListFragment", "onClick Card at $position")
                     viewModel.selectNote(adapterPosition)
-                    val intent = Intent(it.context, NoteActivity::class.java)
-                    it.context.startActivity(intent)
+                    it.findFragment<NoteListFragment>().findNavController()
+                        .navigate(R.id.action_noteListFragment_to_noteFragment)
                 }
             }
 

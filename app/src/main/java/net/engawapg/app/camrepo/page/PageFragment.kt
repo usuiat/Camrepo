@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -18,22 +20,23 @@ import net.engawapg.app.camrepo.databinding.FragmentPageBinding
 import net.engawapg.app.camrepo.databinding.ViewPageMemoBinding
 import net.engawapg.app.camrepo.databinding.ViewPagePhotoBinding
 import net.engawapg.app.camrepo.databinding.ViewPageTitleBinding
-import net.engawapg.app.camrepo.photo.PhotoActivity
 import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
+import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.core.parameter.parametersOf
 
 class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
 
     companion object {
-        fun newInstance() = PageFragment()
         const val IMAGE_SPAN_COUNT = 4
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
     }
 
+    private val args: PageFragmentArgs by navArgs()
     private var _binding: FragmentPageBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PageViewModel by sharedViewModel()
+    private lateinit var viewModel: PageViewModel
     private val cameraViewModel: CameraViewModel by sharedViewModel(owner = { from(this)} )
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
@@ -50,6 +53,8 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPageBinding.inflate(inflater, container, false)
+
+        viewModel = getViewModel { parametersOf(args.pageIndex, IMAGE_SPAN_COUNT) }
 
         /* RecyclerView */
         pageItemAdapter = PageItemAdapter(
@@ -95,11 +100,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_ADD_PHOTO) {
             showCameraFragment()
         } else if (pageItemAdapter.getItemViewType(position) == PageViewModel.VIEW_TYPE_PHOTO) {
-            val intent = Intent(activity, PhotoActivity::class.java)
-            intent.putExtra(PhotoActivity.KEY_PAGE_INDEX, viewModel.pageIndex)
-            val photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
-            intent.putExtra(PhotoActivity.KEY_PHOTO_INDEX, photoIndex)
-            startActivity(intent)
+            val action = PageFragmentDirections.actionPageFragmentToPhotoPagerFragment(
+                pageIndex = viewModel.pageIndex,
+                photoIndex = viewModel.getPhotoIndexOfItemIndex(position, false)
+            )
+            findNavController().navigate(action)
         }
     }
 

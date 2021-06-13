@@ -6,29 +6,19 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
+import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import net.engawapg.app.camrepo.databinding.FragmentPhotoPagerBinding
+import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.sharedViewModel
-
-private const val ARG_PAGE_INDEX = "pageIndex"
-private const val ARG_PHOTO_INDEX = "photoIndex"
 
 class PhotoPagerFragment: Fragment() {
 
-    companion object {
-        fun newInstance(pageIndex: Int, photoIndex: Int) = PhotoPagerFragment().apply {
-            arguments = Bundle().apply {
-                putInt(ARG_PAGE_INDEX, pageIndex)
-                putInt(ARG_PHOTO_INDEX, photoIndex)
-            }
-        }
-    }
-
+    private val args: PhotoPagerFragmentArgs by navArgs()
     private var _binding: FragmentPhotoPagerBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PhotoViewModel by sharedViewModel()
+    private val viewModel: PhotoViewModel by sharedViewModel(owner = {from(this)})
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,13 +31,18 @@ class PhotoPagerFragment: Fragment() {
     ): View {
         _binding = FragmentPhotoPagerBinding.inflate(inflater, container, false)
 
-        val pageIndex = arguments?.run { getInt(ARG_PAGE_INDEX, 0) } ?: 0
-        val photoIndex = arguments?.run { getInt(ARG_PHOTO_INDEX, 0) } ?: 0
-        val position = viewModel.getPosition(pageIndex, photoIndex)
+        /* ViewModel初期化 */
+        if (args.wholeOfNote) {
+            viewModel.initModel(-1) /* ノート全体 */
+        } else {
+            viewModel.initModel(args.pageIndex)
+        }
+
+        val position = viewModel.getPosition(args.pageIndex, args.photoIndex)
 
         binding.photoPager.registerOnPageChangeCallback(pageChangeCallback)
         binding.photoPager.offscreenPageLimit = 1
-        binding.photoPager.adapter = PhotoAdapter(requireActivity(), viewModel)
+        binding.photoPager.adapter = PhotoAdapter(this, viewModel)
         binding.photoPager.setCurrentItem(position, false)
 
         return binding.root
@@ -73,8 +68,8 @@ class PhotoPagerFragment: Fragment() {
         }
     }
 
-    class PhotoAdapter(fa: FragmentActivity, private val viewModel: PhotoViewModel)
-        : FragmentStateAdapter(fa) {
+    class PhotoAdapter(fragment: Fragment, private val viewModel: PhotoViewModel)
+        : FragmentStateAdapter(fragment) {
 
         override fun getItemCount() = viewModel.getPhotoCount()
         override fun createFragment(position: Int): Fragment {

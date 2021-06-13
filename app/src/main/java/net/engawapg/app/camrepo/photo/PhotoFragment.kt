@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentPhotoBinding
+import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 private const val ARG_PHOTO_INDEX = "photoIndex"
@@ -22,7 +23,7 @@ private const val ARG_PHOTO_INDEX = "photoIndex"
 class PhotoFragment : Fragment() {
     private var _binding: FragmentPhotoBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PhotoViewModel by sharedViewModel()
+    private val viewModel: PhotoViewModel by sharedViewModel(owner = {from(requireParentFragment())})
     private var photoIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
