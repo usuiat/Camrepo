@@ -1,6 +1,5 @@
 package net.engawapg.app.camrepo.note
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -13,7 +12,6 @@ import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
-import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteFragment: Fragment(),
@@ -97,9 +95,8 @@ class NoteFragment: Fragment(),
                 true
             }
             R.id.slideshow -> {
-                startActivity(Intent(activity, SlideshowActivity::class.java).apply {
-                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, 0)
-                })
+                val action = NoteFragmentDirections.actionNoteFragmentToSlideshowActivity()
+                findNavController().navigate(action)
                 true
             }
             android.R.id.home -> {

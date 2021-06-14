@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,6 +21,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class SlideshowActivity : AppCompatActivity() {
 
+    private val args: SlideshowActivityArgs by navArgs()
     private lateinit var binding: ActivitySlideshowBinding
     private val viewModel: SlideshowViewModel by viewModel()
     private var isFullScreen = false
@@ -65,9 +67,6 @@ class SlideshowActivity : AppCompatActivity() {
             hideSystemUI()
         }
 
-        /* Get page index */
-        val pageIndex = intent.getIntExtra(KEY_PAGE_INDEX, 0)
-
         /* ToolBar */
         setSupportActionBar(binding.toolbar)
         supportActionBar?.let {
@@ -80,7 +79,7 @@ class SlideshowActivity : AppCompatActivity() {
         binding.slidePager.apply {
             offscreenPageLimit = 1
             adapter = SlideAdapter(this@SlideshowActivity, viewModel)
-            setCurrentItem(pageIndex, false)
+            setCurrentItem(args.pageIndex, false)
         }
 
         /* タップ（だけ）を検出し、StatusBarなどの表示・非表示を切り替える */
@@ -142,7 +141,6 @@ class SlideshowActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val KEY_PAGE_INDEX = "KeyPageIndex"
         private const val TAG = "SlideshowActivity"
     }
 }

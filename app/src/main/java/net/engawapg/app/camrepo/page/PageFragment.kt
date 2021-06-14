@@ -1,7 +1,6 @@
 package net.engawapg.app.camrepo.page
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,7 +19,6 @@ import net.engawapg.app.camrepo.databinding.FragmentPageBinding
 import net.engawapg.app.camrepo.databinding.ViewPageMemoBinding
 import net.engawapg.app.camrepo.databinding.ViewPagePhotoBinding
 import net.engawapg.app.camrepo.databinding.ViewPageTitleBinding
-import net.engawapg.app.camrepo.slideshow.SlideshowActivity
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -159,9 +157,10 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
                 true
             }
             R.id.slideshow -> {
-                startActivity(Intent(activity, SlideshowActivity::class.java).apply {
-                    putExtra(SlideshowActivity.KEY_PAGE_INDEX, viewModel.pageIndex)
-                })
+                val action = PageFragmentDirections.actionPageFragmentToSlideshowActivity(
+                    viewModel.pageIndex
+                )
+                findNavController().navigate(action)
                 true
             }
             android.R.id.home -> {

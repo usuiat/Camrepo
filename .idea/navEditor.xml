@@ -29,6 +29,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_noteFragment_to_slideshowActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
                         </option>
                       </LayoutPositions>
@@ -110,8 +115,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="530" />
-                            <option name="y" value="-322" />
+                            <option name="x" value="523" />
+                            <option name="y" value="-354" />
                           </Point>
                         </option>
                       </LayoutPositions>

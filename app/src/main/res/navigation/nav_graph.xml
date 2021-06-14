@@ -32,6 +32,9 @@
                 android:name="wholeOfNote"
                 android:defaultValue="true" />
         </action>
+        <action
+            android:id="@+id/action_noteFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -53,6 +56,9 @@
                 android:name="wholeOfNote"
                 android:defaultValue="false" />
         </action>
+        <action
+            android:id="@+id/action_pageFragment_to_slideshowActivity"
+            app:destination="@id/slideshowActivity" />
     </fragment>
     <fragment
         android:id="@+id/photoPagerFragment"
@@ -72,4 +78,14 @@
             app:argType="boolean"
             android:defaultValue="true" />
     </fragment>
+    <activity
+        android:id="@+id/slideshowActivity"
+        android:name="net.engawapg.app.camrepo.slideshow.SlideshowActivity"
+        android:label="activity_slideshow"
+        tools:layout="@layout/activity_slideshow" >
+        <argument
+            android:name="pageIndex"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
 </navigation>
