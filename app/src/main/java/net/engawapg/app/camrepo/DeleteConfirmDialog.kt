@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment
 
 class DeleteConfirmDialog: DialogFragment() {
 
-    private lateinit var listener: EventListener
+    private var listener: EventListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -16,7 +16,7 @@ class DeleteConfirmDialog: DialogFragment() {
             val builder = AlertDialog.Builder(it)
             builder.setMessage(R.string.delete_confirm_message)
                 .setPositiveButton(R.string.delete) { _, _ ->
-                    listener.onClickDeleteButton()
+                    listener?.onClickDeleteButton()
                 }
                 .setNegativeButton(R.string.cancel) { _, _ -> }
             // Create the AlertDialog object and return it
@@ -30,15 +30,10 @@ class DeleteConfirmDialog: DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = try {
-            context as EventListener
-        } catch (e: ClassCastException) {
-            try {
-                // TODO parentFragmentがEventListenerとは限らない。Navigation Componentに適したやり方に変える。
-                parentFragment as EventListener
-            } catch (e: ClassCastException) {
-                throw ClassCastException((context.toString() + "must implement Listener."))
-            }
+        listener = when {
+            context is EventListener -> context
+            parentFragment is EventListener -> parentFragment as EventListener
+            else -> null
         }
     }
 }
