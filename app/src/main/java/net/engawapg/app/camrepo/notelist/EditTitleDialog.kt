@@ -14,7 +14,7 @@ class EditTitleDialog: DialogFragment() {
 
     private var _binding: DialogEditTitleBinding? = null
     private val binding get() = _binding!!
-    private lateinit var listener: EventListener
+    private var listener: EventListener? = null
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -46,7 +46,7 @@ class EditTitleDialog: DialogFragment() {
         if (title == "") title = getString(R.string.default_note_title)
         val subTitle = est?.text.toString() /* subTitleは未入力の場合は空欄にしておく */
 
-        listener.onClickOkAtEditTitleDialog(title, subTitle)
+        listener?.onClickOkAtEditTitleDialog(title, subTitle)
     }
 
     interface EventListener {
@@ -55,15 +55,10 @@ class EditTitleDialog: DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = try {
-            context as EventListener
-        } catch (e: ClassCastException) {
-            try {
-                // TODO parentFragmentがEventListenerとは限らない。Navigation Componentに適したやり方に変える。
-                parentFragment as EventListener
-            } catch (e: ClassCastException) {
-                throw ClassCastException((context.toString() + "must implement Listener."))
-            }
+        listener = when {
+            context is EventListener -> context
+            parentFragment is EventListener -> parentFragment as EventListener
+            else -> null
         }
     }
 

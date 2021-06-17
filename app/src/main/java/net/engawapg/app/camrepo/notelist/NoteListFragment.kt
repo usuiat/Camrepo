@@ -14,12 +14,10 @@ import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListFragment: Fragment(),
-    DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
+class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
 
     companion object {
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
-        private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
     }
 
     private var _binding: FragmentNoteListBinding? = null
@@ -123,15 +121,7 @@ class NoteListFragment: Fragment(),
     }
 
     private fun onClickAddButton() {
-        val dialog = EditTitleDialog()
-        dialog.arguments = Bundle().apply {
-            putInt(EditTitleDialog.KEY_TITLE, R.string.create_new_note)
-        }
-        dialog.show(childFragmentManager, EDIT_TITLE_DIALOG)
-    }
-
-    override fun onClickOkAtEditTitleDialog(title: String, subTitle: String) {
-        viewModel.createNewNote(title, subTitle)
+        viewModel.createNewNote(getString(R.string.default_note_title), "")
         findNavController().navigate(R.id.action_noteListFragment_to_noteFragment)
     }
 
