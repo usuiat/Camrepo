@@ -54,6 +54,11 @@ class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
         _binding = null
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.title = ""
+    }
+
     override fun onResume() {
         super.onResume()
         if (viewModel.isCurrentNoteModified()) {

@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.settings
 
 import android.os.Bundle
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import net.engawapg.app.camrepo.R
@@ -16,5 +17,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }?.versionName.toString()
         }
 
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.setTitle(R.string.settings)
     }
 }
