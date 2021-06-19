@@ -16,6 +16,10 @@
         <action
             android:id="@+id/action_noteListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <argument
+            android:name="showAppLogo"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </fragment>
     <fragment
         android:id="@+id/noteFragment"

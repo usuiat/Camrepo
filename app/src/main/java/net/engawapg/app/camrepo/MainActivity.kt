@@ -23,5 +23,13 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         binding.mainToolbar.setupWithNavController(navController, appBarConfiguration)
+
+        navController.addOnDestinationChangedListener { _, _, arguments ->
+            if (arguments?.getBoolean("showAppLogo") == true) {
+                binding.mainToolbar.setLogo(R.drawable.ic_logo)
+            } else {
+                binding.mainToolbar.logo = null
+            }
+        }
     }
 }
