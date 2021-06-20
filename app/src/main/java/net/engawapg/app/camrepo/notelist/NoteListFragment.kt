@@ -12,6 +12,7 @@ import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
+import net.engawapg.app.camrepo.note.NoteFragment
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
@@ -57,6 +58,22 @@ class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = ""
+
+        /* アプリ起動時は、以前開いていたノートがあればすぐにNoteFragmentに遷移する。
+           NoteFragmentから戻ってきた場合は、以前開いていたノートの情報を削除する。*/
+        val returnFromNote = findNavController().currentBackStackEntry?.savedStateHandle
+            ?.get(NoteFragment.RETURN_FROM_NOTE) ?: false
+        if (returnFromNote) {
+            /* NoteFragmentから戻ってきた場合 */
+            viewModel.deletePreviousSelectedNote()
+        } else {
+            /* アプリ起動時 */
+            val index = viewModel.getPreviousSelectedNoteIndex()
+            if (index >= 0) {
+                viewModel.selectNote(index)
+                findNavController().navigate(R.id.action_noteListFragment_to_noteFragment)
+            }
+        }
     }
 
     override fun onResume() {

@@ -1,8 +1,10 @@
 package net.engawapg.app.camrepo.notelist
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.model.NoteProperty
@@ -15,12 +17,38 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
     private var lastModified: Long = 0
     private var currentNote: NoteProperty? = null
 
+    fun getPreviousSelectedNoteIndex(): Int {
+        val fileName = loadSelectedNoteFileName()
+        return model.list.indexOfFirst { noteProperty -> noteProperty.fileName == fileName }
+    }
+
+    fun deletePreviousSelectedNote() {
+        saveSelectedNoteFileName(null)
+    }
+
+    private fun loadSelectedNoteFileName(): String? {
+        val app = getApplication<Application>()
+        val prefName = app.getString(R.string.preference_file)
+        val pref = app.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        val key = app.getString(R.string.preference_key_selected_file)
+        return pref.getString(key, null)
+    }
+
+    private fun saveSelectedNoteFileName(fileName: String?) {
+        val app = getApplication<Application>()
+        val prefName = app.getString(R.string.preference_file)
+        val pref = app.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        val key = app.getString(R.string.preference_key_selected_file)
+        pref.edit().putString(key, fileName).apply()
+    }
+
     fun createNewNote(title: String, subTitle: String) {
         val note = model.createNewNote(title, subTitle)
         lastModified = 0 /* 比較時に更新ありと判定されるように、ゼロを設定 */
         currentNote = note
         Log.d(TAG, "updateDate = $lastModified")
         NoteModel.createModel(note)
+        saveSelectedNoteFileName(note.fileName)
     }
 
     fun save() {
@@ -48,6 +76,7 @@ class NoteListViewModel(app: Application, private val model: NoteListModel)
         currentNote = note
         Log.d(TAG, "updateDate = $lastModified")
         NoteModel.createModel(note)
+        saveSelectedNoteFileName(note.fileName)
     }
 
     fun initSelection() {

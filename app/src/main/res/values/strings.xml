@@ -36,5 +36,6 @@
     <string name="request_camera_permission_message_sdk29">This app needs permission to access camera to take photos.</string>
     <string name="app_folder_name" translatable="false">Camrepo</string>
     <string name="desc_create_new_page">Create New Page</string>
+    <string name="preference_key_selected_file" translatable="false">PREFERENCE_KEY_SELECTED_FILE</string>
 
 </resources>

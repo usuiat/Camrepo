@@ -18,6 +18,7 @@ class NoteFragment: Fragment(),
     DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
 
     companion object {
+        const val RETURN_FROM_NOTE = "ReturnFromNote"
         private const val IMAGE_SPAN_COUNT = 4
         private const val EDIT_TITLE_DIALOG = "EditTitleDialog"
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
@@ -70,6 +71,9 @@ class NoteFragment: Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = ""
+
+        /* NoteFragmentから戻ったのかどうかを、遷移元のFragmentで判断するためのフラグ */
+        findNavController().previousBackStackEntry?.savedStateHandle?.set(RETURN_FROM_NOTE, true)
     }
 
     override fun onResume() {
