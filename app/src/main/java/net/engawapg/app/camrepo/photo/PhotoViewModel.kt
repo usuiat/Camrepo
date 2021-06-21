@@ -1,12 +1,10 @@
 package net.engawapg.app.camrepo.photo
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteModel
 
-class PhotoViewModel(app: Application, private val noteModel: NoteModel)
-    : AndroidViewModel(app) {
+class PhotoViewModel(private val noteModel: NoteModel): ViewModel() {
 
     data class PhotoInfo(val pageIndex: Int, val photoIndex: Int)
 

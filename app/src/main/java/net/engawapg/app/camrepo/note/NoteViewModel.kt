@@ -1,17 +1,15 @@
 package net.engawapg.app.camrepo.note
 
-import android.app.Application
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 
-class NoteViewModel(app: Application, private val noteModel: NoteModel,
-                    private val noteListModel: NoteListModel)
-    : AndroidViewModel(app) {
+class NoteViewModel(private val noteModel: NoteModel, private val noteListModel: NoteListModel)
+    : ViewModel() {
 
     data class ItemInfo(
         val viewType: Int,  /* RecyclerViewのViewType */

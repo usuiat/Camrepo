@@ -25,7 +25,6 @@ val appModule = module {
 
     viewModel { (pageIndex: Int, columnCount: Int) ->
         PageViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get(),
             get(),
             pageIndex,
@@ -35,32 +34,28 @@ val appModule = module {
 
     viewModel {
         CameraViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 
     viewModel {
         PhotoViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 
-    viewModel { NoteViewModel(androidApplication(), getScope(Constants.SCOPE_ID_NOTE).get(), get()) }
+    viewModel { NoteViewModel(getScope(Constants.SCOPE_ID_NOTE).get(), get()) }
 
     viewModel { NoteListViewModel(androidApplication(), get()) }
 
     viewModel {
         SlideshowViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }
 
     viewModel {
         SlideViewModel(
-            androidApplication(),
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
     }

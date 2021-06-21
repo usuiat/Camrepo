@@ -1,15 +1,14 @@
 package net.engawapg.app.camrepo.page
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteModel
 
-class CameraViewModel(app:Application, private val noteModel: NoteModel): AndroidViewModel(app) {
+class CameraViewModel(private val noteModel: NoteModel): ViewModel() {
 
     val eventAddImagePageIndex = MutableLiveData<Int>()
     var currentPageIndex: Int = 0       // 表示中のページインデックス

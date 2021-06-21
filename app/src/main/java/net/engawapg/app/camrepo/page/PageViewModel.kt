@@ -1,18 +1,15 @@
 package net.engawapg.app.camrepo.page
 
-import android.app.Application
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 
-class PageViewModel(app: Application, private val noteModel: NoteModel,
-                    private val noteListModel: NoteListModel, val pageIndex: Int,
-                    private val columnCount: Int)
-    : AndroidViewModel(app) {
+class PageViewModel(private val noteModel: NoteModel, private val noteListModel: NoteListModel,
+                    val pageIndex: Int, private val columnCount: Int): ViewModel() {
 
     var modified = false
     private var photoSelection: MutableList<Boolean>? = null
