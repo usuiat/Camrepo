@@ -11,10 +11,18 @@
         tools:layout="@layout/fragment_note_list" >
         <action
             android:id="@+id/action_noteListFragment_to_noteFragment"
-            app:destination="@id/noteFragment" />
+            app:destination="@id/noteFragment"
+            app:enterAnim="@anim/nav_zoom_enter_anim"
+            app:exitAnim="@anim/nav_zoom_exit_anim"
+            app:popEnterAnim="@anim/nav_zoom_pop_enter_anim"
+            app:popExitAnim="@anim/nav_zoom_pop_exit_anim" />
         <action
             android:id="@+id/action_noteListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/nav_zoom_enter_anim"
+            app:exitAnim="@anim/nav_zoom_exit_anim"
+            app:popEnterAnim="@anim/nav_zoom_pop_enter_anim"
+            app:popExitAnim="@anim/nav_zoom_pop_exit_anim" />
         <argument
             android:name="showAppLogo"
             app:argType="boolean"
@@ -26,10 +34,18 @@
         tools:layout="@layout/fragment_note" >
         <action
             android:id="@+id/action_noteFragment_to_pageFragment"
-            app:destination="@id/pageFragment" />
+            app:destination="@id/pageFragment"
+            app:enterAnim="@anim/nav_zoom_enter_anim"
+            app:exitAnim="@anim/nav_zoom_exit_anim"
+            app:popEnterAnim="@anim/nav_zoom_pop_enter_anim"
+            app:popExitAnim="@anim/nav_zoom_pop_exit_anim" />
         <action
             android:id="@+id/action_noteFragment_to_photoPagerFragment"
-            app:destination="@id/photoPagerFragment" >
+            app:destination="@id/photoPagerFragment"
+            app:enterAnim="@anim/nav_zoom_enter_anim"
+            app:exitAnim="@anim/nav_zoom_exit_anim"
+            app:popEnterAnim="@anim/nav_zoom_pop_enter_anim"
+            app:popExitAnim="@anim/nav_zoom_pop_exit_anim" >
             <argument
                 android:name="wholeOfNote"
                 android:defaultValue="true" />
@@ -51,7 +67,11 @@
             android:defaultValue="0" />
         <action
             android:id="@+id/action_pageFragment_to_photoPagerFragment"
-            app:destination="@id/photoPagerFragment" >
+            app:destination="@id/photoPagerFragment"
+            app:enterAnim="@anim/nav_zoom_enter_anim"
+            app:exitAnim="@anim/nav_zoom_exit_anim"
+            app:popEnterAnim="@anim/nav_zoom_pop_enter_anim"
+            app:popExitAnim="@anim/nav_zoom_pop_exit_anim" >
             <argument
                 android:name="wholeOfNote"
                 android:defaultValue="false" />
