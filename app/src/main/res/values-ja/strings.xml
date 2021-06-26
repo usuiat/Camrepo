@@ -22,4 +22,6 @@
     <string name="request_camera_permission_message_sdk29">このアプリは写真撮影のためにカメラのアクセス許可が必要です。</string>
     <string name="desc_create_new_page">新しいページを作成</string>
     <string name="edit_note_title">ノートのタイトルを編集</string>
+    <string name="desc_add_pictures">写真を追加</string>
+    <string name="desc_take_pictures">写真を撮影</string>
 </resources>

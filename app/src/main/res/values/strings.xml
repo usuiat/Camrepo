@@ -37,5 +37,7 @@
     <string name="app_folder_name" translatable="false">Camrepo</string>
     <string name="desc_create_new_page">Create New Page</string>
     <string name="preference_key_selected_file" translatable="false">PREFERENCE_KEY_SELECTED_FILE</string>
+    <string name="desc_add_pictures">Add pictures</string>
+    <string name="desc_take_pictures">Take pictures</string>
 
 </resources>
