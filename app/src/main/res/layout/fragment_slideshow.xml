@@ -1,185 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black"
-    tools:context=".slideshow.SlideshowActivity">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="16:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.03" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_title_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.22" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.97" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.07" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.93" />
-
-        <Space
-            android:id="@+id/space_over_title"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintVertical_weight="0.15"
-            app:layout_constraintBottom_toTopOf="@id/textView_title"
-            app:layout_constraintStart_toEndOf="@id/guideline_left"
-            app:layout_constraintEnd_toStartOf="@id/guideline_right"
-            app:layout_constraintTop_toTopOf="@id/guideline_top" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textView_title"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="Page Title"
-            app:autoSizeMaxTextSize="50sp"
-            app:autoSizeMinTextSize="12sp"
-            app:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toTopOf="@id/space_under_title"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@id/space_over_title"
-            app:layout_constraintVertical_weight="0.7"
-            tools:ignore="HardcodedText" />
-
-        <Space
-            android:id="@+id/space_under_title"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/guideline_title_bottom"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintStart_toStartOf="@+id/guideline_left"
-            app:layout_constraintTop_toBottomOf="@+id/textView_title"
-            app:layout_constraintVertical_weight="0.15" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        tools:context=".slideshow.SlideshowActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/guideline_title_bottom"
-            app:layout_constraintStart_toEndOf="@id/guideline_left"
-            app:layout_constraintEnd_toStartOf="@+id/guideline_right"
-            app:layout_constraintDimensionRatio="2">
+            android:background="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/group_space_photo"
-                android:visibility="gone"
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="space_right_photo,space_left_photo" />
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.03" />
 
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/group_memo"
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_title_bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="space_right_memo,textView_memo,space_left_memo" />
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.22" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.97" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.07" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.93" />
 
             <Space
-                android:id="@+id/space_left_photo"
+                android:id="@+id/space_over_title"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintHorizontal_weight="0.25"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/photoGrid"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintVertical_weight="0.15"
+                app:layout_constraintBottom_toTopOf="@id/textView_title"
+                app:layout_constraintStart_toEndOf="@id/guideline_left"
+                app:layout_constraintEnd_toStartOf="@id/guideline_right"
+                app:layout_constraintTop_toTopOf="@id/guideline_top" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/photoGrid"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textView_title"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:overScrollMode="never"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/space_right_photo"
-                app:layout_constraintHorizontal_weight="0.5"
-                app:layout_constraintStart_toEndOf="@+id/space_left_photo"
-                app:layout_constraintTop_toTopOf="parent">
-
-            </androidx.recyclerview.widget.RecyclerView>
-
-            <Space
-                android:id="@+id/space_right_photo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintHorizontal_weight="0.25"
-                app:layout_constraintStart_toEndOf="@+id/photoGrid"
-                app:layout_constraintEnd_toStartOf="@id/space_left_memo"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Space
-                android:id="@+id/space_left_memo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/textView_memo"
-                app:layout_constraintHorizontal_weight="0.02"
-                app:layout_constraintStart_toEndOf="@id/space_right_photo"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/textView_memo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:text="Memo"
-                app:autoSizeMaxTextSize="22sp"
-                app:autoSizeMinTextSize="10sp"
+                android:gravity="center"
+                android:text="Page Title"
+                app:autoSizeMaxTextSize="50sp"
+                app:autoSizeMinTextSize="12sp"
                 app:autoSizeTextType="uniform"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/space_right_memo"
-                app:layout_constraintStart_toEndOf="@id/space_left_memo"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_weight="0.46"
+                app:layout_constraintBottom_toTopOf="@id/space_under_title"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_right"
+                app:layout_constraintStart_toStartOf="@+id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@id/space_over_title"
+                app:layout_constraintVertical_weight="0.7"
                 tools:ignore="HardcodedText" />
 
             <Space
-                android:id="@+id/space_right_memo"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/textView_memo"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="0.02"
+                android:id="@+id/space_under_title"
                 android:layout_width="0dp"
-                android:layout_height="0dp" />
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/guideline_title_bottom"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_right"
+                app:layout_constraintStart_toStartOf="@+id/guideline_left"
+                app:layout_constraintTop_toBottomOf="@+id/textView_title"
+                app:layout_constraintVertical_weight="0.15" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/guideline_title_bottom"
+                app:layout_constraintStart_toEndOf="@id/guideline_left"
+                app:layout_constraintEnd_toStartOf="@+id/guideline_right"
+                app:layout_constraintDimensionRatio="2">
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group_space_photo"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="space_right_photo,space_left_photo" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/group_memo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="space_right_memo,textView_memo,space_left_memo" />
+
+                <Space
+                    android:id="@+id/space_left_photo"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintHorizontal_weight="0.25"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/photoGrid"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/photoGrid"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:overScrollMode="never"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/space_right_photo"
+                    app:layout_constraintHorizontal_weight="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/space_left_photo"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <Space
+                    android:id="@+id/space_right_photo"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintHorizontal_weight="0.25"
+                    app:layout_constraintStart_toEndOf="@+id/photoGrid"
+                    app:layout_constraintEnd_toStartOf="@id/space_left_memo"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Space
+                    android:id="@+id/space_left_memo"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/textView_memo"
+                    app:layout_constraintHorizontal_weight="0.02"
+                    app:layout_constraintStart_toEndOf="@id/space_right_photo"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView_memo"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:text="Memo"
+                    app:autoSizeMaxTextSize="22sp"
+                    app:autoSizeMinTextSize="10sp"
+                    app:autoSizeTextType="uniform"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/space_right_memo"
+                    app:layout_constraintStart_toEndOf="@id/space_left_memo"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_weight="0.46"
+                    tools:ignore="HardcodedText" />
+
+                <Space
+                    android:id="@+id/space_right_memo"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/textView_memo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="0.02"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

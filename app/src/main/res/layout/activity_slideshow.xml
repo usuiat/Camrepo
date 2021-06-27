@@ -1,64 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<net.engawapg.app.camrepo.slideshow.TouchDetectLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/black"
-    tools:context=".slideshow.SlideshowActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <View
-        android:id="@+id/fullScreenMask"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:focusable="true" />
+    <data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fullScreenContent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    </data>
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/slidePager"
+    <net.engawapg.app.camrepo.slideshow.TouchDetectLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        tools:context=".slideshow.SlideshowActivity">
+
+        <View
+            android:id="@+id/fullScreenMask"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:focusable="true" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fullScreenContent"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/slidePager"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/uiBackGround"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/background_ui_overlay"
+            android:focusable="false"
+            android:clickable="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/uiBackGround"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/background_ui_overlay"
-        android:focusable="false"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/SlideshowToolbarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/SlideshowToolbarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</net.engawapg.app.camrepo.slideshow.TouchDetectLayout>
+    </net.engawapg.app.camrepo.slideshow.TouchDetectLayout>
+</layout>

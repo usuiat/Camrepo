@@ -1,64 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
-    app:cardBackgroundColor="@color/cardBackground"
-    app:cardCornerRadius="0dp"
-    app:cardElevation="3dp"
-    app:cardPreventCornerOverlap="false">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:cardBackgroundColor="@color/cardBackground"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="3dp"
+        app:cardPreventCornerOverlap="false">
 
-        <EditText
-            android:id="@+id/pageTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="12dp"
-            android:textColor="@color/contentTextColor"
-            android:textSize="22sp"
-            android:ems="10"
-            android:gravity="start|top"
-            android:inputType="textMultiLine"
-            android:hint="@string/hint_page_title"
-            android:autofillHints=""
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/addPictureButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/addPictureButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:contentDescription="@string/desc_add_pictures"
-            android:scaleType="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/takePictureButton"
-            app:layout_constraintStart_toEndOf="@+id/pageTitle"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/image" />
+            <EditText
+                android:id="@+id/pageTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/contentTextColor"
+                android:textSize="22sp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:hint="@string/hint_page_title"
+                android:autofillHints=""
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/addPictureButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/takePictureButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/desc_take_pictures"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/addPictureButton"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/camera_menu" />
+            <ImageButton
+                android:id="@+id/addPictureButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@string/desc_add_pictures"
+                android:scaleType="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/takePictureButton"
+                app:layout_constraintStart_toEndOf="@+id/pageTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/image" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            <ImageButton
+                android:id="@+id/takePictureButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/desc_take_pictures"
+                android:scaleType="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/addPictureButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/camera_menu" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

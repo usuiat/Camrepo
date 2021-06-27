@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.ActivitySlideshowBinding
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -29,8 +31,7 @@ class SlideshowActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySlideshowBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_slideshow)
 
         /* 画面の切り欠きがあるエリアにはレイアウトしない */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
