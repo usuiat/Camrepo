@@ -19,6 +19,7 @@ import net.engawapg.app.camrepo.databinding.FragmentPageBinding
 import net.engawapg.app.camrepo.databinding.ViewPageMemoBinding
 import net.engawapg.app.camrepo.databinding.ViewPagePhotoBinding
 import net.engawapg.app.camrepo.databinding.ViewPageTitleBinding
+import net.engawapg.app.camrepo.util.EventObserver
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -92,6 +93,17 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = ""
+
+        /* ViewModelからのUIイベント受信 */
+        viewModel.uiEvent.observe(viewLifecycleOwner, EventObserver { event ->
+            when (event) {
+                PageViewModel.UI_EVENT_ON_CLICK_TAKE_PICTURE -> {
+                    showCameraFragment()
+                }
+                PageViewModel.UI_EVENT_ON_CLICK_ADD_PICTURE -> {
+                }
+            }
+        })
     }
 
     override fun onPause() {
@@ -238,6 +250,10 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         }
 
         override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+            if (holder is PageTitleViewHolder) {
+                holder.binding.viewModel = viewModel
+                holder.binding.executePendingBindings()
+            }
             holder.bind(position, editMode)
             holder.itemView.setOnClickListener {
                 onItemClick(holder.adapterPosition)
@@ -257,7 +273,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         open fun bind(position: Int, editMode: Boolean) {}
     }
 
-    class PageTitleViewHolder(private val binding: ViewPageTitleBinding,
+    class PageTitleViewHolder(val binding: ViewPageTitleBinding,
                               private val viewModel: PageViewModel,
                               private val onFocusChangeListener: View.OnFocusChangeListener)
         : BaseViewHolder(binding.root) {

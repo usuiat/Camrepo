@@ -3,16 +3,19 @@ package net.engawapg.app.camrepo.page
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
+import net.engawapg.app.camrepo.util.Event
 
 class PageViewModel(private val noteModel: NoteModel, private val noteListModel: NoteListModel,
                     val pageIndex: Int, private val columnCount: Int): ViewModel() {
 
     var modified = false
     private var photoSelection: MutableList<Boolean>? = null
+    val uiEvent = MutableLiveData<Event<Int>>()
 
     fun getItemCount(photoSelectMode: Boolean): Int {
         var n = noteModel.getPhotoCount(pageIndex)
@@ -110,6 +113,14 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         }
     }
 
+    fun onClickAddPicture() {
+        uiEvent.value = Event(UI_EVENT_ON_CLICK_ADD_PICTURE)
+    }
+
+    fun onClickTakePicture() {
+        uiEvent.value = Event(UI_EVENT_ON_CLICK_TAKE_PICTURE)
+    }
+
     companion object {
         private const val TAG = "PageViewModel"
 
@@ -118,5 +129,8 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         const val VIEW_TYPE_MEMO = 3
         const val VIEW_TYPE_ADD_PHOTO = 4
         const val VIEW_TYPE_BLANK = 5
+
+        const val UI_EVENT_ON_CLICK_ADD_PICTURE = 1
+        const val UI_EVENT_ON_CLICK_TAKE_PICTURE = 2
     }
 }

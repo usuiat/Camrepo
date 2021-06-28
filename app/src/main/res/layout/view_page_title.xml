@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.page.PageViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -47,6 +49,7 @@
                 android:contentDescription="@string/desc_add_pictures"
                 android:scaleType="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:onClick="@{()->viewModel.onClickAddPicture()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/takePictureButton"
                 app:layout_constraintStart_toEndOf="@+id/pageTitle"
@@ -60,6 +63,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/desc_take_pictures"
                 android:scaleType="center"
+                android:onClick="@{()->viewModel.onClickTakePicture()}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/addPictureButton"
