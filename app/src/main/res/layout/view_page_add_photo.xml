@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.page.PageViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -23,12 +25,16 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp">
 
-            <net.engawapg.app.camrepo.SquareImageView
+            <ImageView
                 android:id="@+id/cameraIcon"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
+                android:contentDescription="@string/desc_take_pictures"
+                android:onClick="@{() -> viewModel.onClickTakePicture()}"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.page.PageViewModel" />
+        <variable
+            name="item"
+            type="net.engawapg.app.camrepo.page.PagePhotoItem" />
+        <import type="android.view.View" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -22,12 +28,16 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp">
 
-            <net.engawapg.app.camrepo.SquareImageView
+            <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:onClick="@{() -> viewModel.onClickPicture(item)}"
+                app:layout_constraintDimensionRatio="1"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/desc_photo" />
 
             <CheckBox
                 android:id="@+id/checkBox"
@@ -35,6 +45,8 @@
                 android:layout_width="match_parent"
                 android:buttonTint="@color/cardBackground"
                 android:gravity="top"
+                android:visibility="@{viewModel.editMode ? View.VISIBLE : View.GONE}"
+                android:checked="@={item.select}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

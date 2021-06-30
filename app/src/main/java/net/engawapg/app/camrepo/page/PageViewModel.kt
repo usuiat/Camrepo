@@ -3,6 +3,7 @@ package net.engawapg.app.camrepo.page
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
@@ -10,68 +11,116 @@ import net.engawapg.app.camrepo.model.NoteListModel
 import net.engawapg.app.camrepo.model.NoteModel
 import net.engawapg.app.camrepo.util.Event
 
+open class PageItem(val viewType: Int)
+
+class PagePhotoItem(val imageInfo: ImageInfo, val photoIndex: Int)
+    : PageItem(PageViewModel.VIEW_TYPE_PHOTO) {
+    var select = false
+}
+
 class PageViewModel(private val noteModel: NoteModel, private val noteListModel: NoteListModel,
                     val pageIndex: Int, private val columnCount: Int): ViewModel() {
 
     var modified = false
-    private var photoSelection: MutableList<Boolean>? = null
     val uiEvent = MutableLiveData<Event<Int>>()
+    val photoClickEvent = MutableLiveData<Event<Int>>()
+    val editMode = MutableLiveData<Boolean>()
+    private var itemList: List<PageItem>
 
-    fun getItemCount(photoSelectMode: Boolean): Int {
+    init {
+        editMode.value = false
+        itemList = buildItemList()
+    }
+
+    fun reload() {
+        itemList = buildItemList()
+    }
+
+    fun setEditMode(mode: Boolean) {
+        editMode.value = mode
+        itemList = buildItemList()
+    }
+
+    private fun buildItemList(): List<PageItem> {
+        val list = mutableListOf<PageItem>()
+
+        /* Title */
+        if (editMode.value == false) {
+            list.add(PageItem(VIEW_TYPE_PAGE_TITLE))
+        }
+
+        /* Photo */
         var n = noteModel.getPhotoCount(pageIndex)
-        if (!photoSelectMode) n += 1 /* Add Photoの分 */
-        n += columnCount - (n % columnCount) /* Blankの分 */
-        if (!photoSelectMode) n += 2 /* Title, Memoの分 */
-        Log.d(TAG, "ItemCount = $n")
-        return n
+        for (index in 0 until n) {
+            noteModel.getPhotoAt(pageIndex, index)?.let { imageInfo ->
+                list.add(PagePhotoItem(imageInfo, index))
+            }
+        }
+
+        /* Add Photo */
+        if (editMode.value == false) {
+            list.add(PageItem(VIEW_TYPE_ADD_PHOTO))
+            n++
+        }
+
+        /* Blank */
+        val nBlank = columnCount - (n % columnCount)
+        for (i in 0 until nBlank) {
+            list.add(PageItem(VIEW_TYPE_BLANK))
+        }
+
+        /* Memo */
+        if (editMode.value == false) {
+            list.add(PageItem(VIEW_TYPE_MEMO))
+        }
+
+        return list
     }
 
-    fun getViewType(position: Int, photoSelectMode: Boolean) :Int {
-        val photoCount =noteModel.getPhotoCount(pageIndex)
-        return if (photoSelectMode) {
-            when {
-                position < photoCount -> VIEW_TYPE_PHOTO
-                else -> VIEW_TYPE_BLANK
+    fun getItemCount(): Int {
+        return itemList.size
+    }
+
+    fun getViewType(position: Int) :Int {
+        return itemList[position].viewType
+    }
+
+    var pageTitle: String
+        get() = noteModel.getTitle(pageIndex)
+        set(value) {
+            val oldTitle = noteModel.getTitle(pageIndex)
+            if (value != oldTitle) {
+                noteModel.setTitle(pageIndex, value)
+                modified = true
             }
+        }
+
+    var memo: String
+        get() = noteModel.getMemo(pageIndex)
+        set(value) {
+            val oldMemo = noteModel.getMemo(pageIndex)
+            if (value != oldMemo) {
+                noteModel.setMemo(pageIndex, value)
+                modified = true
+            }
+        }
+
+    fun getPhotoItem(index: Int): PagePhotoItem? {
+        val item = itemList[index]
+        return if (item is PagePhotoItem) {
+            item
         } else {
-            val itemCount = getItemCount(photoSelectMode)
-            when {
-                position == 0 -> VIEW_TYPE_PAGE_TITLE
-                position <= photoCount -> VIEW_TYPE_PHOTO
-                position == photoCount + 1 -> VIEW_TYPE_ADD_PHOTO
-                position == itemCount - 1 -> VIEW_TYPE_MEMO
-                else -> VIEW_TYPE_BLANK
-            }
+            null
         }
     }
-
-    fun getPageTitle() = noteModel.getTitle(pageIndex)
-    fun setPageTitle(title: String) {
-        val oldTitle = noteModel.getTitle(pageIndex)
-        if (title != oldTitle) {
-            noteModel.setTitle(pageIndex, title)
-            modified = true
-        }
-    }
-
-    fun getMemo() = noteModel.getMemo(pageIndex)
-    fun setMemo(memo: String) {
-        val oldMemo = noteModel.getMemo(pageIndex)
-        if (memo != oldMemo) {
-            noteModel.setMemo(pageIndex, memo)
-            modified = true
-        }
-    }
-
-    fun getPhotoIndexOfItemIndex(itemIndex: Int, editMode: Boolean): Int {
-        return if (editMode) itemIndex else itemIndex - 1
-    }
-
-    private fun getPhotoAt(index: Int): ImageInfo? = noteModel.getPhotoAt(pageIndex, index)
 
     fun getPhotoBitmap(index: Int, resolver: ContentResolver): Bitmap? {
-        val imageInfo = getPhotoAt(index)
-        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
+        val item = itemList[index]
+        return if (item is PagePhotoItem) {
+            item.imageInfo.getBitmapThumbnailWithResolver(resolver)
+        } else {
+            null
+        }
     }
 
     fun movePhoto(from: Int, to: Int) {
@@ -79,25 +128,14 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         modified = true
     }
 
-    fun initPhotoSelection() {
-        photoSelection  = MutableList(noteModel.getPhotoCount(pageIndex)){false}
+    fun isPhotoSelected(): Boolean {
+        return itemList.any {(it is PagePhotoItem) && it.select }
     }
-
-    fun setPhotoSelection(index: Int, sel: Boolean) {
-        photoSelection?.let {
-            if (index < it.size) {
-                it[index] = sel
-            }
-        }
-    }
-
-    fun getPhotoSelection(index: Int) = photoSelection?.getOrNull(index) ?: false
-
-    fun isPhotoSelected() = photoSelection?.contains(true) ?: false
 
     fun deleteSelectedPhotos() {
-        val indexes = mutableListOf<Int>()
-        photoSelection?.forEachIndexed{ index, b -> if (b) indexes.add(index) }
+        val indexes = itemList.mapNotNull {
+            if ((it is PagePhotoItem) && it.select) it.photoIndex else null
+        }
         Log.d(TAG, "Delete at $indexes")
         noteModel.deletePhotosAt(pageIndex, indexes)
         modified = true
@@ -121,6 +159,18 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         uiEvent.value = Event(UI_EVENT_ON_CLICK_TAKE_PICTURE)
     }
 
+    fun onClickPicture(item: PagePhotoItem) {
+        if (editMode.value == false) {
+            photoClickEvent.value = Event(item.photoIndex)
+        }
+    }
+
+    fun onFocusChangeToTextEdit(@Suppress("UNUSED_PARAMETER")view: View, hasFocus: Boolean) {
+        if (hasFocus) {
+            uiEvent.value = Event(UI_EVENT_ON_FOCUS_CHANGE_TO_TEXT_EDIT)
+        }
+    }
+
     companion object {
         private const val TAG = "PageViewModel"
 
@@ -132,5 +182,6 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
 
         const val UI_EVENT_ON_CLICK_ADD_PICTURE = 1
         const val UI_EVENT_ON_CLICK_TAKE_PICTURE = 2
+        const val UI_EVENT_ON_FOCUS_CHANGE_TO_TEXT_EDIT = 3
     }
 }

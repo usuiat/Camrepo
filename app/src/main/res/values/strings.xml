@@ -39,5 +39,6 @@
     <string name="preference_key_selected_file" translatable="false">PREFERENCE_KEY_SELECTED_FILE</string>
     <string name="desc_add_pictures">Add pictures</string>
     <string name="desc_take_pictures">Take pictures</string>
+    <string name="desc_photo">Photo</string>
 
 </resources>

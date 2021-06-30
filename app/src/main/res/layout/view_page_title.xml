@@ -37,6 +37,8 @@
                 android:inputType="textMultiLine"
                 android:hint="@string/hint_page_title"
                 android:autofillHints=""
+                android:text="@={viewModel.pageTitle}"
+                android:onFocusChange="@{(v, hasFocus) -> viewModel.onFocusChangeToTextEdit(v, hasFocus)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/addPictureButton"
                 app:layout_constraintStart_toStartOf="parent"

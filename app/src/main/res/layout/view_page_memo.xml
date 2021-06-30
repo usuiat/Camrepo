@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.page.PageViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -35,6 +37,8 @@
                 android:hint="@string/hint_memo"
                 android:background="@color/cardBackground"
                 android:autofillHints=""
+                android:text="@={viewModel.memo}"
+                android:onFocusChange="@{(v, hasFocus) -> viewModel.onFocusChangeToTextEdit(v, hasFocus)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
