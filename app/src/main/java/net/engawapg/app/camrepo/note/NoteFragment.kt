@@ -108,10 +108,6 @@ class NoteFragment: Fragment(),
                 findNavController().navigate(action)
                 true
             }
-            android.R.id.home -> {
-                activity?.finish()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }

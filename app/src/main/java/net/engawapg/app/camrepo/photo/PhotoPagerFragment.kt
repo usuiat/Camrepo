@@ -20,11 +20,6 @@ class PhotoPagerFragment: Fragment() {
     private val binding get() = _binding!!
     private val viewModel: PhotoViewModel by sharedViewModel(owner = {from(this)})
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,16 +51,6 @@ class PhotoPagerFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showToolbarTitle(binding.photoPager.currentItem)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
-            android.R.id.home -> {
-                activity?.finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     class PhotoAdapter(fragment: Fragment, private val viewModel: PhotoViewModel)
