@@ -37,7 +37,6 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var cameraFragmentId = 0
-    private lateinit var inputMethodManager: InputMethodManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,13 +72,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             }
         })
 
-        /* 写真操作時にキーボードを閉じるためのやつ */
-        inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
         return binding.root
     }
 
     override fun onDestroyView() {
+        closeKeyboard()
         super.onDestroyView()
         _binding = null
     }
@@ -102,6 +99,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             }
         })
         viewModel.photoClickEvent.observe(viewLifecycleOwner, EventObserver { index ->
+            closeKeyboard()
             val action = PageFragmentDirections.actionPageFragmentToPhotoPagerFragment(
                 pageIndex = viewModel.pageIndex, photoIndex = index
             )
@@ -117,9 +115,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     private fun showCameraFragment() {
         var cf = childFragmentManager.findFragmentById(cameraFragmentId)
         if (cf == null) {
-            /* キーボード消す */
-            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS)
+            closeKeyboard()
             /* EditTextからフォーカスを外す */
             binding.root.requestFocus()
 
@@ -144,6 +140,12 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
                 .commit()
             cameraFragmentId = 0
         }
+    }
+
+    private fun closeKeyboard() {
+        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(activity?.currentFocus?.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -178,9 +180,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             viewModel.setEditMode(true)
             pageItemAdapter.notifyDataSetChanged()
             itemTouchHelper.attachToRecyclerView(null)
-            /* キーボード消す */
-            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS)
+            closeKeyboard()
             return true
         }
 
@@ -283,8 +283,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
             super.onSelectedChanged(viewHolder, actionState)
             Log.d("PageFragment", "ItemTouchHelper onSelectedChanged")
-            inputMethodManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS)
+            closeKeyboard()
             binding.root.requestFocus()
         }
 
