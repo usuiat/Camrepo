@@ -6,6 +6,7 @@ import net.engawapg.app.camrepo.page.CameraViewModel
 import net.engawapg.app.camrepo.note.NoteViewModel
 import net.engawapg.app.camrepo.notelist.NoteListViewModel
 import net.engawapg.app.camrepo.page.PageViewModel
+import net.engawapg.app.camrepo.page.PhotoGalleryViewModel
 import net.engawapg.app.camrepo.photo.PhotoViewModel
 import net.engawapg.app.camrepo.slideshow.SlideViewModel
 import net.engawapg.app.camrepo.slideshow.SlideshowViewModel
@@ -58,5 +59,9 @@ val appModule = module {
         SlideViewModel(
             getScope(Constants.SCOPE_ID_NOTE).get()
         )
+    }
+
+    viewModel {
+        PhotoGalleryViewModel()
     }
 }

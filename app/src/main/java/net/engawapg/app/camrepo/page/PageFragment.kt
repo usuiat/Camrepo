@@ -27,6 +27,10 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     companion object {
         const val IMAGE_SPAN_COUNT = 4
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
+
+        /* 表示中のフラグメント */
+        private const val FRAGMENT_CAMERA = "FragmentCamera"
+        private const val FRAGMENT_GALLERY = "FragmentGallery"
     }
 
     private val args: PageFragmentArgs by navArgs()
@@ -36,7 +40,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     private val cameraViewModel: CameraViewModel by sharedViewModel(owner = { from(this)} )
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
-    private var cameraFragmentId = 0
+    private var bottomFragmentTag: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +54,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         _binding = FragmentPageBinding.inflate(inflater, container, false)
 
         viewModel = getViewModel { parametersOf(args.pageIndex, IMAGE_SPAN_COUNT) }
+        cameraViewModel.currentPageIndex = viewModel.pageIndex
 
         /* RecyclerView */
         pageItemAdapter = PageItemAdapter()
@@ -89,12 +94,13 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         viewModel.uiEvent.observe(viewLifecycleOwner, EventObserver { event ->
             when (event) {
                 PageViewModel.UI_EVENT_ON_CLICK_TAKE_PICTURE -> {
-                    showCameraFragment()
+                    switchBottomFragment(FRAGMENT_CAMERA)
                 }
                 PageViewModel.UI_EVENT_ON_CLICK_ADD_PICTURE -> {
+                    switchBottomFragment(FRAGMENT_GALLERY)
                 }
                 PageViewModel.UI_EVENT_ON_FOCUS_CHANGE_TO_TEXT_EDIT -> {
-                    hideCameraFragment()
+                    switchBottomFragment(null)
                 }
             }
         })
@@ -112,34 +118,47 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         super.onPause()
     }
 
-    private fun showCameraFragment() {
-        var cf = childFragmentManager.findFragmentById(cameraFragmentId)
-        if (cf == null) {
+    private fun switchBottomFragment(tag: String?) {
+        if ((tag == null) && (bottomFragmentTag == null)) {
+            return /* 何もしない */
+        }
+
+        var newTag = tag
+        if (newTag == bottomFragmentTag) {
+            /* 表示中の画面と同じ画面を指定した場合は消す（トグル）*/
+            newTag = null
+        }
+
+        if (bottomFragmentTag == null) {
             closeKeyboard()
             /* EditTextからフォーカスを外す */
             binding.root.requestFocus()
+        }
 
-            cf = CameraFragment.newInstance()
-            childFragmentManager.beginTransaction()
-                .add(R.id.cameraFragmentContainer, cf)
+        val oldFragment = childFragmentManager.findFragmentByTag(bottomFragmentTag)
+        val newFragment = when (newTag) {
+            FRAGMENT_CAMERA -> CameraFragment.newInstance()
+            FRAGMENT_GALLERY -> PhotoGalleryFragment()
+            else -> null
+        }
+
+        val transaction = childFragmentManager.beginTransaction()
+
+        if ((oldFragment != null) && (newFragment == null)) {
+            transaction.remove(oldFragment)
+        } else if ((oldFragment == null) && (newFragment != null)) {
+            transaction.add(R.id.cameraFragmentContainer, newFragment, newTag)
                 .runOnCommit {
                     /* カメラアイコンが見えるようにスクロール */
                     binding.recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
                 }
-                .commit()
-            cameraFragmentId = cf.id
-            cameraViewModel.currentPageIndex = viewModel.pageIndex
+        } else if ((oldFragment != null) && (newFragment != null)){
+            transaction.replace(R.id.cameraFragmentContainer, newFragment, newTag)
         }
-    }
 
-    private fun hideCameraFragment() {
-        val cf = childFragmentManager.findFragmentById(cameraFragmentId)
-        if (cf != null) {
-            childFragmentManager.beginTransaction()
-                .remove(cf)
-                .commit()
-            cameraFragmentId = 0
-        }
+        transaction.commit()
+
+        bottomFragmentTag = if (newFragment != null) newTag else null
     }
 
     private fun closeKeyboard() {
@@ -155,7 +174,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.edit_list_items -> {
-                hideCameraFragment()
+                switchBottomFragment(null)
                 actionMode = activity?.startActionMode(actionModeCallback)
                 true
             }
