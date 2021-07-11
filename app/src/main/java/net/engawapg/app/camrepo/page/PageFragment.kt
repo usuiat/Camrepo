@@ -1,10 +1,14 @@
 package net.engawapg.app.camrepo.page
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -111,6 +115,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             )
             findNavController().navigate(action)
         })
+        cameraViewModel.uiEvent.observe(viewLifecycleOwner, EventObserver { event ->
+            when (event) {
+                CameraViewModel.UI_EVENT_ON_CLICK_CLOSE -> switchBottomFragment(null)
+            }
+        })
     }
 
     override fun onPause() {
@@ -142,23 +151,73 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             else -> null
         }
 
-        val transaction = childFragmentManager.beginTransaction()
-
-        if ((oldFragment != null) && (newFragment == null)) {
-            transaction.remove(oldFragment)
-        } else if ((oldFragment == null) && (newFragment != null)) {
-            transaction.add(R.id.cameraFragmentContainer, newFragment, newTag)
-                .runOnCommit {
-                    /* カメラアイコンが見えるようにスクロール */
-                    binding.recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
-                }
+        if ((oldFragment == null) && (newFragment != null)) {
+            /* 下からスライドイン */
+            slideInFromBottom(newFragment, newTag)
+        } else if ((oldFragment != null) && (newFragment == null)) {
+            /* 下にスライドアウト */
+            slideOutToBottom(oldFragment)
         } else if ((oldFragment != null) && (newFragment != null)){
-            transaction.replace(R.id.cameraFragmentContainer, newFragment, newTag)
+            /* 置き換え */
+            childFragmentManager.beginTransaction()
+                .replace(R.id.bottomFragmentContainer, newFragment, newTag)
+                .commit()
         }
 
-        transaction.commit()
-
         bottomFragmentTag = if (newFragment != null) newTag else null
+    }
+
+    private fun slideInFromBottom(fragment: Fragment, tag: String?) {
+
+        /* bottomFragmentContainerのBOTTOMをrootLayoutのBOTTOMに合わせる */
+        ConstraintSet().apply {
+            clone(binding.rootLayout)
+            clear(R.id.bottomFragmentContainer, ConstraintSet.TOP)
+            connect(R.id.bottomFragmentContainer, ConstraintSet.BOTTOM, R.id.rootLayout, ConstraintSet.BOTTOM)
+            applyTo(binding.rootLayout)
+        }
+
+        /* フラグメントを表示 */
+        childFragmentManager.beginTransaction()
+            .add(R.id.bottomFragmentContainer, fragment, tag)
+            .commit()
+
+        /* スライドインアニメーション */
+        ObjectAnimator.ofFloat(
+            binding.bottomFragmentContainer, "translationY",
+            binding.bottomFragmentContainer.measuredHeight.toFloat(), 0f
+        ).apply {
+            duration = resources.getInteger(R.integer.anim_time).toLong()
+            start()
+        }
+    }
+
+    private fun slideOutToBottom(fragment: Fragment) {
+
+        /* bottomFragmentContainerのTOPをrootLayoutのBOTTOMに合わせる */
+        ConstraintSet().apply {
+            clone(binding.rootLayout)
+            clear(R.id.bottomFragmentContainer, ConstraintSet.BOTTOM)
+            connect(R.id.bottomFragmentContainer, ConstraintSet.TOP, R.id.rootLayout, ConstraintSet.BOTTOM)
+            applyTo(binding.rootLayout)
+        }
+
+        /* アニメーションイベントリスナー。アニメーション終了したらフラグメントを削除 */
+        val listener = object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                childFragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }
+
+        /* スライドアウトアニメーション */
+        ObjectAnimator.ofFloat(
+            binding.bottomFragmentContainer, "translationY",
+            -binding.bottomFragmentContainer.measuredHeight.toFloat(), 0f
+        ).apply {
+            duration = resources.getInteger(R.integer.anim_time).toLong()
+            addListener(listener)
+            start()
+        }
     }
 
     private fun closeKeyboard() {

@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="net.engawapg.app.camrepo.page.CameraViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -55,6 +57,7 @@
             android:contentDescription="@string/desc_close_camera"
             android:scaleType="center"
             android:src="@drawable/close"
+            android:onClick="@{()->viewModel.onClickClose()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

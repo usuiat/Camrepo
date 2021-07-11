@@ -51,6 +51,7 @@ class CameraFragment : Fragment()  {
         savedInstanceState: Bundle?
     ): View {
         _binding = CameraFragmentBinding.inflate(inflater, container, false)
+        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -64,9 +65,6 @@ class CameraFragment : Fragment()  {
         binding.shutterButton.setOnClickListener {
             viewModel.onPressShutter()
             lockFocus()
-        }
-        binding.closeCameraButton.setOnClickListener {
-            parentFragmentManager.beginTransaction().remove(this).commit()
         }
         binding.flashButton.setOnClickListener {
             toggleFlashMode()
