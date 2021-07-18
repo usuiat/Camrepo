@@ -62,6 +62,6 @@ val appModule = module {
     }
 
     viewModel {
-        PhotoGalleryViewModel()
+        PhotoGalleryViewModel(androidApplication())
     }
 }

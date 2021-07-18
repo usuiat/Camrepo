@@ -58,4 +58,8 @@ dependencies {
 
     // Feature module Support
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+    implementation "androidx.fragment:fragment-ktx:1.3.5"
+
+    implementation "com.squareup.picasso:picasso:2.8"
 }

@@ -25,4 +25,5 @@
     <string name="desc_add_pictures">写真を追加</string>
     <string name="desc_take_pictures">写真を撮影</string>
     <string name="desc_photo">写真</string>
+    <string name="permission_req_for_gallery">デバイス内の写真を表示するには、設定アプリでアクセスを許可してください。</string>
 </resources>

@@ -40,5 +40,7 @@
     <string name="desc_add_pictures">Add pictures</string>
     <string name="desc_take_pictures">Take pictures</string>
     <string name="desc_photo">Photo</string>
+    <string name="permission_req_for_gallery">To view the photos on your device, allow access on the settings app.</string>
+    <string name="desc_image_in_photo_gallery" translatable="false">Image in the device</string>
 
 </resources>
