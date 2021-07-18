@@ -119,7 +119,7 @@ class PhotoGalleryFragment : Fragment() {
     ): View {
         _binding = FragmentPhotoGalleryBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner //TODO 必要？
+        binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
     }
