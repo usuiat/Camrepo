@@ -141,6 +141,12 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         modified = true
     }
 
+    fun addImageInfo(info: ImageInfo) {
+        noteModel.addPhotoAt(pageIndex, info)
+        reload()
+        modified = true
+    }
+
     fun save(){
         if (modified) {
             Log.d(TAG, "Note modified")

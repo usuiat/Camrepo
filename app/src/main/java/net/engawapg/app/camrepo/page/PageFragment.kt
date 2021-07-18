@@ -20,6 +20,7 @@ import net.engawapg.app.camrepo.BR
 import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
+import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.util.EventObserver
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.getViewModel
@@ -42,6 +43,7 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
     private val binding get() = _binding!!
     private lateinit var viewModel: PageViewModel
     private val cameraViewModel: CameraViewModel by sharedViewModel(owner = { from(this)} )
+    private val galleryViewModel: PhotoGalleryViewModel by sharedViewModel(owner = { from(this)})
     private var actionMode: ActionMode? = null
     private lateinit var pageItemAdapter: PageItemAdapter
     private var bottomFragmentTag: String? = null
@@ -119,6 +121,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             when (event) {
                 CameraViewModel.UI_EVENT_ON_CLICK_CLOSE -> switchBottomFragment(null)
             }
+        })
+        galleryViewModel.onSelect.observe(viewLifecycleOwner, EventObserver {photoGalleryItem ->
+            viewModel.addImageInfo(ImageInfo(photoGalleryItem.uri))
+            pageItemAdapter.notifyDataSetChanged()
+            binding.recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
         })
     }
 
