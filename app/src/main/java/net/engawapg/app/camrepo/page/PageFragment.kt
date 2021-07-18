@@ -127,6 +127,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
             pageItemAdapter.notifyDataSetChanged()
             binding.recyclerView.scrollToPosition(viewModel.getItemCount() - 2)
         })
+        galleryViewModel.uiEvent.observe(viewLifecycleOwner, EventObserver { event ->
+            when (event) {
+                PhotoGalleryViewModel.UI_EVENT_ON_CLICK_CLOSE -> switchBottomFragment(null)
+            }
+        })
     }
 
     override fun onPause() {

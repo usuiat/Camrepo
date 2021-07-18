@@ -16,6 +16,7 @@
     <string name="request_camera_permission_message">This app needs permission to access camera and storage to take photos.</string>
     <string name="desc_shutter" translatable="false">Shutter Button</string>
     <string name="desc_close_camera" translatable="false">Close Camera</string>
+    <string name="desc_close_gallery" translatable="false">Close Photo Gallery</string>
     <string name="desc_flash_button" translatable="false">Flash Button</string>
     <string name="hint_page_title">Page Title</string>
     <string name="hint_memo">Memo</string>

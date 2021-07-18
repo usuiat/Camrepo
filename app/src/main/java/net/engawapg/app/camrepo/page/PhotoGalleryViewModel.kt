@@ -19,6 +19,8 @@ class PhotoGalleryViewModel(app: Application) : AndroidViewModel(app) {
     val photoList = MutableLiveData<List<PhotoGalleryItem>>()
     /* 写真選択イベント */
     val onSelect = MutableLiveData<Event<PhotoGalleryItem>>()
+    /* UIイベント */
+    val uiEvent = MutableLiveData<Event<Int>>()
 
     /* 写真のリストを読み込む */
     fun loadPhotoList() {
@@ -63,5 +65,14 @@ class PhotoGalleryViewModel(app: Application) : AndroidViewModel(app) {
     fun onClick(item: PhotoGalleryItem) {
         /* URIをイベントとして渡す */
         onSelect.value = Event(item)
+    }
+
+    /* ギャラリーを閉じる */
+    fun onClickClose() {
+        uiEvent.value = Event(UI_EVENT_ON_CLICK_CLOSE)
+    }
+
+    companion object {
+        const val UI_EVENT_ON_CLICK_CLOSE = 1
     }
 }
