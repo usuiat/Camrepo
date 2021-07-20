@@ -28,6 +28,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
 class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
+    // test
 
     companion object {
         const val IMAGE_SPAN_COUNT = 4
