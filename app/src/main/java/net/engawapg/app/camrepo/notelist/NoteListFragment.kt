@@ -8,14 +8,14 @@ import androidx.fragment.app.findFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentNoteListBinding
 import net.engawapg.app.camrepo.databinding.ViewNoteCardBinding
 import net.engawapg.app.camrepo.note.NoteFragment
+import net.engawapg.app.camrepo.util.SimpleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
+class NoteListFragment: Fragment(), SimpleDialog.ResultListener{
 
     companion object {
         private const val DELETE_CONFIRM_DIALOG = "DeleteConfirmDialog"
@@ -120,7 +120,12 @@ class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isSelected()) {
-                    DeleteConfirmDialog().show(childFragmentManager, DELETE_CONFIRM_DIALOG)
+                    SimpleDialog.Builder()
+                        .setMessage(R.string.delete_confirm_message)
+                        .setPositiveText(R.string.delete)
+                        .setNegativeText(R.string.cancel)
+                        .create()
+                        .show(childFragmentManager, DELETE_CONFIRM_DIALOG)
                 }
             }
             return true
@@ -137,9 +142,11 @@ class NoteListFragment: Fragment(), DeleteConfirmDialog.EventListener{
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedItems()
-        actionMode?.finish()
+    override fun onSimpleDialogResult(tag: String?, result: SimpleDialog.Result) {
+        if (result == SimpleDialog.Result.POSITIVE) {
+            viewModel.deleteSelectedItems()
+            actionMode?.finish()
+        }
     }
 
     private fun onClickAddButton() {

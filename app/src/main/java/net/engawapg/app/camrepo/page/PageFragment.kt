@@ -17,17 +17,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import net.engawapg.app.camrepo.BR
-import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.model.ImageInfo
 import net.engawapg.app.camrepo.util.EventObserver
+import net.engawapg.app.camrepo.util.SimpleDialog
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
-class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
+class PageFragment: Fragment(), SimpleDialog.ResultListener {
 
     companion object {
         const val IMAGE_SPAN_COUNT = 4
@@ -273,7 +273,12 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPhotoSelected()) {
-                    DeleteConfirmDialog().show(childFragmentManager, DELETE_CONFIRM_DIALOG)
+                    SimpleDialog.Builder()
+                        .setMessage(R.string.delete_confirm_message)
+                        .setPositiveText(R.string.delete)
+                        .setNegativeText(R.string.cancel)
+                        .create()
+                        .show(childFragmentManager, DELETE_CONFIRM_DIALOG)
                 }
             }
             return true
@@ -290,9 +295,11 @@ class PageFragment: Fragment(), DeleteConfirmDialog.EventListener {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPhotos()
-        actionMode?.finish()
+    override fun onSimpleDialogResult(tag: String?, result: SimpleDialog.Result) {
+        if (result == SimpleDialog.Result.POSITIVE) {
+            viewModel.deleteSelectedPhotos()
+            actionMode?.finish()
+        }
     }
 
     inner class PageItemAdapter: RecyclerView.Adapter<PageItemViewHolder>() {

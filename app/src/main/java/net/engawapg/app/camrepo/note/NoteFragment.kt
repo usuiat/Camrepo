@@ -8,14 +8,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import net.engawapg.app.camrepo.DeleteConfirmDialog
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
+import net.engawapg.app.camrepo.util.SimpleDialog
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class NoteFragment: Fragment(),
-    DeleteConfirmDialog.EventListener, EditTitleDialog.EventListener {
+    SimpleDialog.ResultListener, EditTitleDialog.EventListener {
 
     companion object {
         const val RETURN_FROM_NOTE = "ReturnFromNote"
@@ -164,7 +164,12 @@ class NoteFragment: Fragment(),
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             if (item?.itemId == R.id.delete_selected_items) {
                 if (viewModel.isPageSelected()) {
-                    DeleteConfirmDialog().show(childFragmentManager, DELETE_CONFIRM_DIALOG)
+                    SimpleDialog.Builder()
+                        .setMessage(R.string.delete_confirm_message)
+                        .setPositiveText(R.string.delete)
+                        .setNegativeText(R.string.cancel)
+                        .create()
+                        .show(childFragmentManager, DELETE_CONFIRM_DIALOG)
                 }
             }
             return true
@@ -179,9 +184,11 @@ class NoteFragment: Fragment(),
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
     }
 
-    override fun onClickDeleteButton() {
-        viewModel.deleteSelectedPages()
-        actionMode?.finish()
+    override fun onSimpleDialogResult(tag: String?, result: SimpleDialog.Result) {
+        if (result == SimpleDialog.Result.POSITIVE) {
+            viewModel.deleteSelectedPages()
+            actionMode?.finish()
+        }
     }
 
     class NoteItemAdapter(private val viewModel: NoteViewModel,
