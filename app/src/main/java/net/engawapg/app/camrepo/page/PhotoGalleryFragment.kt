@@ -1,17 +1,13 @@
 package net.engawapg.app.camrepo.page
 
 import android.Manifest
-import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.PermissionChecker
-import androidx.core.os.bundleOf
 import androidx.fragment.app.*
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -19,10 +15,11 @@ import com.squareup.picasso.Picasso
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentPhotoGalleryBinding
 import net.engawapg.app.camrepo.databinding.ViewPhotoGalleryImageBinding
+import net.engawapg.app.camrepo.util.SimpleDialog
 import org.koin.android.viewmodel.ViewModelOwner
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : Fragment(), SimpleDialog.ResultListener {
 
     private var _binding: FragmentPhotoGalleryBinding? = null
     private val binding get() = _binding!!
@@ -43,7 +40,12 @@ class PhotoGalleryFragment : Fragment() {
             /* 拒否された */
             if (shouldShowRequestPermissionRationale(REQ_PERMISSION)) {
                 /* Permissionの必要性を説明するダイアログを表示する */
-                showRationaleDialog()
+                SimpleDialog.Builder()
+                    .setMessage(R.string.permission_req_for_gallery)
+                    .setPositiveText("OK")
+                    .setNegativeText("Cancel")
+                    .create()
+                    .show(childFragmentManager, "RationalDialog")
             } else {
                 /* 拒否（ファイナルアンサー）*/
                 viewModel.isPermissionDenied.value = true
@@ -51,49 +53,13 @@ class PhotoGalleryFragment : Fragment() {
         }
     }
 
-    /* Permissionの必要性を説明するダイアログを表示する */
-    private fun showRationaleDialog() {
-        RationaleDialog().show(childFragmentManager, viewLifecycleOwner) {
-            if (it == RationaleDialog.RESULT_OK) {
-                /* Permissionを要求 */
-                permissionRequest.launch(REQ_PERMISSION)
-            } else {
-                /* あきらめる */
-                viewModel.isPermissionDenied.value = true
-            }
-        }
-    }
-
-    class RationaleDialog: DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            return activity?.let {
-                AlertDialog.Builder(it)
-                    .setMessage(R.string.permission_req_for_gallery)
-                    .setPositiveButton("OK") { _, _ ->
-                        setFragmentResult(REQUEST_KEY, bundleOf(Pair(RESULT_KEY, RESULT_OK)))
-                    }
-                    .setNegativeButton("Cancel") { _, _ ->
-                        setFragmentResult(REQUEST_KEY, bundleOf(Pair(RESULT_KEY, RESULT_CANCEL)))
-                    }
-                    .create()
-            } ?: throw IllegalStateException("Activity cannot be null")
-        }
-
-        fun show(manager: FragmentManager, lifecycleOwner: LifecycleOwner, callback: (Int)->Unit) {
-            val listener = FragmentResultListener { _, result ->
-                val resultValue = result.getInt(RESULT_KEY)
-                callback(resultValue)
-            }
-            manager.setFragmentResultListener(REQUEST_KEY, lifecycleOwner, listener)
-            show(manager, TAG)
-        }
-
-        companion object {
-            private const val TAG = "TAG_RATIONALE_DIALOG"
-            private const val REQUEST_KEY = "RATIONALE_DIALOG_REQUEST_KEY"
-            private const val RESULT_KEY = "RATIONALE_DIALOG_RESULT_KEY"
-            const val RESULT_OK = 1
-            const val RESULT_CANCEL = -1
+    override fun onSimpleDialogResult(tag: String?, result: SimpleDialog.Result) {
+        if (result == SimpleDialog.Result.POSITIVE) {
+            /* Permissionを要求 */
+            permissionRequest.launch(REQ_PERMISSION)
+        } else {
+            /* あきらめる */
+            viewModel.isPermissionDenied.value = true
         }
     }
 
