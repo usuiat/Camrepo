@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:text="@string/permission_req_for_gallery"
             android:visibility="@{viewModel.isPermissionDenied ? View.VISIBLE : View.INVISIBLE}"
+            android:textColor="@color/lightIcon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
