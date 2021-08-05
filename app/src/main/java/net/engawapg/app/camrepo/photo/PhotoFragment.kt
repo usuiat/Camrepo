@@ -1,13 +1,11 @@
 package net.engawapg.app.camrepo.photo
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import com.squareup.picasso.Picasso
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentPhotoBinding
 import org.koin.android.viewmodel.ViewModelOwner.Companion.from
@@ -48,19 +46,14 @@ class PhotoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "viewModel = $viewModel")
-        Log.d(TAG, "photoIndex = $photoIndex")
 
         val imageInfo = viewModel.getPhotoAt(photoIndex)
-        viewLifecycleOwner.lifecycleScope.launch {
-            val resolver = context?.contentResolver
-            val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it) }
-            if (bmp != null) {
-                binding.photoView.setImageBitmap(bmp)
-            } else {
-                binding.photoView.setImageResource(R.drawable.imagenotfound)
-            }
-        }
+        Picasso.get()
+            .load(imageInfo?.uri)
+            .error(R.drawable.imagenotfound)
+            .fit()
+            .centerInside()
+            .into(binding.photoView)
     }
 
     companion object {
@@ -71,7 +64,5 @@ class PhotoFragment : Fragment() {
                     putInt(ARG_PHOTO_INDEX, photoIndex)
                 }
             }
-
-        private const val TAG = "PhotoFragment"
     }
 }

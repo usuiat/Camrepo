@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
 import net.engawapg.app.camrepo.notelist.EditTitleDialog
@@ -308,15 +309,12 @@ class NoteFragment: Fragment(),
         }
 
         override fun bind(position: Int, editMode: Boolean) {
-            val resolver = itemView.context.contentResolver
-            val bmp = viewModel.getPhotoBitmap(position, resolver)
-
-            if (bmp != null) {
-                binding.imageView.setImageBitmap(bmp)
-            } else {
-                binding.imageView.setImageResource(R.drawable.imagenotfound)
-                Log.d("NoteFragment", "Image is not exist @position = $position.")
-            }
+            Picasso.get()
+                .load(viewModel.getPhoto(position)?.uri)
+                .error(R.drawable.imagenotfound)
+                .fit()
+                .centerInside()
+                .into(binding.imageView)
         }
     }
 

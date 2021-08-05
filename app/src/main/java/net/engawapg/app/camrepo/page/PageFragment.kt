@@ -16,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import net.engawapg.app.camrepo.BR
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.*
@@ -324,13 +325,13 @@ class PageFragment: Fragment(), SimpleDialog.ResultListener {
             when (holder.binding) {
                 is ViewPagePhotoBinding -> {
                     holder.binding.item = viewModel.getPhotoItem(position)
-                    val resolver = holder.itemView.context.contentResolver
-                    val bmp = viewModel.getPhotoBitmap(position, resolver)
-                    if (bmp != null) {
-                        holder.binding.imageView.setImageBitmap(bmp)
-                    } else {
-                        holder.binding.imageView.setImageResource(R.drawable.imagenotfound)
-                    }
+                    val uri = viewModel.getPhotoItem(position)?.imageInfo?.uri
+                    Picasso.get()
+                        .load(uri)
+                        .error(R.drawable.imagenotfound)
+                        .fit()
+                        .centerInside()
+                        .into(holder.binding.imageView)
                 }
             }
             holder.binding.setVariable(BR.viewModel, viewModel)

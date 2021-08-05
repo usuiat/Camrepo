@@ -1,7 +1,5 @@
 package net.engawapg.app.camrepo.note
 
-import android.content.ContentResolver
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import net.engawapg.app.camrepo.model.ImageInfo
@@ -138,15 +136,10 @@ class NoteViewModel(private val noteModel: NoteModel, private val noteListModel:
 
     fun getPhotoIndex(itemIndex: Int) = itemList[itemIndex].subIndex
 
-    private fun getPhoto(itemIndex: Int): ImageInfo? {
+    fun getPhoto(itemIndex: Int): ImageInfo? {
         val pageIndex = itemList[itemIndex].pageIndex
         val photoIndex = itemList[itemIndex].subIndex
         return noteModel.getPhotoAt(pageIndex, photoIndex)
-    }
-
-    fun getPhotoBitmap(itemIndex: Int, resolver: ContentResolver): Bitmap? {
-        val imageInfo = getPhoto(itemIndex)
-        return imageInfo?.getBitmapThumbnailWithResolver(resolver)
     }
 
     fun isModifiedAfterLastDisplayedTime(): Boolean {

@@ -1,7 +1,5 @@
 package net.engawapg.app.camrepo.page
 
-import android.content.ContentResolver
-import android.graphics.Bitmap
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.MutableLiveData
@@ -109,15 +107,6 @@ class PageViewModel(private val noteModel: NoteModel, private val noteListModel:
         val item = itemList[index]
         return if (item is PagePhotoItem) {
             item
-        } else {
-            null
-        }
-    }
-
-    fun getPhotoBitmap(index: Int, resolver: ContentResolver): Bitmap? {
-        val item = itemList[index]
-        return if (item is PagePhotoItem) {
-            item.imageInfo.getBitmapThumbnailWithResolver(resolver)
         } else {
             null
         }
