@@ -6,11 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.launch
+import com.squareup.picasso.Picasso
 import net.engawapg.app.camrepo.R
 import net.engawapg.app.camrepo.databinding.FragmentSlideshowBinding
 import net.engawapg.app.camrepo.databinding.ViewSlidePhotoGridBinding
@@ -77,7 +75,7 @@ class SlideshowFragment : Fragment() {
             binding.photoGrid.visibility = View.VISIBLE
             val span = getPhotoGridSpan(isMemoEmpty)
             binding.photoGrid.layoutManager = GridLayoutManager(context, span)
-            binding.photoGrid.adapter = PhotoGridAdapter(viewModel, viewLifecycleOwner, span)
+            binding.photoGrid.adapter = PhotoGridAdapter(viewModel, span)
         }
     }
 
@@ -119,8 +117,7 @@ class SlideshowFragment : Fragment() {
         private const val TAG = "SlideshowFragment"
     }
 
-    class PhotoGridAdapter(private val viewModel: SlideViewModel,
-                           private val lifecycleOwner: LifecycleOwner, private val span: Int)
+    class PhotoGridAdapter(private val viewModel: SlideViewModel, private val span: Int)
         : RecyclerView.Adapter<PhotoGridViewHolder>() {
 
         override fun getItemCount() = viewModel.getPhotoCount()
@@ -134,16 +131,12 @@ class SlideshowFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: PhotoGridViewHolder, position: Int) {
-            val imageInfo = viewModel.getPhoto(position)
-            lifecycleOwner.lifecycleScope.launch {
-                val resolver = holder.itemView.context.contentResolver
-                val bmp = resolver?.let { imageInfo?.getBitmapWithResolver(it, holder.size) }
-                if (bmp != null) {
-                    holder.binding.imageView.setImageBitmap(bmp)
-                } else {
-                    holder.binding.imageView.setImageResource(R.drawable.imagenotfound)
-                }
-            }
+            Picasso.get()
+                .load(viewModel.getPhoto(position)?.uri)
+                .error(R.drawable.imagenotfound)
+                .fit()
+                .centerInside()
+                .into(holder.binding.imageView)
         }
     }
 
