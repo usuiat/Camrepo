@@ -112,6 +112,7 @@ class PageFragment: Fragment(), SimpleDialog.ResultListener {
             }
         })
         viewModel.photoClickEvent.observe(viewLifecycleOwner, EventObserver { index ->
+            deleteBottomFragment()
             closeKeyboard()
             val action = PageFragmentDirections.actionPageFragmentToPhotoPagerFragment(
                 pageIndex = viewModel.pageIndex, photoIndex = index
@@ -138,6 +139,13 @@ class PageFragment: Fragment(), SimpleDialog.ResultListener {
     override fun onPause() {
         viewModel.save()
         super.onPause()
+    }
+
+    private fun deleteBottomFragment() {
+        childFragmentManager.findFragmentByTag(bottomFragmentTag)?.let {
+            childFragmentManager.beginTransaction().remove(it).commitNow()
+        }
+        bottomFragmentTag = null
     }
 
     private fun switchBottomFragment(tag: String?) {
@@ -251,6 +259,7 @@ class PageFragment: Fragment(), SimpleDialog.ResultListener {
                 true
             }
             R.id.slideshow -> {
+                deleteBottomFragment()
                 val action = PageFragmentDirections.actionPageFragmentToSlideshowActivity(
                     viewModel.pageIndex
                 )
