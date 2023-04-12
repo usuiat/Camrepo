@@ -225,7 +225,7 @@ class PageFragment: Fragment(), SimpleDialog.ResultListener {
 
         /* アニメーションイベントリスナー。アニメーション終了したらフラグメントを削除 */
         val listener = object: AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 childFragmentManager.beginTransaction().remove(fragment).commit()
             }
         }
