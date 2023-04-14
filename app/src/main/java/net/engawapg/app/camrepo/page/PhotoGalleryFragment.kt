@@ -1,6 +1,7 @@
 package net.engawapg.app.camrepo.page
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -121,7 +122,11 @@ class PhotoGalleryFragment : Fragment(), SimpleDialog.ResultListener {
 
     companion object {
         private const val SPAN_COUNT = 4
-        private const val REQ_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
+        private val REQ_PERMISSION = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
     }
 
     inner class ImageAdapter
